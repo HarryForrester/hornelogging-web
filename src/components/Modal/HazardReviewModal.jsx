@@ -22,7 +22,9 @@ const HazardReviewModal = ({ show, onHide, onSubmit }) => {
       <Modal.Body>
         <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-3">
-            <Form.Label><b>Review comment</b></Form.Label>
+            <Form.Label>
+              <b>Review comment</b>
+            </Form.Label>
             <Form.Control
               type="text"
               id="comment"

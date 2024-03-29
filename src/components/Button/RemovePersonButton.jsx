@@ -14,30 +14,34 @@ import axios from 'axios';
  * @returns
  */
 const RemovePersonButton = ({ person }) => {
-  const {confirmationModalState, setConfirmationModalState} = useConfirmationModal();
-  const {alertMessageStart, setAlertMessageState} = useAlertMessage();
+  const { confirmationModalState, setConfirmationModalState } = useConfirmationModal();
+  const { alertMessageStart, setAlertMessageState } = useAlertMessage();
   const navigate = useNavigate();
-
-
 
   const deletePerson = () => {
     setConfirmationModalState((prevState) => ({
       ...prevState,
       show: true,
       confirmed: false,
-      label: "Remove Person",
-      message: (<>Are you sure you want to remove crew member: <strong>{person.name}</strong></>)
+      label: 'Remove Person',
+      message: (
+        <>
+          Are you sure you want to remove crew member: <strong>{person.name}</strong>
+        </>
+      )
     }));
-
   };
 
   useEffect(() => {
-    const checkSubmit = async() => {
-      const id = new Date().getTime(); 
+    const checkSubmit = async () => {
+      const id = new Date().getTime();
 
       if (confirmationModalState.confirmed && person._id !== null) {
         try {
-          const response = await axios.delete(process.env.REACT_APP_URL + `/deleteperson/${person._id}`, { withCredentials: true });
+          const response = await axios.delete(
+            process.env.REACT_APP_URL + `/deleteperson/${person._id}`,
+            { withCredentials: true }
+          );
           if (response.status === 200) {
             navigate('/');
             setAlertMessageState((prevState) => ({
@@ -46,7 +50,7 @@ const RemovePersonButton = ({ person }) => {
                 ...prevState.toasts,
                 {
                   id: id,
-                  heading: "Crew Member Removed",
+                  heading: 'Crew Member Removed',
                   show: true,
                   message: `${person.name} has been removed successfully`,
                   background: 'success',
@@ -55,8 +59,6 @@ const RemovePersonButton = ({ person }) => {
               ]
             }));
           }
-          
-
         } catch (error) {
           setAlertMessageState((prevState) => ({
             ...prevState,
@@ -64,7 +66,7 @@ const RemovePersonButton = ({ person }) => {
               ...prevState.toasts,
               {
                 id: id,
-                heading: "Remove Person",
+                heading: 'Remove Person',
                 show: true,
                 message: `Error! Removing ${person.name}  from ${person.crew}`,
                 background: 'danger',
@@ -72,27 +74,25 @@ const RemovePersonButton = ({ person }) => {
               }
             ]
           }));
-          console.error("An error has occured while removing crew member");
+          console.error('An error has occured while removing crew member');
         } finally {
           setConfirmationModalState((prevState) => ({
             ...prevState,
-            confirmed: false,
-          })); 
+            confirmed: false
+          }));
           setTimeout(() => {
             setAlertMessageState((prevState) => ({
               ...prevState,
-              toasts: prevState.toasts.filter((toast) => toast.id !== id),
-          }));
-          }, 10000)
-
+              toasts: prevState.toasts.filter((toast) => toast.id !== id)
+            }));
+          }, 10000);
         }
       }
-    }
+    };
 
     checkSubmit();
-  },[confirmationModalState.confirmed])
+  }, [confirmationModalState.confirmed]);
 
-  
   return (
     <>
       <Button

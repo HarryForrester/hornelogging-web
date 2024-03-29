@@ -12,7 +12,7 @@ const SelectRoleType = ({ selectedRole, onChange }) => {
     'Health And Safety',
     'Office',
     'Crew Leader',
-    'Foreman',
+    'Foreman'
   ];
 
   return (
@@ -23,11 +23,13 @@ const SelectRoleType = ({ selectedRole, onChange }) => {
       <Form.Select
         id="roleInput"
         name="role"
-        value={selectedRole || "Select Role"}
+        value={selectedRole || 'Select Role'}
         onChange={onChange}
         required
       >
-        <option value="Select Role" disabled>Select Role</option>
+        <option value="Select Role" disabled>
+          Select Role
+        </option>
         {roleOptions.map((option) => (
           <option key={option} value={option}>
             {option}

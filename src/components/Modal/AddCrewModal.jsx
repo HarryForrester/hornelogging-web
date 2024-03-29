@@ -8,7 +8,7 @@ import { useAlertMessage } from '../AlertMessage';
 const AddCrewModal = () => {
   const { skidModalState, setSkidModalState } = useSkidModal();
   const { mapState, setMapState } = useMap();
-  const { alertMessageState, setAlertMessageState} = useAlertMessage();
+  const { alertMessageState, setAlertMessageState } = useAlertMessage();
   const [showSpinner, setShowSpinner] = useState(false);
   const [crew, setCrew] = useState(null);
 
@@ -21,48 +21,51 @@ const AddCrewModal = () => {
       ...prevState,
       isAddCrewModalVisible: false
     }));
-  }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setShowSpinner(true);
-    const id = new Date().getTime(); 
+    const id = new Date().getTime();
     try {
       const doesCrewExist = mapState.crews.some((c) => c.name === crew);
       //If crew already exists then show alert to tell user it already exists
-      if(doesCrewExist) { 
+      if (doesCrewExist) {
         setAlertMessageState((prevState) => ({
           ...prevState,
           toasts: [
             ...prevState.toasts,
             {
               id: id,
-              heading: "Add Crew",
+              heading: 'Add Crew',
               show: true,
-              message: "Crew already exists. Please try another crew name",
+              message: 'Crew already exists. Please try another crew name',
               background: 'danger',
               color: 'white'
             }
           ]
         }));
-
       } // if crew does not exist then add the send crew to server.
       else {
-        const response = await axios.post(process.env.REACT_APP_URL + '/createcrew', {
-          name: crew,
-        }, { withCredentials: true });
-      
+        const response = await axios.post(
+          process.env.REACT_APP_URL + '/createcrew',
+          {
+            name: crew
+          },
+          { withCredentials: true }
+        );
+
         if (response.status === 200) {
           handleClose();
           setMapState((prevState) => ({
             ...prevState,
             crews: [
-                ...prevState.crews,
-                {
-                    ...response.data.crew,
-                    people: [], 
-                },
-            ],
+              ...prevState.crews,
+              {
+                ...response.data.crew,
+                people: []
+              }
+            ]
           }));
 
           setAlertMessageState((prevState) => ({
@@ -71,7 +74,7 @@ const AddCrewModal = () => {
               ...prevState.toasts,
               {
                 id: id,
-                heading: "Add Person",
+                heading: 'Add Person',
                 show: true,
                 message: `Success! ${crew}  has been added`,
                 background: 'success',
@@ -80,9 +83,8 @@ const AddCrewModal = () => {
             ]
           }));
           setCrew(null);
-        }  
-      } 
-
+        }
+      }
     } catch (error) {
       setAlertMessageState((prevState) => ({
         ...prevState,
@@ -90,7 +92,7 @@ const AddCrewModal = () => {
           ...prevState.toasts,
           {
             id: id,
-            heading: "Add Person",
+            heading: 'Add Person',
             show: true,
             message: `Error! An Error has occurred addding crew`,
             background: 'danger',
@@ -98,51 +100,54 @@ const AddCrewModal = () => {
           }
         ]
       }));
-        console.error('Error submitting form:', error);
-    } finally { 
+      console.error('Error submitting form:', error);
+    } finally {
       setShowSpinner(false);
-       setTimeout(() => {
+      setTimeout(() => {
         setAlertMessageState((prevState) => ({
           ...prevState,
-          toasts: prevState.toasts.filter((toast) => toast.id !== id),
+          toasts: prevState.toasts.filter((toast) => toast.id !== id)
         }));
-      }, 10000)
+      }, 10000);
     }
   };
-  
+
   return (
     <Modal show={skidModalState.isAddCrewModalVisible} onHide={handleClose} centered>
-          <Modal.Header closeButton>
-            <Modal.Title>Add Crew</Modal.Title>
-          </Modal.Header>
+      <Modal.Header closeButton>
+        <Modal.Title>Add Crew</Modal.Title>
+      </Modal.Header>
 
-          <Modal.Body>
-            <Form autoComplete="off">
-              <Form.Group className="mb-3">
-                <Form.Label htmlFor="name" className="form-label"><b>Crew Name</b></Form.Label>
-                <Form.Control type="text" className="form-control" id="name" name="name" required value={crew} onChange={handleInputChange}/>
-              </Form.Group>
-            </Form>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="dark" onClick={handleSubmit}>
-              {showSpinner ? (
-                <>
-                  <Spinner
-                  as="span"
-                  animation="border"
-                  size="sm"
-                  role="status"
-                  aria-hidden="true"
-                />
-                <span className="visually-hidden">Loading...</span>
-                </>
-              ): (
-                "Add Crew"
-              )}
-        
-            </Button>
-          </Modal.Footer>
+      <Modal.Body>
+        <Form autoComplete="off">
+          <Form.Group className="mb-3">
+            <Form.Label htmlFor="name" className="form-label">
+              <b>Crew Name</b>
+            </Form.Label>
+            <Form.Control
+              type="text"
+              className="form-control"
+              id="name"
+              name="name"
+              required
+              value={crew}
+              onChange={handleInputChange}
+            />
+          </Form.Group>
+        </Form>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="dark" onClick={handleSubmit}>
+          {showSpinner ? (
+            <>
+              <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
+              <span className="visually-hidden">Loading...</span>
+            </>
+          ) : (
+            'Add Crew'
+          )}
+        </Button>
+      </Modal.Footer>
     </Modal>
   );
 };

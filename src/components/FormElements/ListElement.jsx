@@ -1,8 +1,8 @@
 import React from 'react';
 import { Form, Row, Col } from 'react-bootstrap';
 
-const ListElement = ({ labelValue, selectedPerson }) => {
-    const optionValues = selectedPerson ? selectedPerson.split(',') : [];
+const ListElement = (labelValue, selectedPerson) => {
+  const optionValues = selectedPerson ? selectedPerson.split(',') : [];
 
   return (
     <Form.Group as={Row} className="mb-2" style={{ paddingLeft: '20px', paddingRight: '20px' }}>
@@ -12,7 +12,10 @@ const ListElement = ({ labelValue, selectedPerson }) => {
       <Col sm="10">
         <Form.Select className="form-select">
           {optionValues.map((optionValue) => (
-            <option key={optionValue.toLowerCase().replace(/\s+/g, '-')} value={optionValue.toLowerCase().replace(/\s+/g, '-')}>
+            <option
+              key={optionValue.toLowerCase().replace(/\s+/g, '-')}
+              value={optionValue.toLowerCase().replace(/\s+/g, '-')}
+            >
               {optionValue}
             </option>
           ))}

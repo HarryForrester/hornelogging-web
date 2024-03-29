@@ -4,7 +4,6 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { useSkidModal } from './Skid/SkidModalContext';
 
-
 const AddSkidHazardModal = ({ hazards, sumbitSkidHazard }) => {
   const { skidModalState, setSkidModalState } = useSkidModal();
 
@@ -14,9 +13,13 @@ const AddSkidHazardModal = ({ hazards, sumbitSkidHazard }) => {
    * Closes the Add Document Modal and opens the Skid Modal by updating the state.
    * @function handleClose
    * @returns {void}
-  */
+   */
   const handleClose = () => {
-    setSkidModalState((prevState) => ({ ...prevState, isAddSiteHazardModalVisible: false, isSkidModalVisible: true }));
+    setSkidModalState((prevState) => ({
+      ...prevState,
+      isAddSiteHazardModalVisible: false,
+      isSkidModalVisible: true
+    }));
   };
 
   return (
@@ -46,7 +49,12 @@ const AddSkidHazardModal = ({ hazards, sumbitSkidHazard }) => {
                 <div style={{ float: 'left' }}>
                   <Form.Check
                     type="checkbox"
-                    label={<><b>{hazard.id}: </b><em>{hazard.title}</em></>}
+                    label={
+                      <>
+                        <b>{hazard.id}: </b>
+                        <em>{hazard.title}</em>
+                      </>
+                    }
                     id={`hazard-checkbox-${hazard.id}`}
                   />
                   <small>{hazard.sev}</small>

@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Form } from 'react-bootstrap';
 
 const HazardCard = ({ hazard, selectAll, handleHazardChange }) => {
@@ -7,28 +7,32 @@ const HazardCard = ({ hazard, selectAll, handleHazardChange }) => {
 
   useEffect(() => {
     setToggle(selectAll);
-    console.log("selectalll buttjksdfblsf: ", selectAll);
-  },[selectAll])
-
-
+    console.log('selectalll buttjksdfblsf: ', selectAll);
+  }, [selectAll]);
 
   return (
     <Card style={{ marginBottom: '10px' }}>
-      <div className="search-text" style={{ display: 'none' }}>{/* replace with your search text value */}</div>
-      <div className="id-text" style={{ display: 'none' }}>{_id}</div>
+      <div className="search-text" style={{ display: 'none' }}>
+        {/* replace with your search text value */}
+      </div>
+      <div className="id-text" style={{ display: 'none' }}>
+        {_id}
+      </div>
       <Card.Header style={{ backgroundColor: color }}>
         <div className="d-flex align-items-center">
           <Form.Check
             id={_id}
             type="checkbox"
             className="hazard-check"
-            onChange={() =>handleHazardChange(_id)}
+            onChange={() => handleHazardChange(_id)}
             checked={selectAll}
           />
           <label className="form-check-label" htmlFor={_id}>
             &nbsp;{id}:&nbsp;<em>{title}</em>
           </label>
-          <div className="ms-auto"><b>{cat}</b></div>
+          <div className="ms-auto">
+            <b>{cat}</b>
+          </div>
         </div>
       </Card.Header>
       <Card.Body>
@@ -46,7 +50,11 @@ const HazardCard = ({ hazard, selectAll, handleHazardChange }) => {
             </React.Fragment>
           ))}
         </dl>
-        <div className="text-end mt-2"><em>Reviewed: {reviewDate} ({reviewReason})</em></div>
+        <div className="text-end mt-2">
+          <em>
+            Reviewed: {reviewDate} ({reviewReason})
+          </em>
+        </div>
       </Card.Body>
     </Card>
   );

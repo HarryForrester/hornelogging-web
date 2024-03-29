@@ -5,7 +5,6 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import { Form, Button, Card, Alert } from 'react-bootstrap';
 
-
 const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -15,14 +14,18 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    console.log("handmleSumiu")
+    console.log('handmleSumiu');
     e.preventDefault();
     try {
       // Make a POST request to the server
-      const response = await axios.post('http://localhost:3001/login', {
-        username,
-        password,
-      }, {withCredentials: true}); 
+      const response = await axios.post(
+        'http://localhost:3001/login',
+        {
+          username,
+          password
+        },
+        { withCredentials: true }
+      );
 
       // Handle the response from the server
       //console.log('Server response:', response.data);
@@ -47,7 +50,10 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="d-flex align-items-center justify-content-center" style={{minHeight: "100vh"}}>
+    <div
+      className="d-flex align-items-center justify-content-center"
+      style={{ minHeight: '100vh' }}
+    >
       <div className="col-md-4">
         <Card>
           <Card.Header className="text-center">
@@ -56,7 +62,7 @@ const LoginPage = () => {
             </h4>
           </Card.Header>
           <Card.Body>
-            <Form autoComplete='on'>
+            <Form autoComplete="on">
               <Form.Group controlId="username">
                 <Form.Label>Email Address</Form.Label>
                 <Form.Control
@@ -64,7 +70,7 @@ const LoginPage = () => {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
-                  autoComplete='on'
+                  autoComplete="on"
                 />
               </Form.Group>
               <Form.Group controlId="password">
@@ -76,13 +82,10 @@ const LoginPage = () => {
                   required
                 />
               </Form.Group>
-              
-              
-              
             </Form>
           </Card.Body>
           <Card.Footer className="d-flex align-items-center justify-content-center">
-            <Button onClick={handleSubmit} variant="primary" style={{width: '20vh'}}>
+            <Button onClick={handleSubmit} variant="primary" style={{ width: '20vh' }}>
               Login
             </Button>
           </Card.Footer>

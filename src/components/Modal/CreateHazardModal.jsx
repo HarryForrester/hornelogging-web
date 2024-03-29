@@ -18,21 +18,19 @@ const CreateHazardModal = ({ handleSubmit }) => {
       reviewDate: null,
       reviewReason: null,
       category: 'Health',
-      harmFields: [
-        { category: '', description: [""] }
-      ],
-    }))
-  }
+      harmFields: [{ category: '', description: [''] }]
+    }));
+  };
 
   const addHarmRow = () => {
     let obj = {
       category: '',
-      description: [""]
-    }
+      description: ['']
+    };
     setHazardState((prevState) => ({
       ...prevState,
       harmFields: [...hazardState.harmFields, obj]
-    }))
+    }));
   };
 
   const addDescription = (harmIndex) => {
@@ -40,8 +38,8 @@ const CreateHazardModal = ({ handleSubmit }) => {
       ...prevState,
       harmFields: prevState.harmFields.map((harmField, index) => ({
         ...harmField,
-        description: index === harmIndex ? [...harmField.description, ''] : harmField.description,
-      })),
+        description: index === harmIndex ? [...harmField.description, ''] : harmField.description
+      }))
     }));
   };
 
@@ -51,8 +49,7 @@ const CreateHazardModal = ({ handleSubmit }) => {
     setHazardState((prevState) => ({
       ...prevState,
       harmFields: data
-    }))
-
+    }));
   };
 
   const handleRemoveDesc = (harmIndex, descriptionIndex) => {
@@ -67,7 +64,7 @@ const CreateHazardModal = ({ handleSubmit }) => {
     setHazardState((prevState) => ({
       ...prevState,
       harmFields: data
-    }))
+    }));
   };
 
   const handleDescriptionChange = (event, harmIndex, descriptionIndex) => {
@@ -80,7 +77,9 @@ const CreateHazardModal = ({ handleSubmit }) => {
   return (
     <Modal show={hazardState.isCreateHazardModalVisible} onHide={handleClose} centered>
       <Modal.Header closeButton>
-        <Modal.Title id="createModalLabel">{hazardState.isEditing ? 'Edit' : 'Add'} Hazard</Modal.Title>
+        <Modal.Title id="createModalLabel">
+          {hazardState.isEditing ? 'Edit' : 'Add'} Hazard
+        </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form id="createHazardForm" onSubmit={handleSubmit}>
@@ -90,24 +89,26 @@ const CreateHazardModal = ({ handleSubmit }) => {
               type="text"
               placeholder="E.g. Early over-exertion"
               value={hazardState.title}
-              onChange={(e) => setHazardState((prevState) => ({
-                ...prevState,
-                title: e.target.value
+              onChange={(e) =>
+                setHazardState((prevState) => ({
+                  ...prevState,
+                  title: e.target.value
+                }))
               }
-              ))}
             />
           </Form.Group>
-          <Row >
-
+          <Row>
             <Col>
               <Form.Group as={Col} controlId="newHazardSev">
                 <Form.Label>Severity</Form.Label>
                 <Form.Select
                   value={hazardState.sev}
-                  onChange={(e) => setHazardState((prevState) => ({
-                    ...prevState,
-                    sev: e.target.value
-                  }))}
+                  onChange={(e) =>
+                    setHazardState((prevState) => ({
+                      ...prevState,
+                      sev: e.target.value
+                    }))
+                  }
                 >
                   <option value="LOW">LOW</option>
                   <option value="MEDIUM">MEDIUM</option>
@@ -121,10 +122,12 @@ const CreateHazardModal = ({ handleSubmit }) => {
                 <Form.Label>Category</Form.Label>
                 <Form.Select
                   value={hazardState.category}
-                  onChange={(e) => setHazardState((prevState) => ({
-                    ...prevState,
-                    category: e.target.value
-                  }))}
+                  onChange={(e) =>
+                    setHazardState((prevState) => ({
+                      ...prevState,
+                      category: e.target.value
+                    }))
+                  }
                 >
                   <option value="Health">Health</option>
                   <option value="Generic">Generic</option>
@@ -148,7 +151,6 @@ const CreateHazardModal = ({ handleSubmit }) => {
                 </Form.Select>
               </Form.Group>
             </Col>
-
           </Row>
 
           <Form.Group controlId="newHazardReviewDate" className="mb-3">
@@ -157,10 +159,12 @@ const CreateHazardModal = ({ handleSubmit }) => {
               type="date"
               placeholder="E.g. 3/5/2024"
               value={hazardState.reviewDate}
-              onChange={(e) => setHazardState((prevState) => ({
-                ...prevState,
-                reviewDate: e.target.value,
-              }))}
+              onChange={(e) =>
+                setHazardState((prevState) => ({
+                  ...prevState,
+                  reviewDate: e.target.value
+                }))
+              }
             />
           </Form.Group>
 
@@ -170,25 +174,47 @@ const CreateHazardModal = ({ handleSubmit }) => {
               type="text"
               placeholder="E.g. General Review"
               value={hazardState.reviewReason}
-              onChange={(e) => setHazardState((prevState) => ({
-                ...prevState,
-                reviewReason: e.target.value,
-              }))}
+              onChange={(e) =>
+                setHazardState((prevState) => ({
+                  ...prevState,
+                  reviewReason: e.target.value
+                }))
+              }
             />
           </Form.Group>
 
           {hazardState.harmFields.map((harm, harmIndex) => {
             return (
-              <div key={harmIndex} style={{ border: '1px solid #000', borderRadius: '5px 5px 5px 5px', padding: '15px', marginBottom: '10px', position: 'relative' }}>
-                <Button variant='danger' onClick={() => handleRemoveHarm(harmIndex)} style={{ position: 'absolute', top: '0', right: '0', background: 'none', border: 'none' }}><FontAwesomeIcon color="red" size="lg" icon={faCircleMinus} /></Button>
+              <div
+                key={harmIndex}
+                style={{
+                  border: '1px solid #000',
+                  borderRadius: '5px 5px 5px 5px',
+                  padding: '15px',
+                  marginBottom: '10px',
+                  position: 'relative'
+                }}
+              >
+                <Button
+                  variant="danger"
+                  onClick={() => handleRemoveHarm(harmIndex)}
+                  style={{
+                    position: 'absolute',
+                    top: '0',
+                    right: '0',
+                    background: 'none',
+                    border: 'none'
+                  }}
+                >
+                  <FontAwesomeIcon color="red" size="lg" icon={faCircleMinus} />
+                </Button>
                 <Row className="harm-row">
-
                   <Col md={5}>
                     <Form.Control
                       id={harmIndex}
-                      name='category'
-                      className='form-control mb-2'
-                      placeholder='Category (E.g. Fire)'
+                      name="category"
+                      className="form-control mb-2"
+                      placeholder="Category (E.g. Fire)"
                       value={harm.category}
                       onChange={(event) => handleHarmChange(event, harmIndex)}
                     />
@@ -197,7 +223,14 @@ const CreateHazardModal = ({ handleSubmit }) => {
                   <Col md={12}>
                     {harm.description.map((description, descriptionIndex) => {
                       return (
-                        <div style={{ display: 'flex', alignItems: 'stretch', gap: '10px', marginBottom: '10px' }}>
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'stretch',
+                            gap: '10px',
+                            marginBottom: '10px'
+                          }}
+                        >
                           <Form.Control
                             key={descriptionIndex}
                             id={descriptionIndex}
@@ -207,14 +240,26 @@ const CreateHazardModal = ({ handleSubmit }) => {
                             className="form-control mb-2"
                             placeholder="Description (E.g. Do not light fires)"
                             value={description}
-                            onChange={(event) => handleDescriptionChange(event, harmIndex, descriptionIndex)}
+                            onChange={(event) =>
+                              handleDescriptionChange(event, harmIndex, descriptionIndex)
+                            }
                             style={{ flex: '1', borderRadius: '5px 5px 5px 5px' }}
                           />
 
                           {descriptionIndex !== 0 && (
                             <Button
                               onClick={() => handleRemoveDesc(harmIndex, descriptionIndex)}
-                              style={{ flex: 'none', alignSelf: 'stretch', borderRadius: '5px 5px 5px 5px', backgroundColor: '#dc3545', color: '#fff', border: 'none', height: '100%', background: 'none', border: 'none' }}
+                              style={{
+                                flex: 'none',
+                                alignSelf: 'stretch',
+                                borderRadius: '5px 5px 5px 5px',
+                                backgroundColor: '#dc3545',
+                                color: '#fff',
+                                border: 'none',
+                                height: '100%',
+                                background: 'none',
+                                border: 'none'
+                              }}
                             >
                               <FontAwesomeIcon color="red" size="lg" icon={faCircleMinus} />
                             </Button>
@@ -224,17 +269,21 @@ const CreateHazardModal = ({ handleSubmit }) => {
                     })}
                   </Col>
                 </Row>
-                <Button onClick={() => addDescription(harmIndex)} style={{ background: 'none', border: 'none' }}><FontAwesomeIcon color="blue" size="lg" icon={faCirclePlus} /></Button>
+                <Button
+                  onClick={() => addDescription(harmIndex)}
+                  style={{ background: 'none', border: 'none' }}
+                >
+                  <FontAwesomeIcon color="blue" size="lg" icon={faCirclePlus} />
+                </Button>
               </div>
             );
           })}
 
           <Form.Group controlId="hazardHarms" className="mb-3">
-            <Button type="button" variant="primary" className="mt-2" onClick={addHarmRow} >
+            <Button type="button" variant="primary" className="mt-2" onClick={addHarmRow}>
               Add Harm
             </Button>
           </Form.Group>
-          
         </Form>
       </Modal.Body>
       <Modal.Footer>

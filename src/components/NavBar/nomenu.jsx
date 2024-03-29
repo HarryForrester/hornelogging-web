@@ -20,7 +20,7 @@ const NoMenu = () => {
         <Navbar.Toggle aria-controls="navbarNav" />
         <Navbar.Collapse id="navbarNav">
           <Nav className="ml-auto">
-          <OverlayTrigger
+            <OverlayTrigger
               trigger="click"
               placement="bottom"
               overlay={

@@ -18,16 +18,14 @@ import SuccessAlert from './components/Alert/SuccessAlert.jsx';
 import { useAlertMessage } from './components/AlertMessage.js';
 import DeleteConfirmationModal from './components/Modal/DeleteConfirmationModal.jsx';
 
-
 function App() {
   pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
-  const {alertMessageState, setAlertMessageState} = useAlertMessage();
-
+  const { alertMessageState, setAlertMessageState } = useAlertMessage();
 
   return (
     <Router>
       <SuccessAlert />
-      <DeleteConfirmationModal/>
+      <DeleteConfirmationModal />
 
       <Routes>
         <Route

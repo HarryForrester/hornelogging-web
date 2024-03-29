@@ -1,22 +1,30 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import { Form, Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faList, faPlusCircle, faMinusCircle, faCircleMinus } from '@fortawesome/free-solid-svg-icons';
+import {
+  faList,
+  faPlusCircle,
+  faMinusCircle,
+  faCircleMinus
+} from '@fortawesome/free-solid-svg-icons';
 
-function escapeHTML(html) {
-  // Implementation for escaping HTML characters
-  // You can use a library like DOMPurify for better security
-  // For simplicity, let's just replace <, >, &, " with their HTML entities
-  return html.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;').replace(/"/g, '&quot;');
-}
-
-function AddSelectList({ itemLabels = [], label = "", onRemove }) {
-  const [selectListLabel, setSelectListLabel] = useState(label);
-  const [selectListItems, setSelectListItems] = useState(itemLabels);
-
-  const handleLabelChange = (event) => {
+function AddSelectList({
+  itemKey,
+  items = [],
+  label = '',
+  onRemove,
+  onRemoveItem,
+  onChange,
+  addItem,
+  onItemLabelChange
+}) {
+  //const [selectListLabel, setSelectListLabel] = useState(label);
+  const [selectListItems, setSelectListItems] = useState(items);
+  console.log('meme key: ', itemKey);
+  /* const handleLabelChange = (event) => {
     setSelectListLabel(event.target.value);
-  };
+  }; */
 
   const handleItemChange = (index, event) => {
     const updatedItems = [...selectListItems];
@@ -25,7 +33,7 @@ function AddSelectList({ itemLabels = [], label = "", onRemove }) {
   };
 
   const handleAddItem = () => {
-    setSelectListItems((prevItems) => [...prevItems, ""]);
+    setSelectListItems((prevItems) => [...prevItems, '']);
   };
 
   const handleRemoveItem = (index) => {
@@ -33,50 +41,85 @@ function AddSelectList({ itemLabels = [], label = "", onRemove }) {
   };
 
   return (
-    <div className="selectlistElementContainer d-flex flex-column mb-3 element-container" style={{ padding: '5px' }}>
-        <div className="d-flex flex-row selectlist-element" style={{ paddingLeft: '20px' }}>
-            <label className="elementLabel">
-            <FontAwesomeIcon icon={faList} />
-            <span className='span-text-element'> Select List</span>
-            </label>
-            <Form.Control
+    <div className="selectlistElementContainer d-flex flex-column px-3 mb-3 element-container">
+      <div className="d-flex flex-row align-items-center">
+        <label className="elementLabel">
+          <FontAwesomeIcon icon={faList} />
+          <span className="span-text-element"> Select List</span>
+        </label>
+        <div className="flex-grow-1">
+          <Form.Control
             type="text"
             className="selectlist-label form-control element-name"
             placeholder="Select List Element"
-            value={selectListLabel}
-            onChange={handleLabelChange}
-            />
-            <Button className="add-selectlist-item btn btn-secondary ms-2" onClick={handleAddItem} style={{background: 'none', color:'black', border: 'none'}}>
-            <FontAwesomeIcon icon={faPlusCircle} size="lg" />
-            </Button>
-            <Button className="btn btn-danger remove-selectlist-btn ms-2" onClick={onRemove} style={{background: 'none', color:'red', border: 'none'}}>
-            <FontAwesomeIcon icon={faMinusCircle} size="lg" />
-            </Button>
+            value={label}
+            onChange={onChange}
+            isInvalid={!label.trim()}
+            style={{ marginTop: '20px' }}
+            required
+          />
+          <Form.Control.Feedback type="invalid">Selectlist title is required</Form.Control.Feedback>
         </div>
+        <Button
+          className="add-selectlist-item btn btn-secondary ms-2"
+          onClick={addItem}
+          style={{ background: 'none', color: 'black', border: 'none' }}
+        >
+          <FontAwesomeIcon icon={faPlusCircle} size="lg" />
+        </Button>
+        <Button
+          className="btn btn-danger remove-selectlist-btn ms-2"
+          onClick={onRemove}
+          style={{ background: 'none', color: 'red', border: 'none' }}
+        >
+          <FontAwesomeIcon icon={faMinusCircle} size="lg" />
+        </Button>
+      </div>
 
-        <div className="d-flex flex-column">
-            {selectListItems.map((item, index) => (
-                <div key={index} className="select-list-item d-flex flex-row align-items-center">
-                    <Form.Control
-                        type="text"
-                        className="form-control select-item-input selectlist-item"
-                        placeholder="New Item"
-                        style={{ width: '150px', marginTop: '10px', marginLeft: '120px' }}
-                        value={item}
-                        onChange={(e) => handleItemChange(index, e)}
-                    />
-                    <Button
-                        className="btn btn-danger ms-2 remove-selectlist-item"
-                        onClick={() => handleRemoveItem(index)}
-                        style={{ background: 'none', color: 'red', border: 'none' }}
-                    >
-                        <FontAwesomeIcon icon={faCircleMinus} />
-                    </Button>
-                </div>
-            ))}
-        </div>
+      <div className="d-flex flex-column">
+        {items.map((item, index) => (
+          <div key={index} className="select-list-item d-flex flex-row align-items-center">
+            <div
+              className="flex-grow-2"
+              style={{ height: '25px', marginBottom: '35px', marginLeft: '100px' }}
+            >
+              <Form.Control
+                type="text"
+                className="form-control select-item-input selectlist-item"
+                placeholder="New Item"
+                value={item}
+                onChange={(event) => onItemLabelChange(itemKey, index, event)}
+                isInvalid={!item.trim()}
+                required
+                style={{ width: '200px' }}
+              />
+              <Form.Control.Feedback type="invalid">
+                Selectlist item is required
+              </Form.Control.Feedback>
+            </div>
+            <Button
+              className="btn btn-danger ms-2 remove-selectlist-item"
+              onClick={() => onRemoveItem(itemKey, index)}
+              style={{ background: 'none', color: 'red', border: 'none', marginBottom: '20px' }}
+            >
+              <FontAwesomeIcon icon={faCircleMinus} size="lg" />
+            </Button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
+
+AddSelectList.propTypes = {
+  itemKey: PropTypes.string.isRequired,
+  items: PropTypes.array.isRequired,
+  label: PropTypes.string.isRequired,
+  onRemove: PropTypes.func.isRequired,
+  onRemoveItem: PropTypes.func.isRequired,
+  onChange: PropTypes.func.isRequired,
+  addItem: PropTypes.func.isRequired,
+  onItemLabelChange: PropTypes.func.isRequired
+};
 
 export default AddSelectList;

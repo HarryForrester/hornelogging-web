@@ -9,7 +9,7 @@ import { useMap } from '../components/Map/MapContext.js';
 import { useSkidModal } from '../components/Modal/Skid/SkidModalContext.js';
 import { useConfirmationModal } from '../components/ConfirmationModalContext.js';
 import { Button } from 'react-bootstrap';
-import AddSkidButton from '../components/Button/AddSkidButton.jsx'; 
+import AddSkidButton from '../components/Button/AddSkidButton.jsx';
 import { useAlertMessage } from '../components/AlertMessage.js';
 
 const Maps = () => {
@@ -29,13 +29,13 @@ const Maps = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/maps', { 
-          withCredentials: true, 
+        const response = await axios.get('http://localhost:3001/maps', {
+          withCredentials: true,
           onDownloadProgress: (progressEvent) => {
             const percentage = Math.round((progressEvent.loaded * 100) / progressEvent.total);
             setPercentage(percentage);
-          }, 
-        }); 
+          }
+        });
 
         if (response.data.isLoggedIn) {
           const data = response.data;
@@ -48,12 +48,10 @@ const Maps = () => {
             username: data.username,
             hazards: data.hazards,
             generalHazardsData: data.hazardsForGH
-          }))
-
+          }));
         } else {
           navigate('/login');
         }
-
       } catch (error) {
         if (axios.isAxiosError(error) && error.response && error.response.status === 401) {
           // Redirect to the login page if the error is due to unauthorized access
@@ -67,33 +65,29 @@ const Maps = () => {
     fetchData();
   }, [navigate]);
 
-
-
-  const openEditGeneralHazards = () => {    
+  const openEditGeneralHazards = () => {
     setSkidModalState((prevState) => ({
       ...prevState,
       isGeneralHazardsModalVisible: true, // or false based on your logic
       isSelectHazardsGeneral: true // will display Edit General Hazards as modal label for selecting general hazards
     }));
-  }
-
+  };
 
   const hideErrorConfirmationModal = () => {
     setIsErrorConfirmationModalVisible(false);
-
-  }
+  };
 
   const handleMapClick = (map) => {
     const mapId = map._id;
-    const mapName =  map.name;
-    const points =  map.points;
-    console.log("Map Clicked: ", mapState);
+    const mapName = map.name;
+    const points = map.points;
+    console.log('Map Clicked: ', mapState);
 
     const parsePoints = JSON.parse(points);
-    console.log("parsePOint: ", parsePoints);
+    console.log('parsePOint: ', parsePoints);
     var pdfButtons = document.querySelectorAll('.pdf-button');
 
-    pdfButtons.forEach(button => {
+    pdfButtons.forEach((button) => {
       button.classList.remove('active');
       button.disabled = false;
     });
@@ -107,62 +101,52 @@ const Maps = () => {
       currentMapId: mapId,
       currentMapName: mapName,
       currentMapMarkers: parsePoints
-    }))
+    }));
 
     loadFromDB(mapName);
-
   };
 
   const openConfirmRemoveMap = async () => {
-    console.log("remove map");
-    
+    console.log('remove map');
 
     try {
       //TODO add confirm modal
-      
-       
 
-       setConfirmationModalState((prevState) => ({
+      setConfirmationModalState((prevState) => ({
         ...prevState,
         show: true,
-        label: "Remove Map",
+        label: 'Remove Map',
         message: `Are you sure you want to delete ${mapState.currentMapName}?`,
         confirmed: false
-       }))
-       console.log("con: ", confirmationModalState)
+      }));
+      console.log('con: ', confirmationModalState);
 
-      
-
-       //setSkidModalState((prevState) => ({ ...prevState, isConfirmModalVisible: true }));
-
-
-
-
+      //setSkidModalState((prevState) => ({ ...prevState, isConfirmModalVisible: true }));
     } catch (err) {
-      console.error("An error has occurred while removing map", err);
+      console.error('An error has occurred while removing map', err);
     }
-
-  }
+  };
 
   useEffect(() => {
-    const deleteMap = async() => {
-      if(confirmationModalState.confirmed) {
-        const id = new Date().getTime(); 
+    const deleteMap = async () => {
+      if (confirmationModalState.confirmed) {
+        const id = new Date().getTime();
 
         setShowSpinner(true);
 
         setMapState((prevState) => {
           const newData = mapState.maps.filter((map) => map._id !== mapState.currentMapId);
-           return {
+          return {
             ...prevState,
-            maps: newData,
+            maps: newData
           };
-  
         });
         //TODO: reenable - a
 
         try {
-          const resp = await axios.delete(`http://localhost:3001/map/${mapState.currentMapId}`, { withCredentials: true }); 
+          const resp = await axios.delete(`http://localhost:3001/map/${mapState.currentMapId}`, {
+            withCredentials: true
+          });
           if (resp.status === 200) {
             setAlertMessageState((prevState) => ({
               ...prevState,
@@ -170,7 +154,7 @@ const Maps = () => {
                 ...prevState.toasts,
                 {
                   id: id,
-                  heading: "Remove Map",
+                  heading: 'Remove Map',
                   show: true,
                   message: `Success! ${mapState.currentMapName}  has been removed.`,
                   background: 'success',
@@ -179,9 +163,8 @@ const Maps = () => {
               ]
             }));
           } else {
-            console.log("Failed to remove map")
+            console.log('Failed to remove map');
           }
-
         } catch (error) {
           setAlertMessageState((prevState) => ({
             ...prevState,
@@ -189,7 +172,7 @@ const Maps = () => {
               ...prevState.toasts,
               {
                 id: id,
-                heading: "Remove Map",
+                heading: 'Remove Map',
                 show: true,
                 message: `Error! An error occurred while removing map: ${mapState.currentMapName}`,
                 background: 'danger',
@@ -197,28 +180,22 @@ const Maps = () => {
               }
             ]
           }));
-          console.error("An error occurred while removing map: ", error);
-
+          console.error('An error occurred while removing map: ', error);
         } finally {
           setShowSpinner(false);
 
           setTimeout(() => {
             setAlertMessageState((prevState) => ({
               ...prevState,
-              toasts: prevState.toasts.filter((toast) => toast.id !== id),
-          }));
-          }, 10000)
-
+              toasts: prevState.toasts.filter((toast) => toast.id !== id)
+            }));
+          }, 10000);
         }
-
       }
+    };
 
-    }
-
-     deleteMap()
-    
-
-  },[confirmationModalState.confirmed])
+    deleteMap();
+  }, [confirmationModalState.confirmed]);
 
   useEffect(() => {
     // Access the DOM element using the ref
@@ -245,10 +222,10 @@ const Maps = () => {
   }, []); // Empty dependency array ensures that this effect runs once after the initial render
 
   const loadFromDB = async (mapName) => {
-
     try {
-      const res = await axios.get(`http://localhost:3001/loadfromdb/${mapName}`, { withCredentials: true }); // Replace with your API endpoint
-
+      const res = await axios.get(`http://localhost:3001/loadfromdb/${mapName}`, {
+        withCredentials: true
+      }); // Replace with your API endpoint
 
       /* if (!res.ok) {
        throw new Error(`Error loading map from server: ${res.statusText}`);
@@ -256,29 +233,23 @@ const Maps = () => {
 
       const map = res.data;
       //          navigate('/login');
-      if(res.status === 200) {
+      if (res.status === 200) {
         if (map.pdfData.map) {
           const pdfBlob = new Blob([map.pdfData.map], { type: 'application/pdf' });
           const pdfUrl = `http://localhost:3001${map.pdfData.map}`;
-  
+
           setMapState((prevState) => ({
             ...prevState,
             currentMapUrl: pdfUrl
-          }))
+          }));
           setShowAddPoint(true); // shows the add point button
           setShowRemoveMap(true);
-  
         }
-  
+
         return map;
-         
       } else {
         navigate('/login');
-
-
       }
-
-      
     } catch (error) {
       console.error('Error loading map from server:', error);
       throw error;
@@ -287,7 +258,7 @@ const Maps = () => {
 
   // selects first map in list and calls handleMapClick to render the first map
   useEffect(() => {
-    if(mapState.maps.length > 0) {
+    if (mapState.maps.length > 0) {
       const firstMap = mapState.maps[0];
       handleMapClick(firstMap);
     } else {
@@ -297,13 +268,11 @@ const Maps = () => {
         ...prevState,
         currentMapUrl: null,
         currentMapId: null,
-    currentMapName: null,
-    currentMapMarkers: []
-        
-      }))
+        currentMapName: null,
+        currentMapMarkers: []
+      }));
     }
-  }, [mapState.maps])
- 
+  }, [mapState.maps]);
 
   return (
     <>
@@ -313,43 +282,50 @@ const Maps = () => {
         <div id="map-buttons">
           <div style={{ float: 'right' }}>
             <div className="btn-group mb-3" id="button-container" role="group">
+              {showAddPoint && <AddSkidButton pdfContainerRef={pdfContainerRef} />}
 
-              {showAddPoint && (<AddSkidButton pdfContainerRef={pdfContainerRef} />)}
-            
-              <Button variant="outline-secondary" onClick={openEditGeneralHazards}>Edit General Hazards</Button>
+              <Button variant="outline-secondary" onClick={openEditGeneralHazards}>
+                Edit General Hazards
+              </Button>
 
               {showRemoveMap && (
-                <Button variant="outline-danger" onClick={openConfirmRemoveMap}>Delete</Button>
+                <Button variant="outline-danger" onClick={openConfirmRemoveMap}>
+                  Delete
+                </Button>
               )}
-              
+
               <UploadMapButton />
 
               {isErrorConfirmationModalVisible && (
-                <ErrorConfirmationModal message={errorMessage} onClose={hideErrorConfirmationModal} />
-
+                <ErrorConfirmationModal
+                  message={errorMessage}
+                  onClose={hideErrorConfirmationModal}
+                />
               )}
-
             </div>
           </div>
 
           <div className="btn-group mb-3" id="button-container" role="group">
-            <Button variant="outline-secondary" disabled>Current Maps</Button>
-          
-            {mapState.maps.length > 0 && (mapState.maps.map((map) => (
-              <Button
-                key={map._id}
-                className="pdf-button"
-                variant="outline-secondary"
-                data-id={map._id}
-                value={map.name}
-                onClick={() => handleMapClick(map)}
-              >
-                {map.name}
-              </Button>
-            )))}
+            <Button variant="outline-secondary" disabled>
+              Current Maps
+            </Button>
+
+            {mapState.maps.length > 0 &&
+              mapState.maps.map((map) => (
+                <Button
+                  key={map._id}
+                  className="pdf-button"
+                  variant="outline-secondary"
+                  data-id={map._id}
+                  value={map.name}
+                  onClick={() => handleMapClick(map)}
+                >
+                  {map.name}
+                </Button>
+              ))}
           </div>
         </div>
-        <div ref={pdfContainerRef} id="pdf-container" className="pdf-container" >
+        <div ref={pdfContainerRef} id="pdf-container" className="pdf-container">
           <MapViewer percentage={percentage} />
         </div>
       </div>

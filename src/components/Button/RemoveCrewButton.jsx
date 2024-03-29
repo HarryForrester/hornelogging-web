@@ -7,7 +7,7 @@ import { useMap } from '../Map/MapContext';
 import axios from 'axios';
 
 /**
- * Removes a Crew 
+ * Removes a Crew
  * @returns
  */
 const RemoveCrewButton = ({ crew }) => {
@@ -20,7 +20,7 @@ const RemoveCrewButton = ({ crew }) => {
   const id = new Date().getTime();
 
   const deleteCrew = (crew) => {
-    console.log("cerew: ", crew)
+    console.log('cerew: ', crew);
     setCrewId(crew._id);
     setCrewName(crew.name);
 
@@ -28,8 +28,12 @@ const RemoveCrewButton = ({ crew }) => {
       ...prevState,
       show: true,
       confirmed: false,
-      label: "Remove Crew",
-      message: (<>Are you sure you want to remove crew: <strong>{crew.name}</strong></>)
+      label: 'Remove Crew',
+      message: (
+        <>
+          Are you sure you want to remove crew: <strong>{crew.name}</strong>
+        </>
+      )
     }));
   };
 
@@ -44,26 +48,32 @@ const RemoveCrewButton = ({ crew }) => {
             // Check if the removed crew has people
             if (removedCrew.people && removedCrew.people.length > 0) {
               // Find the Unassigned crew in the state
-              const unassignedCrewIndex = updatedCrews.findIndex((crew) => crew.name === 'Unassigned');
+              const unassignedCrewIndex = updatedCrews.findIndex(
+                (crew) => crew.name === 'Unassigned'
+              );
 
               if (unassignedCrewIndex !== -1) {
                 // Move the crew.people to the Unassigned crew's people array
                 updatedCrews[unassignedCrewIndex] = {
                   ...updatedCrews[unassignedCrewIndex],
-                  people: [...updatedCrews[unassignedCrewIndex].people, ...removedCrew.people],
+                  people: [...updatedCrews[unassignedCrewIndex].people, ...removedCrew.people]
                 };
 
                 // Optionally, you can clear the people array in the original crew
-                updatedCrews = updatedCrews.map((crew) => (crew._id === crewId ? { ...crew, people: [] } : crew));
+                updatedCrews = updatedCrews.map((crew) =>
+                  crew._id === crewId ? { ...crew, people: [] } : crew
+                );
               } else {
                 // If "Unassigned" doesn't exist, create it with the people from the removed crew
                 const unassignedCrew = {
                   name: 'Unassigned',
-                  people: removedCrew.people,
+                  people: removedCrew.people
                 };
 
                 // Optionally, you can clear the people array in the original crew
-                updatedCrews = updatedCrews.map((crew) => (crew._id === crewId ? { ...crew, people: [] } : crew));
+                updatedCrews = updatedCrews.map((crew) =>
+                  crew._id === crewId ? { ...crew, people: [] } : crew
+                );
 
                 updatedCrews.push(unassignedCrew);
               }
@@ -75,13 +85,15 @@ const RemoveCrewButton = ({ crew }) => {
 
           return {
             ...prevState,
-            crews: updatedCrews,
+            crews: updatedCrews
           };
         });
 
-
         try {
-          const response = await axios.delete(process.env.REACT_APP_URL + `/deletecrew/${crewId}/${crewName}`, { withCredentials: true });
+          const response = await axios.delete(
+            process.env.REACT_APP_URL + `/deletecrew/${crewId}/${crewName}`,
+            { withCredentials: true }
+          );
 
           if (response.status === 200) {
             setAlertMessageState((prevState) => ({
@@ -90,7 +102,7 @@ const RemoveCrewButton = ({ crew }) => {
                 ...prevState.toasts,
                 {
                   id: id,
-                  heading: "Crew Removed",
+                  heading: 'Crew Removed',
                   show: true,
                   message: `Success! Removed Crew ${crew.name}   `,
                   background: 'success',
@@ -106,7 +118,7 @@ const RemoveCrewButton = ({ crew }) => {
               ...prevState.toasts,
               {
                 id: id,
-                heading: "Remove Crew",
+                heading: 'Remove Crew',
                 show: true,
                 message: `Error! An error has occured while removing crew: ${crew.name}`,
                 background: 'danger',
@@ -114,37 +126,39 @@ const RemoveCrewButton = ({ crew }) => {
               }
             ]
           }));
-          console.log("Error deleting crew: ", err);
+          console.log('Error deleting crew: ', err);
         } finally {
           setConfirmationModalState((prevState) => ({
             ...prevState,
-            confirmed: false,
-          })); 
+            confirmed: false
+          }));
           setTimeout(() => {
             setAlertMessageState((prevState) => ({
               ...prevState,
-              toasts: prevState.toasts.filter((toast) => toast.id !== id),
+              toasts: prevState.toasts.filter((toast) => toast.id !== id)
             }));
-          }, 10000)
+          }, 10000);
         }
       }
-
-    }
+    };
 
     checkSubmit();
-
   }, [confirmationModalState.confirmed, crewId]);
 
   return (
     <div className="col-md-1">
-      <div className="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups" style={{ float: 'right', marginTop: '8px' }}>
+      <div
+        className="btn-toolbar"
+        role="toolbar"
+        aria-label="Toolbar with button groups"
+        style={{ float: 'right', marginTop: '8px' }}
+      >
         <div className="btn-group me-2" role="group" aria-label="Second group">
           {!crew.unassigned && (
             <>
               <button type="button" className="btn btn-link" onClick={() => deleteCrew(crew)}>
-                <FontAwesomeIcon icon={faTrash} color='black' />
+                <FontAwesomeIcon icon={faTrash} color="black" />
               </button>
-
             </>
           )}
         </div>

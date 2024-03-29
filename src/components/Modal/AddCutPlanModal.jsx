@@ -14,7 +14,11 @@ const AddCutPlanModal = ({ submitCutPlan }) => {
   };
 
   const handleClose = () => {
-    setSkidModalState((prevState) => ({ ...prevState, isAddCutPlanModalVisible: false, isSkidModalVisible: true }));
+    setSkidModalState((prevState) => ({
+      ...prevState,
+      isAddCutPlanModalVisible: false,
+      isSkidModalVisible: true
+    }));
     // Reset the form state when closing the modal
     setSelectedFile(null);
     setFileName('');

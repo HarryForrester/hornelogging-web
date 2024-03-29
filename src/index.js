@@ -1,4 +1,4 @@
-import React, {StrictMode} from 'react';
+import React, { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
@@ -26,10 +26,10 @@ root.render(
             <PersonDataProvider>
               <SkidMarkerProvider>
                 <HazardProvider>
-          <App />
-          </HazardProvider>
-          </SkidMarkerProvider>
-          </PersonDataProvider>
+                  <App />
+                </HazardProvider>
+              </SkidMarkerProvider>
+            </PersonDataProvider>
           </AlertMessageProvider>
         </ConfirmationModalProvider>
       </MapProvider>

@@ -10,7 +10,7 @@ const AddSkidButton = ({ pdfContainerRef }) => {
       // If enableMarker is true, cancel the operation
       setMapState((prevState) => ({
         ...prevState,
-        enableMarker: false,
+        enableMarker: false
       }));
     } else {
       // If enableMarker is false, perform the addPoint operation
@@ -18,9 +18,9 @@ const AddSkidButton = ({ pdfContainerRef }) => {
 
       setMapState((prevState) => ({
         ...prevState,
-       // originalHeight: height,
+        // originalHeight: height,
         //originalWidth: width,
-        enableMarker: true,
+        enableMarker: true
       }));
     }
   };

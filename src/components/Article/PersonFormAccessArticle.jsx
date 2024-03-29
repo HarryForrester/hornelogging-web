@@ -8,7 +8,7 @@ const PersonFormAccessArticle = () => {
   const { personDataState, setPersonDataState } = usePersonData();
 
   const toggleTimeSheet = async (event) => {
-    const id = new Date().getTime(); 
+    const id = new Date().getTime();
     const isChecked = event.target.checked;
 
     const data = {
@@ -17,8 +17,10 @@ const PersonFormAccessArticle = () => {
     };
 
     try {
-      const response = await axios.post('http://localhost:3001/toggleTimeSheet', data, { withCredentials: true }); // Replace with your API endpoint
-      if(response.status === 200) {
+      const response = await axios.post('http://localhost:3001/toggleTimeSheet', data, {
+        withCredentials: true
+      }); // Replace with your API endpoint
+      if (response.status === 200) {
         setAlertMessageState((prevState) => ({
           ...prevState,
           toasts: [
@@ -41,7 +43,7 @@ const PersonFormAccessArticle = () => {
           ...prevState.toasts,
           {
             id: id,
-            heading: "Time Sheet",
+            heading: 'Time Sheet',
             show: true,
             message: `Error has occurred while changing form state`,
             background: 'danger',
@@ -49,57 +51,53 @@ const PersonFormAccessArticle = () => {
           }
         ]
       }));
-      console.error("Network error:",err); 
+      console.error('Network error:', err);
     } finally {
       setTimeout(() => {
         setAlertMessageState((prevState) => ({
           ...prevState,
-          toasts: prevState.toasts.filter((toast) => toast.id !== id),
-      }));
-      }, 10000)
+          toasts: prevState.toasts.filter((toast) => toast.id !== id)
+        }));
+      }, 10000);
     }
   };
 
   const toggleForm = async (event, form) => {
     const id = new Date().getTime();
     const formId = form._id;
-    const formTitle = form.title
+    const formTitle = form.title;
     const personId = personDataState.person._id;
-  
+
     try {
-
-
       setPersonDataState((prevState) => {
         const updatedForms = prevState.forms.map((form) => {
-          if(form._id === formId) {
-            const updatedAvailbaleOnDevice = {...JSON.parse(form.availableOnDeviceSerialized)};
+          if (form._id === formId) {
+            const updatedAvailbaleOnDevice = { ...JSON.parse(form.availableOnDeviceSerialized) };
             updatedAvailbaleOnDevice[personId] = isChecked;
 
             return {
               ...form,
-              availableOnDeviceSerialized: JSON.stringify(updatedAvailbaleOnDevice),
+              availableOnDeviceSerialized: JSON.stringify(updatedAvailbaleOnDevice)
             };
-
           }
           return form;
-        })
-;
-
+        });
         return {
           ...prevState,
-          forms: updatedForms,
-
-        }
-      })
+          forms: updatedForms
+        };
+      });
       const isChecked = event.target.checked;
       const data = {
         id: formId,
         person: personDataState.person._id,
         checked: isChecked
       };
-      const response = await axios.post(process.env.REACT_APP_URL+'/toggleForm', data, { withCredentials: true });
-      if(response.status === 200) {
-         setAlertMessageState((prevState) => ({
+      const response = await axios.post(process.env.REACT_APP_URL + '/toggleForm', data, {
+        withCredentials: true
+      });
+      if (response.status === 200) {
+        setAlertMessageState((prevState) => ({
           ...prevState,
           toasts: [
             ...prevState.toasts,
@@ -114,7 +112,6 @@ const PersonFormAccessArticle = () => {
           ]
         }));
       }
-
     } catch (error) {
       setAlertMessageState((prevState) => ({
         ...prevState,
@@ -122,7 +119,7 @@ const PersonFormAccessArticle = () => {
           ...prevState.toasts,
           {
             id: id,
-            heading: "Form Error",
+            heading: 'Form Error',
             show: true,
             message: `Error has occurred while changing form state`,
             background: 'danger',
@@ -135,9 +132,9 @@ const PersonFormAccessArticle = () => {
       setTimeout(() => {
         setAlertMessageState((prevState) => ({
           ...prevState,
-          toasts: prevState.toasts.filter((toast) => toast.id !== id),
-      }));
-      }, 10000)
+          toasts: prevState.toasts.filter((toast) => toast.id !== id)
+        }));
+      }, 10000);
     }
   };
 
@@ -152,7 +149,7 @@ const PersonFormAccessArticle = () => {
         <div className="form-access">
           {personDataState.timesheetAccess.map((form) => (
             <ToggleWithLabel
-              key={`timesheet-access-${form._id}`}  
+              key={`timesheet-access-${form._id}`}
               personId={personDataState.person._id}
               form={form}
               isFormEnabled={isFormEnabled}
@@ -162,11 +159,11 @@ const PersonFormAccessArticle = () => {
           ))}
           {personDataState.forms.map((form) => (
             <ToggleWithLabel
-              key={`form-${form._id}`} 
+              key={`form-${form._id}`}
               personId={personDataState.person._id}
               form={form}
               isFormEnabled={isFormEnabled}
-              toggle={(e) =>toggleForm(e, form)}
+              toggle={(e) => toggleForm(e, form)}
               availableOnDevice={form.availableOnDeviceSerialized}
             />
           ))}

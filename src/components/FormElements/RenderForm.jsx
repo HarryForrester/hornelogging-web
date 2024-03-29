@@ -1,6 +1,6 @@
 import React from 'react';
 import FreeformElement from './FreeformElement';
-//mport { , , createNumberFormElement, createListFormElement, createDateFormElement, createTimeFormElement, createSelectlistFormElement, createImageFormElement, createSignatureFormElement } from '../FormElements' 
+//mport { , , createNumberFormElement, createListFormElement, createDateFormElement, createTimeFormElement, createSelectlistFormElement, createImageFormElement, createSignatureFormElement } from '../FormElements'
 import CheckboxElement from './CheckboxElement';
 import NumberElement from './NumberElement';
 import ListElement from './ListElement';
@@ -15,9 +15,7 @@ function FormSection({ section }) {
     <div className="mb-3">
       <h4 className="section-title">{section.title}</h4>
       {section.items.map((item, index) => (
-        <React.Fragment key={index}>
-          {renderFormItem(item)}
-        </React.Fragment>
+        <React.Fragment key={index}>{renderFormItem(item)}</React.Fragment>
       ))}
       <hr />
     </div>
@@ -60,9 +58,5 @@ function renderForm(sections) {
 }
 
 export default function RenderForm({ form }) {
-  return (
-    <div>
-      {renderForm(JSON.parse(form.sectionsSerialized))}
-    </div>
-  );
+  return <div>{renderForm(JSON.parse(form.sectionsSerialized))}</div>;
 }

@@ -3,9 +3,7 @@ import React from 'react';
 const InfoArticle = ({ data, imageSrc }) => {
   return (
     <article>
-      <div style={{ float: 'right' }}>
-        
-      </div>
+      <div style={{ float: 'right' }}></div>
       <table>
         <tbody className="group1">
           {data.map(({ label, value }) => (

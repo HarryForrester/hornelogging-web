@@ -2,10 +2,10 @@ import React from 'react';
 
 /**
  * Used for editing a person and editing their
- * @param {*} param0 
- * @returns 
+ * @param {*} param0
+ * @returns
  */
-const InputWithLabel = ({ type,label, name, value, onChange }) => {
+const InputWithLabel = ({ type, label, name, value, onChange }) => {
   return (
     <div className="mb-3">
       <label htmlFor={name} className="form-label">

@@ -19,7 +19,7 @@ const MarkerPopover = ({ markerContent }) => {
             background: 'white',
             boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
             padding: '10px',
-            zIndex: 1,
+            zIndex: 1
           }}
         >
           {markerContent}

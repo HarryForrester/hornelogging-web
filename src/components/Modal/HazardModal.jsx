@@ -12,16 +12,24 @@ function HazardModal() {
    * Closes the Hazard Modal and opens the Skid Modal by updating the state.
    * @function handleClose
    * @returns {void}
-  */
+   */
   const handleClose = () => {
     setSkidModalState((prevState) => ({ ...prevState, hazardModalVisible: false }));
   };
 
   return (
-    <Modal show={skidModalState.hazardModalVisible} onHide={handleClose} style={{zindex: 99999}} backdrop="static">
+    <Modal
+      show={skidModalState.hazardModalVisible}
+      onHide={handleClose}
+      style={{ zindex: 99999 }}
+      backdrop="static"
+    >
       <Modal.Header style={{ backgroundColor: selectedHazard.color }}>
         <Modal.Title>
-          <b>{selectedHazard.id}: <em>{selectedHazard.title}</em></b> <small>({selectedHazard.sev})</small>
+          <b>
+            {selectedHazard.id}: <em>{selectedHazard.title}</em>
+          </b>{' '}
+          <small>({selectedHazard.sev})</small>
         </Modal.Title>
         <div style={{ float: 'right' }}>
           <b>{selectedHazard.cat}</b>
@@ -45,7 +53,9 @@ function HazardModal() {
       </Modal.Body>
       <Modal.Footer>
         <div style={{ float: 'right', marginTop: '10px', marginBottom: '10px' }}>
-          <em>Reviewed: {selectedHazard.reviewDate} ({selectedHazard.reviewReason})</em>
+          <em>
+            Reviewed: {selectedHazard.reviewDate} ({selectedHazard.reviewReason})
+          </em>
         </div>
         <Button variant="danger" onClick={handleClose}>
           Close

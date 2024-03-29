@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form } from 'react-bootstrap';
 
-const SelectlistElement = ({ labelValue, itemSelected }) => {
+const SelectlistElement = (labelValue, itemSelected) => {
   return (
     <Form.Group className="mb-2 px-3">
       <Form.Label className="selectlist-label">{labelValue}</Form.Label>
