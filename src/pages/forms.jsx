@@ -105,7 +105,7 @@ const Forms = () => {
   const confirmDeleteFormTemplate = (id) => {
     if (!window.confirm('Are you sure you want to delete this form?')) return;
     deleteFormTemplate(id);
-  }
+  };
 
   const deleteFormTemplate = async (formId) => {
     setShowSpinner(true);
@@ -316,14 +316,27 @@ const Forms = () => {
             <div>{item.title}</div>
             <div>
               <Button variant="link">
-                <FontAwesomeIcon icon={faTrash} onClick={() => confirmDeleteFormTemplate(item._id)} />
+                <FontAwesomeIcon
+                  icon={faTrash}
+                  onClick={() => confirmDeleteFormTemplate(item._id)}
+                />
               </Button>
               {/* Add your other buttons here */}
 
-              <Button variant="secondary" size="sm" onClick={() => openEditFormModal(item)}>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => openEditFormModal(item)}
+                style={{ marginRight: '10px' }}
+              >
                 Edit Form Template
               </Button>
-              <Button variant="secondary" size="sm" onClick={() => openViewFormModal(item)}>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => openViewFormModal(item)}
+                style={{ marginRight: '10px' }}
+              >
                 View Form Template
               </Button>
               <Button variant="secondary" size="sm" onClick={() => openFormDocsModal(item._id)}>

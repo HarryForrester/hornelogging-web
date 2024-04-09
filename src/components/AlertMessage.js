@@ -1,4 +1,5 @@
-import { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
+import PropTypes from 'prop-types';
 
 const AlertMessageContext = createContext();
 
@@ -19,6 +20,10 @@ export const AlertMessageProvider = ({ children }) => {
     </AlertMessageContext.Provider>
   );
 };
+
+AlertMessageProvider.propTypes = {
+  children: PropTypes.func.isRequired,
+}
 
 export const useAlertMessage = () => {
   return useContext(AlertMessageContext);

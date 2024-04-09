@@ -8,6 +8,7 @@ import Maps from './pages/maps.jsx';
 import Library from './pages/library.jsx';
 import Hazards from './pages/hazards.jsx';
 import Forms from './pages/forms.jsx';
+import Profile from './pages/profile.jsx';
 
 import NotFound from './components/NotFound.jsx';
 import { pdfjs } from 'react-pdf';
@@ -88,6 +89,15 @@ function App() {
             <React.Fragment>
               <NavBar />
               <Library />
+            </React.Fragment>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <React.Fragment>
+              <NavBar />
+              <Profile />
             </React.Fragment>
           }
         />
