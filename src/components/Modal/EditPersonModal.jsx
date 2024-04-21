@@ -8,6 +8,7 @@ import { useSkidModal } from './Skid/SkidModalContext';
 import { useMap } from '../Map/MapContext';
 import { usePersonData } from '../PersonData';
 import { useAlertMessage } from '../AlertMessage';
+import { faL } from '@fortawesome/free-solid-svg-icons';
 
 const EditPersonModal = () => {
   const { skidModalState, setSkidModalState } = useSkidModal();
@@ -15,7 +16,7 @@ const EditPersonModal = () => {
   const { mapState, setMapState } = useMap();
   const { alertMessageState, setAlertMessageState } = useAlertMessage();
   const [showSpinner, setShowSpinner] = useState(false); // shows spinner while submitting to server
-  const person = personDataState.person;
+  const person = personDataState?.person;
   const [formState, setFormState] = useState({
     id: '',
     name: '',
@@ -30,25 +31,27 @@ const EditPersonModal = () => {
     contactphone: '',
     doctor: '',
     medical: '',
-    imgPreview: ''
+    imgPreview: '',
+    archive: ''
   });
 
   useEffect(() => {
     setFormState({
-      id: person._id,
-      name: person.name,
-      crew: person.crew,
-      role: person.role,
-      phone: person.phone,
-      email: person.email,
-      address: person.address,
-      dob: person.dob,
-      startDate: person.startDate,
-      contact: person.contact,
-      contactphone: person.contactphone,
-      doctor: person.doctor,
-      medical: person.medical,
-      imgPreview: ''
+      id: person?._id,
+      name: person?.name,
+      crew: person?.crew,
+      role: person?.role,
+      phone: person?.phone,
+      email: person?.email,
+      address: person?.address,
+      dob: person?.dob,
+      startDate: person?.startDate,
+      contact: person?.contact,
+      contactphone: person?.contactphone,
+      doctor: person?.doctor,
+      medical: person?.medical,
+      imgPreview: person?.imgPreview,
+      archive: person?.archive
     });
   }, [person]);
 
@@ -90,7 +93,8 @@ const EditPersonModal = () => {
       contactphone: '',
       doctor: '',
       medical: '',
-      imgPreview: ''
+      imgPreview: '',
+      archive: ''
     });
   };
 
@@ -192,38 +196,40 @@ const EditPersonModal = () => {
   };
 
   return (
-    <Modal show={skidModalState.isEditPersonModalVisible} onHide={handleClose} backdrop="static">
+    <Modal
+      show={skidModalState.isEditPersonModalVisible}
+      onHide={handleClose}
+      size="xl"
+      backdrop="static"
+    >
       <Modal.Header className="modal-header" closeButton>
         <Modal.Title>Edit Person</Modal.Title>
       </Modal.Header>
 
       <Modal.Body>
         <Form onSubmit={handleSubmit}>
-          <Form.Group className="row g-3">
-            <fieldset>
-              <legend>Employee Details</legend>
-            </fieldset>
-
-            <Form.Group className="col-md-5">
+          <Form.Group className="row g-4">
+            <Form.Group className="col-md-3">
               <Form.Label htmlFor="imgurl">
                 <Image
-                  src={formState.imgPreview || process.env.REACT_APP_URL + '/' + person.imgUrl}
+                  src={formState?.imgPreview || process.env.REACT_APP_URL + '/' + person?.imgUrl}
                   className="figure-img img-fluid z-depth-1 rounded mb-0 border border-dark"
                   alt="..."
-                  style={{ width: '128px' }}
                   id="img-preview"
                 />
+                <Button>Click</Button>
+                <Form.Control
+                  type="file"
+                  id="imgurl"
+                  name="fileupload"
+                  size="sm"
+                  style={{ display: 'none' }}
+                  onChange={handleImageChange}
+                />
               </Form.Label>
-              <Form.Control
-                type="file"
-                id="imgurl"
-                name="fileupload"
-                style={{ display: 'none' }}
-                onChange={handleImageChange}
-              />
             </Form.Group>
 
-            <Form.Group className="col-md-6">
+            <Form.Group className="col-md-5">
               <InputWithLabel
                 type={'text'}
                 label={'Name'}
@@ -231,7 +237,6 @@ const EditPersonModal = () => {
                 value={formState.name}
                 onChange={(value) => handleInputChange('name', value)}
               />
-              <br />
               <InputWithLabel
                 type={'tel'}
                 label={'Phone Number'}
@@ -239,7 +244,6 @@ const EditPersonModal = () => {
                 value={formState.phone}
                 onChange={(value) => handleInputChange('phone', value)}
               />
-              <br />
               <InputWithLabel
                 type={'email'}
                 label={'Email Address'}
@@ -247,17 +251,23 @@ const EditPersonModal = () => {
                 value={formState.email}
                 onChange={(value) => handleInputChange('email', value)}
               />
+              <InputWithLabel
+                type={'text'}
+                label={'Parnter Contact Name'}
+                name={'contact'}
+                value={formState.contact}
+                onChange={(value) => handleInputChange('contact', value)}
+              />
             </Form.Group>
 
-            <InputWithLabel
-              type={'text'}
-              label={'Address'}
-              name={'address'}
-              value={formState.address}
-              onChange={(value) => handleInputChange('address', value)}
-            />
-
-            <Form.Group className="col-md-6">
+            <Form.Group className="col-md-4">
+              <InputWithLabel
+                type={'text'}
+                label={'Address'}
+                name={'address'}
+                value={formState.address}
+                onChange={(value) => handleInputChange('address', value)}
+              />
               <InputWithLabel
                 type={'date'}
                 label={'Date of Birth'}
@@ -265,9 +275,6 @@ const EditPersonModal = () => {
                 value={formState.dob}
                 onChange={(value) => handleInputChange('dob', value)}
               />
-            </Form.Group>
-
-            <Form.Group className="col-md-6">
               <InputWithLabel
                 type={'date'}
                 label={'Start Date'}
@@ -275,39 +282,16 @@ const EditPersonModal = () => {
                 value={formState.startDate}
                 onChange={(value) => handleInputChange('startDate', value)}
               />
-            </Form.Group>
-
-            <fieldset>
-              <legend>Parnter / Contact Info</legend>
-            </fieldset>
-
-            <Form.Group className="col-md-6">
-              <InputWithLabel
-                type={'text'}
-                label={'Contact Name'}
-                name={'contact'}
-                value={formState.contact}
-                onChange={(value) => handleInputChange('contact', value)}
-              />
-            </Form.Group>
-
-            <Form.Group className="col-md-6">
               <InputWithLabel
                 type={'tel'}
-                label={'Contact Number'}
+                label={'Parnter Contact Number'}
                 name={'contactphone'}
                 value={formState.contactphone}
                 onChange={(value) => handleInputChange('contactphone', value)}
               />
             </Form.Group>
 
-            <fieldset>
-              <legend>Job Description / Medical Info</legend>
-            </fieldset>
-
-            <Form.Group className="col-md-6">
-              {/*                             <SelectWithLabel htmlFor={"crewInput"} id={"crewInput"} label={"Crew"} name={"crew"} value={formState.crew} onChange={handleCrewChange} crewTypes={personDataState.crewTypes} />
-               */}{' '}
+            <Form.Group className="col-md-4">
               <Form.Label htmlFor="roleInput" className="form-label">
                 Crew
               </Form.Label>
@@ -321,18 +305,25 @@ const EditPersonModal = () => {
                 <option value="Unassigned" disabled>
                   Select Crew
                 </option>
-                {personDataState.crewTypes.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
+                {personDataState &&
+                  personDataState.crewTypes &&
+                  personDataState.crewTypes.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
               </Form.Select>
             </Form.Group>
-
             <SelectRoleType
               onChange={handleRoleChange}
               selectedRole={formState.role}
               key={formState.role}
+            />
+            <Form.Check
+              type="checkbox"
+              label="Archive"
+              checked={formState.archive}
+              onChange={(e) => handleInputChange('archive', e.target.checked)}
             />
 
             <Form.Group className="col-md-6">
@@ -345,7 +336,7 @@ const EditPersonModal = () => {
               />
             </Form.Group>
 
-            <Form.Group className="col-md-12">
+            <Form.Group className="col-md-6">
               <InputWithLabel
                 type={'text'}
                 label={'Medical Issues'}

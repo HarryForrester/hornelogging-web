@@ -40,7 +40,6 @@ const Profile = () => {
   const [showGeneratedPasswordModal, setShowGeneratedPasswordModal] = useState(false);
   const [generatedPasswordMessage, setGeneratedPasswordMessage] = useState(null); //TODO: Make more secure as it stores passsword
 
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -70,8 +69,7 @@ const Profile = () => {
   const closeGeneratedPasswordModal = () => {
     setShowGeneratedPasswordModal(false);
     setGeneratedPasswordMessage(null);
-  }
-
+  };
 
   const submitCreateDeviceAccount = async (
     selectedCrew,
@@ -124,10 +122,11 @@ const Profile = () => {
 
       if (resp.status === 200) {
         console.log('data', resp.data);
-        setGeneratedPasswordMessage("Email: " + resp.data.username + " " + "Password: " + resp.data.otp);
+        setGeneratedPasswordMessage(
+          'Email: ' + resp.data.username + ' ' + 'Password: ' + resp.data.otp
+        );
         setShowGeneratedPasswordModal(true);
 
-        
         setDevices(resp.data.device);
         setShowNewDeviceModal(false);
         setAlertMessageState((prevState) => ({
@@ -568,10 +567,10 @@ const Profile = () => {
   const openNewDeviceModal = () => {
     setShowNewDeviceModal(true);
   };
-  
+
   const closeCreateAccountModal = () => {
     setShowNewDeviceModal(false);
-  }
+  };
   const closeUserDocTypeModal = () => {
     setShowNewUserDocTypeModal(false);
   };
@@ -703,7 +702,7 @@ const Profile = () => {
   };
 
   return (
-    <Container>
+    <Container style={{ marginTop: '50px' }}>
       <Tabs id="profile-tab" activeKey={key} onSelect={(k) => setKey(k)} className="mb-3">
         <Tab eventKey="userDocTypes" title="User Document Types">
           <div style={{ marginTop: '60px' }}>
@@ -850,11 +849,11 @@ const Profile = () => {
         close={closeCreateAccountModal}
       />
 
-      <GeneratedPasswordModal 
-      show={showGeneratedPasswordModal}
-      message={generatedPasswordMessage}
-      close={closeGeneratedPasswordModal}
-       />
+      <GeneratedPasswordModal
+        show={showGeneratedPasswordModal}
+        message={generatedPasswordMessage}
+        close={closeGeneratedPasswordModal}
+      />
     </Container>
   );
 };

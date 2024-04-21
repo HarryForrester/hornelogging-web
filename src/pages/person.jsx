@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import PersonInfoArticle from '../components/Article/PersonInfoArticle';
-import PersonDocumentArticle from '../components/Article/PersonDocumentArticle';
-import PersonFormAccessArticle from '../components/Article/PersonFormAccessArticle';
+import PersonInfoCard from '../components/Card/PersonInfoCard';
+import PersonDocumentCard from '../components/Card/PersonDocumentCard';
+import PersonFormAccessCard from '../components/Card/PersonFormAccessCard';
 import EditPersonModal from '../components/Modal/EditPersonModal';
 import RemovePersonButton from '../components/Button/RemovePersonButton';
 import { useSkidModal } from '../components/Modal/Skid/SkidModalContext';
 import { Button } from 'react-bootstrap';
 import { usePersonData } from '../components/PersonData';
+import QualificationsCard from '../components/Card/QualificationsCard';
 
 const Person = () => {
   const { id } = useParams();
@@ -29,7 +30,7 @@ const Person = () => {
         const response = await axios.get(`${process.env.REACT_APP_URL}/person/${id}`, {
           withCredentials: true
         });
-        if (response.status === 200) {
+        if (response.data.isLoggedIn) {
           const data = response.data;
           setPersonDataState((prevState) => ({
             ...prevState,
@@ -52,7 +53,7 @@ const Person = () => {
   }, [navigate]);
 
   return (
-    <div className="container">
+    <div className="container" style={{ marginTop: '50px' }}>
       <div>
         <h1>
           {personDataState.person?.name}{' '}
@@ -77,11 +78,13 @@ const Person = () => {
       </div>
 
       <br style={{ clear: 'left' }} />
-      <PersonInfoArticle person={personDataState.person} />
+      <PersonInfoCard person={personDataState.person} />
       <br />
-      <PersonDocumentArticle />
+      <PersonDocumentCard />
       <br />
-      <PersonFormAccessArticle />
+      <QualificationsCard />
+
+      <PersonFormAccessCard />
       <EditPersonModal />
     </div>
   );

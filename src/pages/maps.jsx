@@ -276,9 +276,7 @@ const Maps = () => {
 
   return (
     <>
-      <NavBar username={mapState.username} />
-
-      <div className="container">
+      <div className="container" style={{ marginTop: '50px' }}>
         <div id="map-buttons">
           <div style={{ float: 'right' }}>
             <div className="btn-group mb-3" id="button-container" role="group">

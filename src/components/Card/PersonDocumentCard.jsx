@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDownload, faEye, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faEye, faTrash, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { InputGroup, FormControl, ProgressBar, Form } from 'react-bootstrap';
 import { useAlertMessage } from '../AlertMessage';
 import { usePersonData } from '../PersonData';
-const PersonDocumentArticle = () => {
+import { Card, Button, ListGroup } from 'react-bootstrap';
+import UploadUserDocumentModal from '../Modal/UploadUserDocument';
+const PersonDocumentCard = () => {
   const [uploadPercentage, setUploadPercentage] = useState(0);
   const { alertMessageState, setAlertMessageState } = useAlertMessage();
   const { personDataState, setPersonDataState } = usePersonData();
+  const [isUploadFileModalVisible, setUploadFileModalVisible] = useState(false);
 
   const handleFileTypeChange = async (file, event) => {
     const id = new Date().getTime();
@@ -200,84 +203,86 @@ const PersonDocumentArticle = () => {
     }
   };
 
-  return (
-    <article>
-      <h1>Documents</h1>
-      <Form encType="multipart/form-data">
-        <div style={{ width: '100%' }}>
-          <InputGroup className="mb-3">
-            <FormControl
-              type="file"
-              id="customFile"
-              name="fileupload"
-              onChange={handleFileUpload}
-            />
-          </InputGroup>
-          {uploadPercentage > 0 && uploadPercentage < 100 && (
-            <ProgressBar
-              variant="info"
-              now={uploadPercentage}
-              label={`Uploading: ${uploadPercentage}%`}
-              className="mt-2"
-            />
-          )}
-        </div>
-      </Form>
+  const filesByType = {};
+  personDataState.files.forEach((file) => {
+    if (!filesByType[file.type]) {
+      filesByType[file.type] = [];
+    }
+    filesByType[file.type].push(file);
+  });
 
-      <dl>
-        {personDataState.files.map((file) => (
-          <React.Fragment key={file._id}>
-            <dt className="fs-5 mb-1">
-              <Form>
-                <Form.Select
-                  id={`filetype-${file._id}`}
-                  name="filetype"
-                  onChange={(e) => handleFileTypeChange(file, e)}
-                  defaultValue={file.type}
-                >
-                  {personDataState.fileTypes.map((fileType) => (
-                    <option key={fileType} value={fileType}>
-                      {fileType}
-                    </option>
-                  ))}
-                </Form.Select>
-              </Form>
-            </dt>
-            <dd className="mb-1">
-              {file.fileName}
-              &nbsp;
+  return (
+    <Card>
+      <Card.Header>Employee Files</Card.Header>
+      <Card.Body>
+        {/* Upload modal */}
+        <UploadUserDocumentModal
+          show={isUploadFileModalVisible}
+          close={() => setUploadFileModalVisible(false)}
+        />
+
+        {/* Upload button */}
+        <Button onClick={() => setUploadFileModalVisible(true)} className="mb-3">
+          {' '}
+          <FontAwesomeIcon icon={faUpload} color="white" className="me-1" />
+          Upload File
+        </Button>
+
+        {/* File list */}
+        {Object.entries(filesByType).map(([fileType, files]) => (
+  <div key={fileType} className="mb-4">
+    <h5>{fileType}</h5>
+    <ListGroup>
+      {files.map((file) => (
+        <ListGroup.Item
+          key={file._id}
+          className="d-flex justify-content-between align-items-center border-0"
+          style={{ backgroundColor: '#f8f9fa', borderRadius: '8px' }}
+        >
+          <div className="d-flex flex-column">
+            <span className="fs-6">{file.fileName}</span>
+            <div className="d-flex">
+              {/* View */}
               <a
                 href={process.env.REACT_APP_URL + file.uri}
                 target="_blank"
                 rel="noopener noreferrer"
+                className="btn btn-outline-secondary btn-sm text-decoration-none me-2"
               >
-                <FontAwesomeIcon icon={faEye} color="black" />
+                <FontAwesomeIcon icon={faEye} className="me-1" />
+                View
               </a>
-              &nbsp;&nbsp;
+              {/* Download */}
               <a
-                href={process.env.REACT_APP_URL + file.uri}
+                href={`${process.env.REACT_APP_URL}${file.uri}?download=true`}
                 download={file.fileName}
                 target="_blank"
                 rel="noopener noreferrer"
+                className="btn btn-outline-secondary btn-sm text-decoration-none me-2"
               >
-                <FontAwesomeIcon icon={faDownload} color="black" />
+                <FontAwesomeIcon icon={faDownload} className="me-1" />
+                Download
               </a>
-              &nbsp;
-              <a
-                style={{ marginLeft: 'auto' }}
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleFileDelete(file.fileName, file._id);
-                }}
-              >
-                <FontAwesomeIcon icon={faTrash} color="black" />
-              </a>
-            </dd>
-          </React.Fragment>
-        ))}
-      </dl>
-    </article>
+            </div>
+          </div>
+          {/* Delete */}
+          <Button
+            variant="danger"
+            size="sm"
+            onClick={() => handleFileDelete(file.fileName, file._id)}
+          >
+            <FontAwesomeIcon icon={faTrash} className="me-1" />
+            Delete
+          </Button>
+        </ListGroup.Item>
+      ))}
+    </ListGroup>
+  </div>
+))}
+
+      </Card.Body>
+    </Card>
   );
 };
 
-export default PersonDocumentArticle;
+export default PersonDocumentCard;

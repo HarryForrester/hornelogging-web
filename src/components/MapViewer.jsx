@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { ProgressBar } from 'react-bootstrap';
 import axios from 'axios';
-
+import PropTypes from 'prop-types';
 import HazardModal from './Modal/HazardModal';
 import { useSkidModal } from '../components/Modal/Skid/SkidModalContext';
 import { useMap } from './Map/MapContext';
@@ -314,29 +314,32 @@ const PDFViewer = ({ hazards, percentage }) => {
         const data = response.data;
 
         setSkidMarkerState((prevState) => {
-          const updatedPeopleByCrew = data.people.reduce(
-            (updatedCrews, item) => {
-              if (item.archive === 'on') return updatedCrews;
+          const updatedPeopleByCrew =
+            data.people !== undefined
+              ? data.people.reduce(
+                  (updatedCrews, item) => {
+                    if (item.archive === 'on') return updatedCrews;
 
-              const crewName = item.crew;
-              const existingCrew = updatedCrews[crewName] || [];
-              const existingPerson = existingCrew.find((person) => person._id === item._id);
+                    const crewName = item.crew;
+                    const existingCrew = updatedCrews[crewName] || [];
+                    const existingPerson = existingCrew.find((person) => person._id === item._id);
 
-              if (!existingPerson) {
-                updatedCrews[crewName] = [
-                  ...existingCrew,
-                  {
-                    _id: item._id,
-                    name: item.name,
-                    role: item.role
-                  }
-                ];
-              }
+                    if (!existingPerson) {
+                      updatedCrews[crewName] = [
+                        ...existingCrew,
+                        {
+                          _id: item._id,
+                          name: item.name,
+                          role: item.role
+                        }
+                      ];
+                    }
 
-              return updatedCrews;
-            },
-            { ...prevState.peopleByCrew }
-          );
+                    return updatedCrews;
+                  },
+                  { ...prevState.peopleByCrew }
+                )
+              : { ...prevState.peopleByCrew };
 
           return {
             ...prevState,
@@ -520,6 +523,11 @@ const PDFViewer = ({ hazards, percentage }) => {
       )}
     </>
   );
+};
+
+PDFViewer.propTypes = {
+  hazards: PropTypes.array.isRequired,
+  percentage: PropTypes.number.isRequired
 };
 
 export default PDFViewer;

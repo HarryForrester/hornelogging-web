@@ -1,5 +1,5 @@
-import { createContext, useContext, useState } from 'react';
-
+import React, { createContext, useContext, useState } from 'react';
+import PropTypes from 'prop-types';
 const MapContext = createContext();
 
 export const MapProvider = ({ children }) => {
@@ -13,6 +13,7 @@ export const MapProvider = ({ children }) => {
     enableMarker: false,
     files: [],
     crews: [],
+    archivedPeople: [],
     crewTypes: [],
     maps: [],
     username: null,
@@ -25,6 +26,10 @@ export const MapProvider = ({ children }) => {
 
   return <MapContext.Provider value={{ mapState, setMapState }}>{children}</MapContext.Provider>;
 };
+
+MapProvider.propTypes = {
+  children: PropTypes.object.isRequired,
+}
 
 export const useMap = () => {
   return useContext(MapContext);

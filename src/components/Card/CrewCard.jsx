@@ -2,7 +2,7 @@ import React from 'react';
 import { Card } from 'react-bootstrap';
 import RemoveCrewButton from '../Button/RemoveCrewButton';
 import PersonCard from './PersonCard';
-
+import PropTypes from 'prop-types';
 const CrewCard = ({ crew }) => {
   return (
     <Card className="mb-5">
@@ -14,10 +14,13 @@ const CrewCard = ({ crew }) => {
       </Card.Header>
 
       <Card.Body>
-        <PersonCard crew={crew} />
+        <PersonCard people={crew.people} />
       </Card.Body>
     </Card>
   );
 };
 
+CrewCard.propTypes = {
+  crew: PropTypes.array.isRequired
+};
 export default CrewCard;

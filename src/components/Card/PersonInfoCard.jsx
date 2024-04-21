@@ -1,7 +1,8 @@
 import React from 'react';
-import InfoArticle from './InfoArticle';
+import InfoCard from './InfoCard';
+import PropTypes from 'prop-types';
 
-const PersonInfoArticle = ({ person }) => {
+const PersonInfoCard = ({ person }) => {
   const data = [
     { label: 'Crew', value: person?.crew },
     { label: 'Role', value: person?.role },
@@ -13,7 +14,11 @@ const PersonInfoArticle = ({ person }) => {
     { label: 'Medical Issues', value: person?.medical }
   ];
 
-  return <InfoArticle data={data} imageSrc={process.env.REACT_APP_URL + '/' + person?.imgUrl} />;
+  return <InfoCard data={data} imageSrc={process.env.REACT_APP_URL + '/' + person?.imgUrl} />;
 };
 
-export default PersonInfoArticle;
+PersonInfoCard.propTypes = {
+  person: PropTypes.object.isRequired
+};
+
+export default PersonInfoCard;

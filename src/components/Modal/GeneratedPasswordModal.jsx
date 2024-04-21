@@ -11,9 +11,9 @@ import { useAlertMessage } from '../AlertMessage';
 const GeneratedPasswordModal = ({ message, submit, show, close }) => {
   return (
     <Modal show={show} onHide={close} backdrop="static">
-        <Modal.Header>
-            <Modal.Title>Generated Password</Modal.Title>
-        </Modal.Header>
+      <Modal.Header>
+        <Modal.Title>Generated Password</Modal.Title>
+      </Modal.Header>
       <Modal.Body>{message}</Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={close}>

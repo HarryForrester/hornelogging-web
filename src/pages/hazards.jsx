@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import PersonInfoArticle from '../components/Article/PersonInfoArticle';
-import PersonDocumentArticle from '../components/Article/PersonDocumentArticle';
-import PersonFormAccessArticle from '../components/Article/PersonFormAccessArticle';
-import EditPersonModal from '../components/Modal/EditPersonModal';
-import RemovePersonButton from '../components/Button/RemovePersonButton';
+//import PersonInfoCard from '../components/Card/PersonInfoCard';
+//import PersonDocumentArticle from '../components/Article/PersonDocumentArticle';
+//import PersonFormAccessArticle from '../components/Article/PersonFormAccessArticle';
+//import EditPersonModal from '../components/Modal/EditPersonModal';
+//import RemovePersonButton from '../components/Button/RemovePersonButton';
 import { useSkidModal } from '../components/Modal/Skid/SkidModalContext';
 import { usePersonData } from '../components/PersonData';
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
@@ -380,7 +380,7 @@ const Hazards = () => {
 
   return (
     <>
-      <Container>
+      <Container style={{ marginTop: '50px' }}>
         <Row>
           <Col md={6}>
             <h2>Hazard Register</h2>

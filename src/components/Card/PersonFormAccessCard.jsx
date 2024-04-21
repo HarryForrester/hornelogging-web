@@ -3,7 +3,9 @@ import axios from 'axios';
 import ToggleWithLabel from '../Toggle/ToggleWithLabel';
 import { useAlertMessage } from '../AlertMessage';
 import { usePersonData } from '../PersonData';
-const PersonFormAccessArticle = () => {
+import { Card } from 'react-bootstrap';
+
+const PersonFormAccessCard = () => {
   const { alertMessageState, setAlertMessageState } = useAlertMessage();
   const { personDataState, setPersonDataState } = usePersonData();
 
@@ -70,18 +72,21 @@ const PersonFormAccessArticle = () => {
 
     try {
       setPersonDataState((prevState) => {
-        const updatedForms = prevState.forms.map((form) => {
-          if (form._id === formId) {
-            const updatedAvailbaleOnDevice = { ...JSON.parse(form.availableOnDeviceSerialized) };
-            updatedAvailbaleOnDevice[personId] = isChecked;
+        const updatedForms =
+          prevState &&
+          prevState.forms &&
+          prevState.forms.map((form) => {
+            if (form._id === formId) {
+              const updatedAvailbaleOnDevice = { ...JSON.parse(form.availableOnDeviceSerialized) };
+              updatedAvailbaleOnDevice[personId] = isChecked;
 
-            return {
-              ...form,
-              availableOnDeviceSerialized: JSON.stringify(updatedAvailbaleOnDevice)
-            };
-          }
-          return form;
-        });
+              return {
+                ...form,
+                availableOnDeviceSerialized: JSON.stringify(updatedAvailbaleOnDevice)
+              };
+            }
+            return form;
+          });
         return {
           ...prevState,
           forms: updatedForms
@@ -143,34 +148,40 @@ const PersonFormAccessArticle = () => {
   };
 
   return (
-    <article>
-      <h1>Enable Forms</h1>
-      <dl>
-        <div className="form-access">
-          {personDataState.timesheetAccess.map((form) => (
-            <ToggleWithLabel
-              key={`timesheet-access-${form._id}`}
-              personId={personDataState.person._id}
-              form={form}
-              isFormEnabled={isFormEnabled}
-              toggle={toggleTimeSheet}
-              availableOnDevice={form.availableOnDevice}
-            />
-          ))}
-          {personDataState.forms.map((form) => (
-            <ToggleWithLabel
-              key={`form-${form._id}`}
-              personId={personDataState.person._id}
-              form={form}
-              isFormEnabled={isFormEnabled}
-              toggle={(e) => toggleForm(e, form)}
-              availableOnDevice={form.availableOnDeviceSerialized}
-            />
-          ))}
-        </div>
-      </dl>
-    </article>
+    <Card>
+      <Card.Header>Enable Device Forms</Card.Header>
+      <Card.Body>
+        <dl>
+          <div className="form-access">
+            {personDataState &&
+              personDataState.timesheetAccess &&
+              personDataState.timesheetAccess.map((form) => (
+                <ToggleWithLabel
+                  key={`timesheet-access-${form._id}`}
+                  personId={personDataState.person._id}
+                  form={form}
+                  isFormEnabled={isFormEnabled}
+                  toggle={toggleTimeSheet}
+                  availableOnDevice={form.availableOnDevice}
+                />
+              ))}
+            {personDataState &&
+              personDataState.forms &&
+              personDataState.forms.map((form) => (
+                <ToggleWithLabel
+                  key={`form-${form._id}`}
+                  personId={personDataState.person._id}
+                  form={form}
+                  isFormEnabled={isFormEnabled}
+                  toggle={(e) => toggleForm(e, form)}
+                  availableOnDevice={form.availableOnDeviceSerialized}
+                />
+              ))}
+          </div>
+        </dl>
+      </Card.Body>
+    </Card>
   );
 };
 
-export default PersonFormAccessArticle;
+export default PersonFormAccessCard;

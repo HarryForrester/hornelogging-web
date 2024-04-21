@@ -9,6 +9,8 @@ import PeopleAndCrewSearch from '../components/Input/PeopleAndCrewSearch';
 import CrewCard from '../components/Card/CrewCard';
 import NavBar from '../components/NavBar/main.jsx';
 import { useMap } from '../components/Map/MapContext.js';
+import { Card } from 'react-bootstrap';
+import PersonCard from '../components/Card/PersonCard.jsx';
 
 const Crews = () => {
   const [username, setUsername] = useState('');
@@ -19,11 +21,12 @@ const Crews = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get('http://localhost:3001/', { withCredentials: true }); // Replace with your API endpoint
-
+        console.log('resp', response);
         if (response.data.isLoggedIn) {
           setMapState((prevState) => ({
             ...prevState,
-            crews: response.data.crews
+            crews: response.data.crews,
+            archivedPeople: response.data.archivedPeople
           }));
 
           setUsername(response.data.username);
@@ -44,8 +47,7 @@ const Crews = () => {
 
   return (
     <>
-      <NavBar username={username} />
-      <div className="container">
+      <div className="container" style={{ marginTop: '50px' }}>
         <div className="col-md-12">
           <h2>Crews</h2>
         </div>
@@ -60,6 +62,16 @@ const Crews = () => {
         {mapState.crews.map((crew) => (
           <CrewCard key={crew.name} crew={crew} />
         ))}
+
+        <Card className="mb-5">
+          <Card.Header className="bg-light">
+            <h5 className="mb-0 crew-name">Archive</h5>
+          </Card.Header>
+
+          <Card.Body>
+            <PersonCard people={mapState.archivedPeople} />
+          </Card.Body>
+        </Card>
 
         <AddPersonModal />
         <AddCrewModal />

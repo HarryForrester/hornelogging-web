@@ -1,13 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Navbar, Nav, Container } from 'react-bootstrap';
+import PropTypes from 'prop-types';
+import { Link, Outlet } from 'react-router-dom';
+import Cookies from 'js-cookie';
+import { useAuth } from '../../context/AuthContext';
 
-import { Link } from 'react-router-dom';
+const NavBar = ({ username }) => {
+  const { user, logout, isLoggedIn } = useAuth();
 
-const NavBar = ({ username, children }) => {
   return (
     <>
       <Navbar expand="lg" fixed="top" bg="light" variant="light">
-        <Container style={{ maxWidth: '1140px' }}>
+        <Container>
           <Link className="navbar-brand" to="/">
             <img
               src="/img/sticker.png"
@@ -40,19 +44,21 @@ const NavBar = ({ username, children }) => {
                 Profile
               </Nav.Link>
               {/* Add other navigation links as needed */}
-              <Nav.Link as={Link} to="/login">
-                Logout ({username})
+              <Nav.Link as={Link} to="/login" onClick={logout}>
+                Logout ({user})
               </Nav.Link>
             </Nav>
           </Navbar.Collapse>
         </Container>
       </Navbar>
 
-      <div className="container" style={{ marginTop: '3.5rem', maxWidth: '1140px' }}>
-        {children}
-      </div>
+      <Outlet context={{ user, isLoggedIn }} />
     </>
   );
+};
+
+NavBar.propTypes = {
+  username: PropTypes.string.isRequired
 };
 
 export default NavBar;

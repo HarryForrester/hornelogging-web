@@ -1,26 +1,28 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import { Form } from 'react-bootstrap';
 
-/**
- * Used for editing a person and editing their
- * @param {*} param0
- * @returns
- */
 const InputWithLabel = ({ type, label, name, value, onChange }) => {
   return (
-    <div className="mb-3">
-      <label htmlFor={name} className="form-label">
-        {label}
-      </label>
-      <input
+    <Form.Group controlId={name} className="mb-3">
+      <Form.Label>{label}</Form.Label>
+      <Form.Control
         type={type}
-        className="form-control"
-        id={name}
         name={name}
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        style={{ height: '38px', width: '100%' }}
       />
-    </div>
+    </Form.Group>
   );
+};
+
+InputWithLabel.propTypes = {
+  type: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  value: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired
 };
 
 export default InputWithLabel;

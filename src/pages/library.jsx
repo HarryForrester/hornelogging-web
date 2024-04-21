@@ -15,12 +15,13 @@ const Library = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      console.log('yeaj bvro fucm');
       try {
         const response = await axios.get('http://localhost:3001/library', {
           withCredentials: true
         }); // Replace with your API endpoint
 
-        if (response.data) {
+        if (response.data.isLoggedIn) {
           setUsername(response.data.username);
           setDocList(response.data.doc);
           setFiles(response.data.files);
@@ -89,11 +90,10 @@ const Library = () => {
 
   return (
     <>
-      <script src="https://kit.fontawesome.com/318f8477e6.js" crossorigin="anonymous"></script>
+      {/*       <script src="https://kit.fontawesome.com/318f8477e6.js" crossorigin="anonymous"></script>
+       */}
 
-      <NavBar username={username} />
-
-      <div>
+      <div style={{ marginTop: '50px' }}>
         <div className="row no-gutters mb-4">
           <div className="col-md-6">
             <h2>Library</h2>
@@ -118,53 +118,59 @@ const Library = () => {
             </div>
           </form>
           <dl>
-            {files.map((file) => (
-              <React.Fragment key={file._id}>
-                <dt style={{ fontSize: 'medium' }}>
-                  <form action={`/library/updatefiletype/${file._id}`} method="post">
-                    <select
-                      id="filetype"
-                      name="filetype"
-                      style={{ marginBottom: '-15px' }}
-                      onChange={() =>
-                        updateFileType(file._id, document.getElementById('filetype').value)
-                      }
+            {files &&
+              files.map((file) => (
+                <React.Fragment key={file._id}>
+                  <dt style={{ fontSize: 'medium' }}>
+                    <form action={`/library/updatefiletype/${file._id}`} method="post">
+                      <select
+                        id="filetype"
+                        name="filetype"
+                        style={{ marginBottom: '-15px' }}
+                        onChange={() =>
+                          updateFileType(file._id, document.getElementById('filetype').value)
+                        }
+                      >
+                        <option value="">Library</option>
+                        {docList &&
+                          docList.map((doc) => (
+                            <option
+                              key={doc.name}
+                              value={doc.name}
+                              selected={doc.name === file.type}
+                            >
+                              {doc.name}
+                            </option>
+                          ))}
+                      </select>
+                    </form>
+                  </dt>
+                  <dd>
+                    {file.fileName}
+                    &nbsp;
+                    <a href={file.uri} target="_blank" rel="noopener noreferrer">
+                      <FontAwesomeIcon icon={faEye} />
+                    </a>
+                    &nbsp;&nbsp;
+                    <a
+                      href={file.uri}
+                      download={file.fileName}
+                      target="_blank"
+                      rel="noopener noreferrer"
                     >
-                      <option value="">Library</option>
-                      {docList.map((doc) => (
-                        <option key={doc.name} value={doc.name} selected={doc.name === file.type}>
-                          {doc.name}
-                        </option>
-                      ))}
-                    </select>
-                  </form>
-                </dt>
-                <dd>
-                  {file.fileName}
-                  &nbsp;
-                  <a href={file.uri} target="_blank" rel="noopener noreferrer">
-                    <FontAwesomeIcon icon={faEye} />
-                  </a>
-                  &nbsp;&nbsp;
-                  <a
-                    href={file.uri}
-                    download={file.fileName}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <FontAwesomeIcon icon={faDownload} />
-                  </a>
-                  &nbsp;
-                  <a
-                    style={{ marginLeft: 'auto' }}
-                    href="#"
-                    onClick={() => confirmDelete(file._id)}
-                  >
-                    <FontAwesomeIcon icon={faTrash} />
-                  </a>
-                </dd>
-              </React.Fragment>
-            ))}
+                      <FontAwesomeIcon icon={faDownload} />
+                    </a>
+                    &nbsp;
+                    <a
+                      style={{ marginLeft: 'auto' }}
+                      href="#"
+                      onClick={() => confirmDelete(file._id)}
+                    >
+                      <FontAwesomeIcon icon={faTrash} />
+                    </a>
+                  </dd>
+                </React.Fragment>
+              ))}
           </dl>
         </article>
       </div>

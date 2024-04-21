@@ -259,7 +259,7 @@ const Forms = () => {
   };
 
   return (
-    <Container>
+    <Container style={{ marginTop: '50px' }}>
       <Row>
         <Col md={6}>
           <h2>Forms</h2>

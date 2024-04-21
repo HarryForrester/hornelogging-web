@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, Button, Form, Spinner } from 'react-bootstrap';
-
+import PropTypes from 'prop-types';
 const SelectRoleType = ({ selectedRole, onChange }) => {
   const roleOptions = [
     'Loader Operator',
@@ -16,7 +16,7 @@ const SelectRoleType = ({ selectedRole, onChange }) => {
   ];
 
   return (
-    <Form.Group className="col-md-6">
+    <Form.Group className="col-md-4">
       <Form.Label htmlFor="roleInput" className="form-label">
         Role
       </Form.Label>
@@ -40,4 +40,8 @@ const SelectRoleType = ({ selectedRole, onChange }) => {
   );
 };
 
+SelectRoleType.propTypes = {
+  selectedRole: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired
+};
 export default SelectRoleType;
