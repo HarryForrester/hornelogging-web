@@ -1,5 +1,5 @@
-import { createContext, useContext, useState } from 'react';
-
+import React, { createContext, useContext, useState } from 'react';
+import PropTypes from 'prop-types';
 const PersonDataContext = createContext();
 
 export const PersonDataProvider = ({ children }) => {
@@ -9,7 +9,8 @@ export const PersonDataProvider = ({ children }) => {
     fileTypes: [],
     crewTypes: [],
     timesheetAccess: [],
-    forms: []
+    forms: [],
+    quals: [],
   });
 
   return (
@@ -19,6 +20,9 @@ export const PersonDataProvider = ({ children }) => {
   );
 };
 
+PersonDataProvider.propTypes = {
+  children: PropTypes.object.isRequired,
+}
 export const usePersonData = () => {
   return useContext(PersonDataContext);
 };
