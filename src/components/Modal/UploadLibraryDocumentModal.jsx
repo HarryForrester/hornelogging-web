@@ -6,7 +6,7 @@ import { usePersonData } from '../PersonData';
 import PropTypes from 'prop-types';
 import DragAndDropUpload from '../DragAndDropUpload';
 
-const UploadUserDocumentModal = ({ show, close }) => {
+const UploadLibraryDocumentModal = ({ show, close, docTypes: fileTypes, updateLibraryFiles }) => {
   const [fileName, setFileName] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
   const [fileTypeIsValid, setFileTypeIsValid] = useState(null);
@@ -25,6 +25,7 @@ const UploadUserDocumentModal = ({ show, close }) => {
     setFileTypeIsValid(null);
     setUploadPercentage(0);
     setSelectedFileType('defaultFileType');
+    setShowProgressBar(false);
   };
 
   const removeUploadedFile = () => {
@@ -59,37 +60,28 @@ const UploadUserDocumentModal = ({ show, close }) => {
       formData.append('fileType', fileTypeValue);
 
       try {
-        const response = await axios.post(
-          `${process.env.REACT_APP_URL}/person/upload/${personDataState.person._id}`,
-          formData,
-          {
-            withCredentials: true,
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            },
-            onUploadProgress: (progressEvent) => {
-              const percentage = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-              setUploadPercentage(percentage);
-            }
+        const response = await axios.post(`${process.env.REACT_APP_URL}/library/upload`, formData, {
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          },
+          onUploadProgress: (progressEvent) => {
+            const percentage = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            setUploadPercentage(percentage);
           }
-        );
+        });
 
         if (response.status === 200) {
-          //fileInput.value = '';
-          setPersonDataState((prevState) => ({
-            ...prevState,
-            files: [...prevState.files, response.data.file]
-          }));
-
+          updateLibraryFiles(response.data.files);
           setAlertMessageState((prevState) => ({
             ...prevState,
             toasts: [
               ...prevState.toasts,
               {
                 id: id,
-                heading: 'File Uploaded',
+                heading: 'Library File Uploaded',
                 show: true,
-                message: `Success! ${fileTypeValue} file ${fileName} has been uploaded successfully`,
+                message: `Success! ${fileTypeValue} file ${fileName} has been uploaded successfully to Library`,
                 background: 'success',
                 color: 'white'
               }
@@ -107,7 +99,7 @@ const UploadUserDocumentModal = ({ show, close }) => {
               id: id,
               heading: 'Error',
               show: true,
-              message: `Error has occurred while submitting ${fileTypeValue} file ${fileName}, please try again`,
+              message: `Error has occurred while submitting ${fileTypeValue} file ${fileName} to Library, please try again`,
               background: 'danger',
               color: 'white'
             }
@@ -135,7 +127,7 @@ const UploadUserDocumentModal = ({ show, close }) => {
     <Modal show={show} onHide={handleClose} backdrop="static" centered>
       <Modal.Header className="modal-header" closeButton>
         <h5 className="modal-title" id="uploadMapModalLabel">
-          Upload Employee File
+          Upload Library File
         </h5>
       </Modal.Header>
       <Modal.Body className="modal-body">
@@ -187,13 +179,11 @@ const UploadUserDocumentModal = ({ show, close }) => {
                   <option value="defaultFileType" disabled>
                     Select a file type
                   </option>
-                  {personDataState &&
-                    personDataState.fileTypes &&
-                    personDataState.fileTypes.map((fileType) => (
-                      <option key={fileType} value={fileType}>
-                        {fileType}
-                      </option>
-                    ))}
+                  {fileTypes.map((fileType) => (
+                    <option key={fileType._id} value={fileType.name}>
+                      {fileType.name}
+                    </option>
+                  ))}
                 </Form.Select>
                 <Form.Control.Feedback type="invalid">
                   Please select a file type.
@@ -225,9 +215,11 @@ const UploadUserDocumentModal = ({ show, close }) => {
   );
 };
 
-UploadUserDocumentModal.propTypes = {
+UploadLibraryDocumentModal.propTypes = {
   show: PropTypes.bool.isRequired,
-  close: PropTypes.func.isRequired
+  close: PropTypes.func.isRequired,
+  docTypes: PropTypes.array.isRequired,
+  updateLibraryFiles: PropTypes.func.isRequired
 };
 
-export default UploadUserDocumentModal;
+export default UploadLibraryDocumentModal;

@@ -165,7 +165,7 @@ const PersonDocumentCard = () => {
               ...prevState.toasts,
               {
                 id: id,
-                heading: 'Person Document Added',
+                heading: 'Person Document Removed',
                 show: true,
                 message: `Success! ${fileName} has been removed to ${personDataState.person.name} documents `,
                 background: 'success',
@@ -230,56 +230,55 @@ const PersonDocumentCard = () => {
 
         {/* File list */}
         {Object.entries(filesByType).map(([fileType, files]) => (
-  <div key={fileType} className="mb-4">
-    <h5>{fileType}</h5>
-    <ListGroup>
-      {files.map((file) => (
-        <ListGroup.Item
-          key={file._id}
-          className="d-flex justify-content-between align-items-center border-0"
-          style={{ backgroundColor: '#f8f9fa', borderRadius: '8px' }}
-        >
-          <div className="d-flex flex-column">
-            <span className="fs-6">{file.fileName}</span>
-            <div className="d-flex">
-              {/* View */}
-              <a
-                href={process.env.REACT_APP_URL + file.uri}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-outline-secondary btn-sm text-decoration-none me-2"
-              >
-                <FontAwesomeIcon icon={faEye} className="me-1" />
-                View
-              </a>
-              {/* Download */}
-              <a
-                href={`${process.env.REACT_APP_URL}${file.uri}?download=true`}
-                download={file.fileName}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-outline-secondary btn-sm text-decoration-none me-2"
-              >
-                <FontAwesomeIcon icon={faDownload} className="me-1" />
-                Download
-              </a>
-            </div>
+          <div key={fileType} className="mb-4">
+            <h5>{fileType}</h5>
+            <ListGroup>
+              {files.map((file) => (
+                <ListGroup.Item
+                  key={file._id}
+                  className="d-flex justify-content-between align-items-center border-0"
+                  style={{ backgroundColor: '#f8f9fa', borderRadius: '8px' }}
+                >
+                  <div className="d-flex flex-column">
+                    <span className="fs-6">{file.fileName}</span>
+                    <div className="d-flex">
+                      {/* View */}
+                      <a
+                        href={process.env.REACT_APP_URL + file.uri}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-outline-secondary btn-sm text-decoration-none me-2"
+                      >
+                        <FontAwesomeIcon icon={faEye} className="me-1" />
+                        View
+                      </a>
+                      {/* Download */}
+                      <a
+                        href={`${process.env.REACT_APP_URL}${file.uri}?download=true`}
+                        download={file.fileName}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-outline-secondary btn-sm text-decoration-none me-2"
+                      >
+                        <FontAwesomeIcon icon={faDownload} className="me-1" />
+                        Download
+                      </a>
+                    </div>
+                  </div>
+                  {/* Delete */}
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    onClick={() => handleFileDelete(file.fileName, file._id)}
+                  >
+                    <FontAwesomeIcon icon={faTrash} className="me-1" />
+                    Delete
+                  </Button>
+                </ListGroup.Item>
+              ))}
+            </ListGroup>
           </div>
-          {/* Delete */}
-          <Button
-            variant="danger"
-            size="sm"
-            onClick={() => handleFileDelete(file.fileName, file._id)}
-          >
-            <FontAwesomeIcon icon={faTrash} className="me-1" />
-            Delete
-          </Button>
-        </ListGroup.Item>
-      ))}
-    </ListGroup>
-  </div>
-))}
-
+        ))}
       </Card.Body>
     </Card>
   );

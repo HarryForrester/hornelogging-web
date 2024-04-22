@@ -8,9 +8,10 @@ import { SkidModalProvider, useSkidModal } from './Skid/SkidModalContext';
 import { useAlertMessage } from '../AlertMessage';
 import { useMap } from '../Map/MapContext';
 import Feedback from 'react-bootstrap/esm/Feedback';
+import DragAndDropUpload from '../DragAndDropUpload';
 const UploadPdfModal = () => {
   const [pdfName, setPdfName] = useState(null);
-  const [selectedPdf, setSelectedPdf] = useState(null);
+  //const [selectedPdf, setSelectedPdf] = useState(null);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [pdfNameIsValid, setPdfNameIsValid] = useState(null);
   const [pdfFileIsValid, setPdfFileIsValid] = useState(null);
@@ -21,6 +22,9 @@ const UploadPdfModal = () => {
   const { alertMessageState, setAlertMessageState } = useAlertMessage();
   const { mapState, setMapState } = useMap();
 
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [fileIsValid, setFileIsValid] = useState(null);
+
   const handlePdfNameChange = (event) => {
     setPdfName(event);
     setPdfNameIsValid(event ? true : null);
@@ -28,7 +32,8 @@ const UploadPdfModal = () => {
 
   const handlePdfInputChange = (event) => {
     const file = event.target.files[0];
-    setSelectedPdf(file);
+    //setSelectedPdf(file);
+    setSelectedFile(file);
     setPdfFileIsValid(event ? true : null);
   };
 
@@ -43,11 +48,11 @@ const UploadPdfModal = () => {
       //setMessage("Please enter a name map name")
       setPdfNameIsValid(false);
       //setShowErrorModal(true);
-    } else if (!selectedPdf) {
+    } else if (!selectedFile) {
       setPdfFileIsValid(false);
     } else {
       const formData = new FormData();
-      formData.append('file', selectedPdf);
+      formData.append('file', selectedFile);
       formData.append('id', pdfName);
 
       try {
@@ -125,7 +130,8 @@ const UploadPdfModal = () => {
 
   const resetForm = () => {
     setPdfName(null);
-    setSelectedPdf(null);
+    //setSelectedPdf(null);
+    setSelectedFile(null);
     setPdfFileIsValid(null);
     setPdfNameIsValid(null);
     setUploadPercentage(0);
@@ -138,6 +144,10 @@ const UploadPdfModal = () => {
     }));
 
     resetForm();
+  };
+
+  const removeUploadedFile = () => {
+    setSelectedFile(null);
   };
 
   return (
@@ -175,9 +185,18 @@ const UploadPdfModal = () => {
           </Form.Group>
           <Form.Group className="mb-3">
             {/* <FileInputWithLabel label={"Upload PDF Map"} name={"pdf-input"} onChange={handlePdfInputChange} /> */}
-            <Form.Label>Upload PDF Map</Form.Label>
-
-            <Form.Control
+            <Form.Label>
+              Upload PDF Map
+              {fileIsValid === false && <span className="text-danger"> * File Required</span>}
+            </Form.Label>
+            <DragAndDropUpload
+              setSelectedFile={setSelectedFile}
+              setFileIsValid={setFileIsValid}
+              selectedFile={selectedFile}
+              removeUploadedFile={removeUploadedFile}
+              fileTypes={{ 'application/pdf': [] }}
+            />
+            {/* <Form.Control
               type={'file'}
               className="form-control"
               id="pdf-input"
@@ -190,6 +209,7 @@ const UploadPdfModal = () => {
             {pdfFileIsValid === false && (
               <Feedback type="invalid">Please select a valid file.</Feedback>
             )}
+ */}{' '}
           </Form.Group>
         </Form>
       </Modal.Body>

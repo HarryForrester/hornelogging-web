@@ -3,7 +3,7 @@ import SelectRoleType from '../SelectList/SelectRoleType';
 import InputWithLabel from '../Input/InputWithLabel';
 import SelectWithLabel from '../Select/SelectWithLabel';
 import axios from 'axios';
-import { Button, Form, Image, Modal, Spinner } from 'react-bootstrap';
+import { Button, Form, Image, Modal, Spinner, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { useSkidModal } from './Skid/SkidModalContext';
 import { useMap } from '../Map/MapContext';
 import { usePersonData } from '../PersonData';
@@ -210,14 +210,16 @@ const EditPersonModal = () => {
         <Form onSubmit={handleSubmit}>
           <Form.Group className="row g-4">
             <Form.Group className="col-md-3">
-              <Form.Label htmlFor="imgurl">
+              <Form.Label htmlFor="imgurl" className="image-container">
                 <Image
                   src={formState?.imgPreview || process.env.REACT_APP_URL + '/' + person?.imgUrl}
                   className="figure-img img-fluid z-depth-1 rounded mb-0 border border-dark"
                   alt="..."
                   id="img-preview"
                 />
-                <Button>Click</Button>
+                <OverlayTrigger placement="bottom" overlay={<Tooltip>Upload image</Tooltip>}>
+                  <div className="image-overlay">Upload image</div>
+                </OverlayTrigger>
                 <Form.Control
                   type="file"
                   id="imgurl"
@@ -291,7 +293,7 @@ const EditPersonModal = () => {
               />
             </Form.Group>
 
-            <Form.Group className="col-md-4">
+            <Form.Group className="col-md-5">
               <Form.Label htmlFor="roleInput" className="form-label">
                 Crew
               </Form.Label>
@@ -319,12 +321,16 @@ const EditPersonModal = () => {
               selectedRole={formState.role}
               key={formState.role}
             />
-            <Form.Check
-              type="checkbox"
-              label="Archive"
-              checked={formState.archive}
-              onChange={(e) => handleInputChange('archive', e.target.checked)}
-            />
+            <Form.Group className="col-md-1">
+              <div style={{ paddingTop: '30px' }}>
+                <Form.Check
+                  type="checkbox"
+                  label="Archive"
+                  checked={formState.archive ? JSON.parse(formState.archive) : false}
+                  onChange={(e) => handleInputChange('archive', e.target.checked)}
+                />
+              </div>
+            </Form.Group>
 
             <Form.Group className="col-md-6">
               <InputWithLabel

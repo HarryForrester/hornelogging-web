@@ -644,3 +644,27 @@ button[for='current-maps'] {
 .icon {
   margin-right: 89px;
 }
+
+.image-container {
+  position: relative;
+  display: inline-block;
+}
+
+.image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* semi-transparent background */
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0; /* initially hidden */
+  transition: opacity 0.3s ease; /* smooth transition */
+}
+
+.image-container:hover .image-overlay {
+  opacity: 1; /* show overlay on hover */
+}
