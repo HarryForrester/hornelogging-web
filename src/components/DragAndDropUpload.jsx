@@ -41,7 +41,7 @@ const DragAndDropUpload = ({
   setSelectedFile,
   setFileIsValid,
   removeUploadedFile,
-  fileTypes,
+  fileTypes
 }) => {
   const { getRootProps, getInputProps, isFocused, isDragAccept, isDragReject } = useDropzone({
     accept: fileTypes,

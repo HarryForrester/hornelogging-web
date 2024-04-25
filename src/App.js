@@ -9,7 +9,7 @@ import Library from './pages/library.jsx';
 import Hazards from './pages/hazards.jsx';
 import Forms from './pages/forms.jsx';
 import Profile from './pages/profile.jsx';
-
+import Training from './pages/training.jsx';
 import NotFound from './components/NotFound.jsx';
 import { pdfjs } from 'react-pdf';
 import axios from 'axios';
@@ -142,6 +142,15 @@ function App() {
               <React.Fragment>
                 <NavBar />
                 <Profile />
+              </React.Fragment>
+            }
+          />
+          <Route
+            path="/training/:id?"
+            element={
+              <React.Fragment>
+                <NavBar />
+                <Training />
               </React.Fragment>
             }
           />

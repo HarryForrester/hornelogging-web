@@ -9,23 +9,19 @@ import { usePersonData } from '../PersonData';
 
 const QualificationsCard = ({ person }) => {
   const [isQualModalVisible, setQualModalVisible] = useState(false);
-    const { personDataState, setPersonDataState } = usePersonData();
-
-
+  const { personDataState, setPersonDataState } = usePersonData();
 
   return (
     <>
-    <AddQualificationModal show={isQualModalVisible} hide={() => setQualModalVisible(false)}/>
-    <Card className="mb-5">
-      <Card.Header className="bg-light">Qualifications</Card.Header>
+      <AddQualificationModal show={isQualModalVisible} hide={() => setQualModalVisible(false)} />
+      <Card className="mb-5">
+        <Card.Header className="bg-light">Qualifications</Card.Header>
 
-      <Card.Body>
-      <Button onClick={() => setQualModalVisible(true)}>Add Qualification</Button>
-      <QualifiedTable quals={personDataState.quals} person={person} />
-
-
-      </Card.Body>
-    </Card>
+        <Card.Body>
+          <Button onClick={() => setQualModalVisible(true)}>Add Qualification</Button>
+          <QualifiedTable quals={personDataState.quals} person={person} />
+        </Card.Body>
+      </Card>
     </>
   );
 };

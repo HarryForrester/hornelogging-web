@@ -40,7 +40,7 @@ const Person = () => {
             crewTypes: data.crewTypes,
             timesheetAccess: data.timesheetAccess,
             forms: data.forms,
-            quals: data.quals,
+            quals: data.quals
           }));
         } else {
           navigate('/login');
@@ -83,7 +83,7 @@ const Person = () => {
       <br />
       <PersonDocumentCard />
       <br />
-      <QualificationsCard person={personDataState.person}/>
+      <QualificationsCard person={personDataState.person} />
 
       <PersonFormAccessCard />
       <EditPersonModal />
