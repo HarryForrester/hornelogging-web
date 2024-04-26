@@ -8,61 +8,61 @@ import axios from 'axios';
 import { useAlertMessage } from './AlertMessage';
 const OnJobTraining = ({ person, onjobs, showModal, updateOnjobTrainingRecords }) => {
   const [selectedRows, setSelectedRows] = useState([]);
-const {id: userId} = useParams();
-const { setAlertMessageState } = useAlertMessage();
+  const { id: userId } = useParams();
+  const { setAlertMessageState } = useAlertMessage();
 
-  const handleRemoveonjobTraining = async(_id) => {
+  const handleRemoveonjobTraining = async (_id) => {
     const id = new Date().getTime(); // creates id for alert messages
 
-    console.log('onJobTraining', _id, userId);
-
     try {
-        const resposne = await axios.post(`${process.env.REACT_APP_URL}/removeOnjobTraining`, {_id, userId}, {withCredentials: true});
+      const resposne = await axios.post(
+        `${process.env.REACT_APP_URL}/removeOnjobTraining`,
+        { _id, userId },
+        { withCredentials: true }
+      );
 
-        if (resposne.status === 200) {
-            console.log('data jajaj', resposne.data);
-            updateOnjobTrainingRecords(resposne.data.onJobTraining);
-            setAlertMessageState((prevState) => ({
-                ...prevState,
-                toasts: [
-                  ...prevState.toasts,
-                  {
-                    id: id,
-                    heading: 'On-Job Training Record Removed',
-                    show: true,
-                    message: `Success! On-Job Training Record has been removed`,
-                    background: 'success',
-                    color: 'white'
-                  }
-                ]
-              }));
-        }
-
-    } catch (err) {
+      if (resposne.status === 200) {
+        updateOnjobTrainingRecords(resposne.data.onJobTraining);
         setAlertMessageState((prevState) => ({
-            ...prevState,
-            toasts: [
-              ...prevState.toasts,
-              {
-                id: id,
-                heading: 'Error: Could not remove on-job training record',
-                show: true,
-                message: `Error has occurred while removing on-job training record, please try again`,
-                background: 'danger',
-                color: 'white'
-              }
-            ]
-          }));
-        console.error("An error occurred while removing onjob training record", err);
+          ...prevState,
+          toasts: [
+            ...prevState.toasts,
+            {
+              id: id,
+              heading: 'On-Job Training Record Removed',
+              show: true,
+              message: `Success! On-Job Training Record has been removed`,
+              background: 'success',
+              color: 'white'
+            }
+          ]
+        }));
+      }
+    } catch (err) {
+      setAlertMessageState((prevState) => ({
+        ...prevState,
+        toasts: [
+          ...prevState.toasts,
+          {
+            id: id,
+            heading: 'Error: Could not remove on-job training record',
+            show: true,
+            message: `Error has occurred while removing on-job training record, please try again`,
+            background: 'danger',
+            color: 'white'
+          }
+        ]
+      }));
+      console.error('An error occurred while removing onjob training record', err);
     } finally {
-        setTimeout(() => {
-            setAlertMessageState((prevState) => ({
-              ...prevState,
-              toasts: prevState.toasts.filter((toast) => toast.id !== id)
-            }));
-          }, 10000);
+      setTimeout(() => {
+        setAlertMessageState((prevState) => ({
+          ...prevState,
+          toasts: prevState.toasts.filter((toast) => toast.id !== id)
+        }));
+      }, 10000);
     }
-  }
+  };
 
   const handleCheckboxChange = (checked, onjob) => {
     setSelectedRows((prevSelectedRows) => {
@@ -88,10 +88,7 @@ const { setAlertMessageState } = useAlertMessage();
 
   const printSelected = () => {
     // Logic to print selected rows
-    if (selectedRows.length < 1) {
-      console.log('hey');
-    } else {
-      console.log('for fucks sake', selectedRows);
+    if (!selectedRows.length < 1) {
       showPrintableWindow();
     }
   };
@@ -210,8 +207,6 @@ const { setAlertMessageState } = useAlertMessage();
     printWindow.print();
   };
 
-  // Call showPrintableWindow() to display the printable HTML in a new window for printing
-
   return (
     <div>
       <div>
@@ -220,13 +215,13 @@ const { setAlertMessageState } = useAlertMessage();
           <h3>On-job Training</h3>
         </div>
         <div style={{ float: 'right' }}>
-          <Button variant="primary" onClick={toggleSelectAll}>
+          <Button variant="primary" onClick={toggleSelectAll} style={{ marginRight: '10px' }}>
             <b>Select All</b>
           </Button>
-          <Button variant="primary" onClick={toggleSelectNone}>
+          <Button variant="primary" onClick={toggleSelectNone} style={{ marginRight: '10px' }}>
             <b>Select None</b>
           </Button>
-          <Button variant="primary" onClick={printSelected}>
+          <Button variant="primary" onClick={printSelected} style={{ marginRight: '10px' }}>
             <FontAwesomeIcon icon={faPrint} />
           </Button>
           <Button variant="primary" onClick={showModal} data-toggle="modal" data-target="#myModal1">
@@ -256,7 +251,11 @@ const { setAlertMessageState } = useAlertMessage();
                           {onjob.date}: {onjob.reportType}
                         </b>
                       </div>
-                      <Button variant="default" size="xs" onClick={() => handleRemoveonjobTraining(onjob._id)}>
+                      <Button
+                        variant="default"
+                        size="xs"
+                        onClick={() => handleRemoveonjobTraining(onjob._id)}
+                      >
                         <FontAwesomeIcon icon={faCircleXmark} /> Delete
                       </Button>
                     </div>
@@ -315,7 +314,7 @@ OnJobTraining.propTypes = {
   person: PropTypes.object.isRequired,
   onjobs: PropTypes.func.isRequired,
   showModal: PropTypes.bool.isRequired,
-  updateOnjobTrainingRecords: PropTypes.func.isRequired,
+  updateOnjobTrainingRecords: PropTypes.func.isRequired
 };
 
 export default OnJobTraining;

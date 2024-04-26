@@ -9,13 +9,18 @@ import PeopleAndCrewSearch from '../components/Input/PeopleAndCrewSearch';
 import CrewCard from '../components/Card/CrewCard';
 import NavBar from '../components/NavBar/main.jsx';
 import { useMap } from '../components/Map/MapContext.js';
-import { Card } from 'react-bootstrap';
+import { Card, Button } from 'react-bootstrap';
 import PersonCard from '../components/Card/PersonCard.jsx';
 
 const Crews = () => {
   const [username, setUsername] = useState('');
   const navigate = useNavigate();
   const { mapState, setMapState } = useMap();
+  const [showArchived, setShowArchived] = useState(false);
+
+  const toggleArchivedStaff = () => {
+    setShowArchived(!showArchived);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -63,15 +68,20 @@ const Crews = () => {
           <CrewCard key={crew.name} crew={crew} />
         ))}
 
-        <Card className="mb-5">
-          <Card.Header className="bg-light">
-            <h5 className="mb-0 crew-name">Archive</h5>
-          </Card.Header>
+        <Button onClick={toggleArchivedStaff} className="mb-3">
+          {showArchived ? 'Hide Archived Staff' : 'Show Archived Staff'}
+        </Button>
+        {showArchived && (
+          <Card className="mb-5">
+            <Card.Header className="bg-light">
+              <h5 className="mb-0 crew-name">Archived Staff</h5>
+            </Card.Header>
 
-          <Card.Body>
-            <PersonCard people={mapState.archivedPeople} />
-          </Card.Body>
-        </Card>
+            <Card.Body>
+              <PersonCard people={mapState.archivedPeople} />
+            </Card.Body>
+          </Card>
+        )}
 
         <AddPersonModal />
         <AddCrewModal />

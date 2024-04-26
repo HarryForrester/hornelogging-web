@@ -5,13 +5,11 @@ import PropTypes from 'prop-types';
 const TrainingProgramme = ({ records, handleAdd, handleEdit }) => {
   return (
     <div>
-      <div>
-        <div className="d-flex justify-content-end">
-          <Button variant="primary" onClick={handleAdd}>
-            <b>+</b>
-          </Button>
-        </div>
+      <div className="d-flex justify-content-between align-items-center pb-1">
         <h3>Training Programme</h3>
+        <Button variant="primary" onClick={handleAdd}>
+          <b>+</b>
+        </Button>
       </div>
 
       <Table striped bordered condensed>

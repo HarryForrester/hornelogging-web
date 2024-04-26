@@ -3,11 +3,13 @@ import { Modal, Form, Button } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import { useAlertMessage } from '../AlertMessage';
+import { useParams } from 'react-router-dom';
 const AddTrainingRecordModal = ({
   employeeId,
   show,
   hide,
   setTrainingRecords,
+  setOutstanding,
   selectedRecord,
   setSelectedRecord,
   editMode
@@ -19,6 +21,7 @@ const AddTrainingRecordModal = ({
   const [achievedDate, setAchievedDate] = useState('');
   const { alertMessageState, setAlertMessageState } = useAlertMessage();
   const [_id, setId] = useState(null);
+  const { id } = useParams();
 
   useEffect(() => {
     setRequirement(selectedRecord?.requirement);
@@ -44,13 +47,16 @@ const AddTrainingRecordModal = ({
 
     const data = {
       _id,
-      employee: employeeId,
       requirement,
       unit,
       issued,
       targetDate,
       achievedDate
     };
+
+    if (id) {
+      data.employee = employeeId;
+    }
     console.log('handle me hehe', data);
 
     let url;
@@ -67,7 +73,13 @@ const AddTrainingRecordModal = ({
       });
 
       if (response.status === 200) {
-        setTrainingRecords(response.data.trainingRecords);
+        console.log('oi you man: ', response.data);
+        if (response.data.trainingRecords) {
+          setTrainingRecords(response.data.trainingRecords);
+        } else if (response.data.outstanding) {
+          setOutstanding(response.data.outstanding);
+        }
+
         onClose();
 
         setAlertMessageState((prevState) => ({
@@ -168,6 +180,7 @@ AddTrainingRecordModal.propTypes = {
   hide: PropTypes.func.isRequired,
   employeeId: PropTypes.string.isRequired,
   setTrainingRecords: PropTypes.func.isRequired,
+  setOutstanding: PropTypes.func.isRequired,
   title: PropTypes.string.isRequired,
   selectedRecord: PropTypes.object.isRequired,
   setSelectedRecord: PropTypes.func.isRequired,

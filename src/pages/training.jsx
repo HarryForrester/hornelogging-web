@@ -100,6 +100,7 @@ const Training = () => {
         hide={() => setTRModalVisble(false)}
         employeeId={currentEmployeeId}
         setTrainingRecords={setTrainingRecords}
+        setOutstanding={setOutstanding}
         selectedRecord={selectedRecord}
         setSelectedRecord={setSelectedRecord}
         editMode={editTrainingRecordModal}
@@ -132,7 +133,7 @@ const Training = () => {
             ))}
         </Form.Select>
       </Form.Group>
-      <br/>
+      <br />
       {currentEmployeeId && (
         <>
           <TrainingProgramme
