@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 const RemoveSkidButton = ({ onClick }) => {
   const buttonStyle = {
@@ -22,5 +23,9 @@ const RemoveSkidButton = ({ onClick }) => {
     </button>
   );
 };
+
+RemoveSkidButton.propTypes = {
+  onClick: PropTypes.func.isRequired,
+}
 
 export default RemoveSkidButton;

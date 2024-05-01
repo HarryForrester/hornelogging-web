@@ -440,6 +440,7 @@ const PDFViewer = ({ hazards, percentage }) => {
                 onLoadSuccess={(page) => {
                   const { width, height } = page;
                   //console.log("width: " + width + " height: " + height)
+                  setMapState((prevState) => ({...prevState, originalWidth: width, originalHeight: height}))
                   setPdfSize({ width, height });
                 }}
               />

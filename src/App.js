@@ -10,6 +10,7 @@ import Hazards from './pages/hazards.jsx';
 import Forms from './pages/forms.jsx';
 import Profile from './pages/profile.jsx';
 import Training from './pages/training.jsx';
+import Tasks from './components/Tasks.jsx';
 import NotFound from './components/NotFound.jsx';
 import { pdfjs } from 'react-pdf';
 import axios from 'axios';
@@ -145,6 +146,16 @@ function App() {
               </React.Fragment>
             }
           />
+          <Route
+            path="/tasks"
+            element={
+              <React.Fragment>
+                <NavBar />
+                <Tasks />
+              </React.Fragment>
+            }
+          />
+
           <Route
             path="/training/:id?"
             element={

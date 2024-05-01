@@ -1,4 +1,6 @@
+import React from 'react';
 import { createContext, useContext, useState } from 'react';
+import PropTypes from 'prop-types';
 
 const SkidModalContext = createContext();
 
@@ -33,6 +35,10 @@ export const SkidModalProvider = ({ children }) => {
     </SkidModalContext.Provider>
   );
 };
+
+SkidModalProvider.propTypes = {
+  children: PropTypes.object.isRequired,
+}
 
 export const useSkidModal = () => {
   return useContext(SkidModalContext);

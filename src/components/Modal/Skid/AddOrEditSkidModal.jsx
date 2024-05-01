@@ -8,6 +8,7 @@ import { useMap } from '../../Map/MapContext';
 import { Anchor, ListGroup, ListGroupItem, Spinner } from 'react-bootstrap';
 import { useAlertMessage } from '../../AlertMessage';
 import { useSkidMarker } from '../../SkidMarkerContext';
+import PropTypes from 'prop-types';
 
 const AddOrEditSkidModal = ({ mousePosition, editSkid, resetMarker }) => {
   const { skidModalState, setSkidModalState } = useSkidModal();
@@ -51,6 +52,8 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, resetMarker }) => {
       point: {
         originalWidth: mapState.originalWidth,
         originalHeight: mapState.originalHeight,
+        pdfHeight: mapState.pdfHeight,
+        pdfWidth: mapState.pdfWidth,
         x: mousePosition.x,
         y: mousePosition.y
       }
@@ -510,5 +513,11 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, resetMarker }) => {
     </>
   );
 };
+
+AddOrEditSkidModal.propTypes = {
+  editSkid: PropTypes.any.isRequired,
+  resetMarker: PropTypes.func.isRequired,
+  mousePosition: PropTypes.object.isRequired,
+}
 
 export default AddOrEditSkidModal;

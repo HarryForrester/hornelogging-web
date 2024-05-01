@@ -1,3 +1,4 @@
+import React from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
@@ -5,6 +6,7 @@ import axios from 'axios';
 import { useSkidModal } from './Skid/SkidModalContext';
 import { useMap } from '../Map/MapContext';
 import { Anchor, ListGroup, ListGroupItem } from 'react-bootstrap';
+import PropTypes from 'prop-types';
 
 const EditGeneralHazardModal = ({ submitGeneralHazardModal, handleClose }) => {
   const { skidModalState, setSkidModalState } = useSkidModal();
@@ -116,4 +118,8 @@ const EditGeneralHazardModal = ({ submitGeneralHazardModal, handleClose }) => {
   );
 };
 
+EditGeneralHazardModal.propTypes = {
+  submitGeneralHazardModal: PropTypes.func.isRequired,
+  handleClose: PropTypes.func.isRequired
+}
 export default EditGeneralHazardModal;

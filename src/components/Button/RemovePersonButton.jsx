@@ -6,7 +6,7 @@ import { Button } from 'react-bootstrap';
 import { useConfirmationModal } from '../ConfirmationModalContext';
 import { useNavigate } from 'react-router-dom';
 import { useAlertMessage } from '../AlertMessage';
-
+import PropTypes from 'prop-types';
 import axios from 'axios';
 
 /**
@@ -106,5 +106,9 @@ const RemovePersonButton = ({ person }) => {
     </>
   );
 };
+
+RemovePersonButton.propTypes = {
+  person: PropTypes.object.isRequired
+}
 
 export default RemovePersonButton;

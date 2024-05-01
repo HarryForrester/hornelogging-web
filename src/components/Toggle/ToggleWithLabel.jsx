@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 
 /**
  * Used for toggling a form so it can be enable for that person
@@ -38,5 +39,15 @@ const ToggleWithLabel = ({ type, personId, form, isFormEnabled, toggle, availabl
     </>
   );
 };
+
+ToggleWithLabel.propTypes = {
+  type: PropTypes.string.isRequired,
+  personId: PropTypes.number.isRequired,
+  form: PropTypes.object.isRequired,
+  isFormEnabled: PropTypes.bool.isRequired,
+  availableOnDevice: PropTypes.any.isRequired,
+  toggle: PropTypes.func.isRequired
+
+}
 
 export default ToggleWithLabel;

@@ -10,6 +10,12 @@ const OnJobTraining = ({ person, onjobs, showModal, updateOnjobTrainingRecords }
   const [selectedRows, setSelectedRows] = useState([]);
   const { id: userId } = useParams();
   const { setAlertMessageState } = useAlertMessage();
+  
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+    return date.toLocaleDateString('en-GB', options); // Assuming you want the format DD/MM/YYYY
+  };
 
   const handleRemoveonjobTraining = async (_id) => {
     const id = new Date().getTime(); // creates id for alert messages
@@ -159,7 +165,7 @@ const OnJobTraining = ({ person, onjobs, showModal, updateOnjobTrainingRecords }
           <td>
             <div class="d-flex align-items-center justify-content-between">
               <div class="d-inline-block">
-                <b class="d-inline-block">${onjob.date}: ${onjob.reportType}</b>
+                <b class="d-inline-block">${formatDate(onjob.date)}: ${onjob.reportType}</b>
               </div>
               <Button variant="default" size="xs" class="no-print">
                 <FontAwesomeIcon class="button-icon" icon={faCircleXmark} /> Delete
@@ -209,7 +215,7 @@ const OnJobTraining = ({ person, onjobs, showModal, updateOnjobTrainingRecords }
 
   return (
     <div>
-      <div>
+      <div style={{paddingBottom: '50px'}}>
         <br />
         <div style={{ float: 'left' }}>
           <h3>On-job Training</h3>
@@ -248,7 +254,7 @@ const OnJobTraining = ({ person, onjobs, showModal, updateOnjobTrainingRecords }
                           checked={selectedRows.includes(onjob)}
                         />
                         <b className="d-inline-block">
-                          {onjob.date}: {onjob.reportType}
+                          {formatDate(onjob.date)}: {onjob.reportType}
                         </b>
                       </div>
                       <Button

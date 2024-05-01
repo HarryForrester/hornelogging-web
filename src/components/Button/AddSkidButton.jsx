@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from 'react-bootstrap';
 import { useMap } from '../Map/MapContext';
+import PropTypes from 'prop-types';
 
 const AddSkidButton = ({ pdfContainerRef }) => {
   const { mapState, setMapState } = useMap();
@@ -33,5 +34,9 @@ const AddSkidButton = ({ pdfContainerRef }) => {
     </>
   );
 };
+
+AddSkidButton.propTypes = {
+  pdfContainerRef: PropTypes.func.isRequired
+}
 
 export default AddSkidButton;

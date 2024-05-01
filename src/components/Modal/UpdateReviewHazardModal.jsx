@@ -5,6 +5,7 @@ import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRemove } from '@fortawesome/free-solid-svg-icons';
 import Feedback from 'react-bootstrap/esm/Feedback';
+import PropTypes from 'prop-types';
 
 const UpdateReviewHazardModal = ({ submit }) => {
   const { hazardState, setHazardState } = useHazardState();
@@ -68,5 +69,9 @@ const UpdateReviewHazardModal = ({ submit }) => {
     </Modal>
   );
 };
+
+UpdateReviewHazardModal.propTypes = {
+  submit: PropTypes.func.isRequired
+}
 
 export default UpdateReviewHazardModal;

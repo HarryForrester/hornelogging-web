@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Form } from 'react-bootstrap';
+import PropTypes from 'prop-types';
 
 const HazardCard = ({ hazard, selectAll, handleHazardChange }) => {
   const { _id, color, id, title, cat, harms, reviewDate, reviewReason } = hazard;
@@ -59,5 +60,11 @@ const HazardCard = ({ hazard, selectAll, handleHazardChange }) => {
     </Card>
   );
 };
+
+HazardCard.propTypes = {
+  hazard: PropTypes.object.isRequired,
+  selectAll: PropTypes.object.isRequired,
+  handleHazardChange: PropTypes.func.isRequired
+}
 
 export default HazardCard;

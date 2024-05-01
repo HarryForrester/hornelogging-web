@@ -3,7 +3,7 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import { useSkidModal } from './Skid/SkidModalContext';
 import { useMap } from '../Map/MapContext';
-
+import PropTypes from 'prop-types';
 import { faZ } from '@fortawesome/free-solid-svg-icons';
 
 const SelectHazardsModal = ({ hazards, submitSelectedHazards }) => {
@@ -123,5 +123,10 @@ const SelectHazardsModal = ({ hazards, submitSelectedHazards }) => {
     </Modal>
   );
 };
+
+SelectHazardsModal.propTypes = {
+  hazards: PropTypes.array.isRequired,
+  submitSelectedHazards: PropTypes.func.isRequired, 
+}
 
 export default SelectHazardsModal;

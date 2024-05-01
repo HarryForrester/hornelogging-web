@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Modal, Form, Button } from 'react-bootstrap';
+import PropTypes from 'prop-types';
 
 const HazardReviewModal = ({ show, onHide, onSubmit }) => {
   const [comment, setComment] = useState('');
@@ -43,5 +44,11 @@ const HazardReviewModal = ({ show, onHide, onSubmit }) => {
     </Modal>
   );
 };
+
+HazardReviewModal.propTypes = {
+  show: PropTypes.bool.isRequired,
+  onHide: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired
+}
 
 export default HazardReviewModal;

@@ -39,21 +39,7 @@ const AddOnjobTrainingRecordModal = ({
     // Handle saving data here
     console.log('Form data:', formData);
     // Clear form data
-    setFormData({
-      reportType: 'Training/Assessment',
-      date: '',
-      trainer: '',
-      talk: '',
-      talkTime: '',
-      show: '',
-      showTime: '',
-      look: '',
-      lookTime: '',
-      confirm: '',
-      confirmTime: '',
-      competence: 'Constant Supervision Required'
-    });
-
+    
     try {
       console.log('form data ok:)', formData);
       const response = await axios.post(
@@ -84,6 +70,21 @@ const AddOnjobTrainingRecordModal = ({
           ]
         }));
       }
+      setFormData({
+        reportType: 'Training/Assessment',
+        date: '',
+        trainer: '',
+        talk: '',
+        talkTime: '',
+        show: '',
+        showTime: '',
+        look: '',
+        lookTime: '',
+        confirm: '',
+        confirmTime: '',
+        competence: 'Constant Supervision Required'
+      });
+  
     } catch (err) {
       setAlertMessageState((prevState) => ({
         ...prevState,
@@ -137,7 +138,7 @@ const AddOnjobTrainingRecordModal = ({
             </Form.Group>
             <Form.Group>
               <Form.Label>Date</Form.Label>
-              <Form.Control type="text" name="date" value={formData.date} onChange={handleChange} />
+              <Form.Control type="date" name="date" value={formData.date} onChange={handleChange} />
             </Form.Group>
             <Form.Group>
               <Form.Label>Trainer</Form.Label>
@@ -159,7 +160,7 @@ const AddOnjobTrainingRecordModal = ({
               />
               <Form.Control
                 style={{ width: '100px', float: 'right', marginTop: '4px' }}
-                type="text"
+                type={'text'}
                 name="talkTime"
                 value={formData.talkTime}
                 onChange={handleChange}

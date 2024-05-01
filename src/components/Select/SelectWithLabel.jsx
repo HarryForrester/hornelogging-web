@@ -1,11 +1,12 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 /**
  * Used for editing a person and editing their
  * @param {*} param0
  * @returns
  */
-const SelectWithLabel = ({ htmlFor, className, id, label, name, value, onChange, crewTypes }) => {
+const SelectWithLabel = ({ htmlFor, id, label, name, value, onChange, crewTypes }) => {
   return (
     <>
       <label htmlFor={htmlFor} className="form-label">
@@ -21,5 +22,16 @@ const SelectWithLabel = ({ htmlFor, className, id, label, name, value, onChange,
     </>
   );
 };
+
+SelectWithLabel.propTypes = {
+  htmlFor: PropTypes.any.isRequired,
+  id: PropTypes.number.isRequired,
+  label: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  value: PropTypes.any.isRequired,
+  onChange: PropTypes.func.isRequired,
+  crewTypes: PropTypes.array.isRequired
+
+}
 
 export default SelectWithLabel;

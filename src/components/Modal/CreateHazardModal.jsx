@@ -5,6 +5,7 @@ import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleMinus } from '@fortawesome/free-solid-svg-icons';
 import { faCirclePlus } from '@fortawesome/free-solid-svg-icons';
+import PropTypes from 'prop-types';
 
 const CreateHazardModal = ({ handleSubmit }) => {
   const { hazardState, setHazardState } = useHazardState();
@@ -224,6 +225,7 @@ const CreateHazardModal = ({ handleSubmit }) => {
                     {harm.description.map((description, descriptionIndex) => {
                       return (
                         <div
+                        key={descriptionIndex}
                           style={{
                             display: 'flex',
                             alignItems: 'stretch',
@@ -258,7 +260,6 @@ const CreateHazardModal = ({ handleSubmit }) => {
                                 border: 'none',
                                 height: '100%',
                                 background: 'none',
-                                border: 'none'
                               }}
                             >
                               <FontAwesomeIcon color="red" size="lg" icon={faCircleMinus} />
@@ -293,4 +294,7 @@ const CreateHazardModal = ({ handleSubmit }) => {
   );
 };
 
+CreateHazardModal.propTypes = {
+  handleSubmit: PropTypes.func.isRequired,
+}
 export default CreateHazardModal;

@@ -9,6 +9,7 @@ import TimeElement from './TimeElement';
 import SelectlistElement from './SelectlistElement';
 import ImageElement from './ImageElement';
 import SignatureElement from './SignatureElement';
+import PropTypes from 'prop-types';
 
 function FormSection({ section }) {
   return (
@@ -55,6 +56,14 @@ function renderForm(sections) {
       ))}
     </form>
   );
+}
+
+FormSection.propTypes = {
+  section: PropTypes.object.isRequired,
+}
+
+RenderForm.propTypes = {
+  form: PropTypes.object.isRequired
 }
 
 export default function RenderForm({ form }) {

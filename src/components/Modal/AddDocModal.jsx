@@ -3,6 +3,7 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import { useSkidModal } from './Skid/SkidModalContext';
 import { useMap } from '../Map/MapContext';
+import PropTypes from 'prop-types';
 
 /**
  * AddDocModal component for handling document selection.
@@ -106,5 +107,9 @@ const AddDocModal = ({ docSumbit }) => {
     </Modal>
   );
 };
+
+AddDocModal.propTypes = {
+  docSumbit: PropTypes.func.isRequired
+}
 
 export default AddDocModal;

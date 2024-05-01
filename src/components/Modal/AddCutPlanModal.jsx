@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import { useSkidModal } from './Skid/SkidModalContext';
+import PropTypes from 'prop-types';
 
 const AddCutPlanModal = ({ submitCutPlan }) => {
   const { skidModalState, setSkidModalState } = useSkidModal();
@@ -82,5 +83,9 @@ const AddCutPlanModal = ({ submitCutPlan }) => {
     </Modal>
   );
 };
+
+AddCutPlanModal.propTypes = {
+  submitCutPlan: PropTypes.func.isRequired
+}
 
 export default AddCutPlanModal;

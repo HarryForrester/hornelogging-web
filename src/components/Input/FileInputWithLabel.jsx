@@ -1,11 +1,13 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
 
 /**
  * Used for editing a person and editing their
  * @param {*} param0
  * @returns
  */
-const FileInputWithLabel = ({ type, label, name, value, onChange }) => {
+const FileInputWithLabel = ({ label, name, onChange }) => {
   return (
     <div className="mb-3">
       <label htmlFor={name} className="form-label">
@@ -21,5 +23,11 @@ const FileInputWithLabel = ({ type, label, name, value, onChange }) => {
     </div>
   );
 };
+
+FileInputWithLabel.propTypes = {
+  label: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+}
 
 export default FileInputWithLabel;

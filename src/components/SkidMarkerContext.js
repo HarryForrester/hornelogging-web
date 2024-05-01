@@ -1,4 +1,5 @@
-import { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
+import PropTypes from 'prop-types';
 
 const SkidMarkerContext = createContext();
 
@@ -24,6 +25,10 @@ export const SkidMarkerProvider = ({ children }) => {
     </SkidMarkerContext.Provider>
   );
 };
+
+SkidMarkerProvider.propTypes = {
+  children: PropTypes.object.isRequired,
+}
 
 export const useSkidMarker = () => {
   return useContext(SkidMarkerContext);

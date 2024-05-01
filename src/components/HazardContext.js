@@ -1,5 +1,5 @@
-import { createContext, useContext, useState } from 'react';
-
+import React, { createContext, useContext, useState } from 'react';
+import PropTypes from 'prop-types';
 const HazardContext = createContext();
 
 export const HazardProvider = ({ children }) => {
@@ -22,6 +22,10 @@ export const HazardProvider = ({ children }) => {
     </HazardContext.Provider>
   );
 };
+
+HazardProvider.propTypes = {
+  children: PropTypes.object.isRequired
+}
 
 export const useHazardState = () => {
   return useContext(HazardContext);

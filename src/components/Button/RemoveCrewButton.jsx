@@ -5,6 +5,8 @@ import { useConfirmationModal } from '../ConfirmationModalContext';
 import { useAlertMessage } from '../AlertMessage';
 import { useMap } from '../Map/MapContext';
 import axios from 'axios';
+import PropTypes from 'prop-types';
+
 
 /**
  * Removes a Crew
@@ -166,5 +168,10 @@ const RemoveCrewButton = ({ crew }) => {
     </div>
   );
 };
+
+RemoveCrewButton.propTypes = {
+  crew: PropTypes.object.isRequired,
+  person: PropTypes.object.isRequired,
+}
 
 export default RemoveCrewButton;

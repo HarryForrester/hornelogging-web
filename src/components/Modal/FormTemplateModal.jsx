@@ -1,6 +1,7 @@
 import React from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import RenderForm from '../FormElements/RenderForm';
+import PropTypes from 'prop-types';
 
 const FormTemplateModal = ({ show, onClose, form }) => {
   return (
@@ -18,5 +19,11 @@ const FormTemplateModal = ({ show, onClose, form }) => {
     </Modal>
   );
 };
+
+FormTemplateModal.propTypes = {
+  show: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  form: PropTypes.object.isRequired
+}
 
 export default FormTemplateModal;

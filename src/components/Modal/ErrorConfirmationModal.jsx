@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import { useConfirmationModal } from '../ConfirmationModalContext';
+import PropTypes from 'prop-types';
 
 const ErrorConfirmationModal = ({ message, show }) => {
   const { confirmationModalState, setConfirmationModalState } = useConfirmationModal();
@@ -9,7 +10,7 @@ const ErrorConfirmationModal = ({ message, show }) => {
   //confirmModalMessage: null,
   //confirmed: false
 
-  const handleClose = () => {};
+  const handleClose = () => {console.log("close")};
 
   return (
     <>
@@ -40,5 +41,10 @@ const ErrorConfirmationModal = ({ message, show }) => {
     </>
   );
 };
+
+ErrorConfirmationModal.propTypes = {
+  message: PropTypes.string.isRequired,
+  show: PropTypes.func.isRequired
+}
 
 export default ErrorConfirmationModal;
