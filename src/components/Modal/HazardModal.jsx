@@ -14,14 +14,13 @@ function HazardModal() {
    * @returns {void}
    */
   const handleClose = () => {
-    setSkidModalState((prevState) => ({ ...prevState, hazardModalVisible: false }));
+    setSkidModalState((prevState) => ({ ...prevState, hazardModalVisible: false, isSkidModalVisible: true}));
   };
 
   return (
     <Modal
       show={skidModalState.hazardModalVisible}
       onHide={handleClose}
-      style={{ zindex: 99999 }}
       backdrop="static"
     >
       <Modal.Header style={{ backgroundColor: selectedHazard.color }}>

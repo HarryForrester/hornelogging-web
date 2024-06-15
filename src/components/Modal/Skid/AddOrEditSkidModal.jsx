@@ -303,6 +303,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, resetMarker }) => {
     setSkidModalState((prevState) => ({
       ...prevState,
       hazardModalVisible: true,
+      isSkidModalVisible: false,
       selectedHazardData: hazard
     }));
   };
@@ -318,7 +319,6 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, resetMarker }) => {
   return (
     <>
       <Modal
-        style={{ zIndex: 9999 }}
         show={skidModalState.isSkidModalVisible}
         onHide={handleClose}
         backdrop="static"

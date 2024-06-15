@@ -179,9 +179,9 @@ const PDFViewer = ({ hazards, percentage }) => {
         } else {
           //setSkidModalState((prevState) => ({ ...prevState, isSelectHazardModalVisible: false, isSkidModalVisible: true, selectedSkidHazards: selectedHazards, selectedSkidHazardsData: response.data }));
           setSkidModalState((prevState) => {
-            const existingIds = prevState.selectedSkidHazardsData.map((hazard) => hazard.id);
+            const existingIds = prevState.selectedSkidHazardsData.map((hazard) => hazard._id);
             const newData = response.data.filter(
-              (newHazard) => !existingIds.includes(newHazard.id)
+              (newHazard) => !existingIds.includes(newHazard._id)
             );
             console.log('exisinfIds: ', existingIds);
             console.log('newData:', newData);
@@ -401,19 +401,20 @@ const PDFViewer = ({ hazards, percentage }) => {
 
   return (
     <>
-      <AddOrEditSkidModal
-        mousePosition={skidMarkerState.mousePosition}
-        editSkid={skidMarkerState.editSkid}
-      />
+      
       <AddDocModal docSumbit={submitDoc} />
       <AddCutPlanModal submitCutPlan={submitCutPlan} />
       <SelectHazardsModal hazards={hazards} submitSelectedHazards={submitSelectedHazards} />
       <HazardModal />
+     
       <EditGeneralHazardModal
         submitGeneralHazardModal={submitGeneralHazardModal}
         handleClose={handleClose}
       />
-
+ <AddOrEditSkidModal
+        mousePosition={skidMarkerState.mousePosition}
+        editSkid={skidMarkerState.editSkid}
+      />
       {percentage >= 100 ? (
         pdfData && mapState.currentMapName ? (
           <div
