@@ -191,7 +191,7 @@ const PDFViewer = ({ hazards, percentage }) => {
               ...prevState,
               isSelectHazardModalVisible: false,
               isSkidModalVisible: true,
-              selectedSkidHazards: [existingIds, selectedHazards],
+              selectedSkidHazards: [...existingIds, ...selectedHazards],
               selectedSkidHazardsData: [...prevState.selectedSkidHazardsData, ...newData]
             };
           });
