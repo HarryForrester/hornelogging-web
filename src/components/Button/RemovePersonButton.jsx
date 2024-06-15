@@ -109,6 +109,6 @@ const RemovePersonButton = ({ person }) => {
 
 RemovePersonButton.propTypes = {
   person: PropTypes.object.isRequired
-}
+};
 
 export default RemovePersonButton;

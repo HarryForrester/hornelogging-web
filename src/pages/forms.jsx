@@ -180,18 +180,20 @@ const Forms = () => {
     console.log('sections: ', sections);
   };
 
-  const openFormDocsModal = async (form) => {
+  const openFormDocsModal = async (id) => {
     setFilledFormsModalVisible(true);
-    console.log('openFormDocsModal', form);
+    console.log('openFormDocsModal', id);
     try {
-      let url = `http://localhost:3001/findCompletedForms?formId=${encodeURIComponent(form._id)}`;
+      let url = `http://localhost:3001/findCompletedForms?formId=${encodeURIComponent(id)}`;
 
       const response = await axios.get(url, { withCredentials: true });
 
       if (response.status === 200) {
         console.log('Success! ', response.data);
-        setSelectedFormId(response.data.docs[0].formId);
-        setSelectedFilledForms(response.data.docs);
+        setSelectedFormId(response.data.forms[0].formId);
+        setSelectedFilledForms(response.data.forms);
+      } else {
+        console.error("fuck me ")
       }
     } catch (error) {
       console.error('An error has occurred while fetching form data', error);

@@ -10,7 +10,7 @@ export const PersonDataProvider = ({ children }) => {
     crewTypes: [],
     timesheetAccess: [],
     forms: [],
-    quals: [],
+    quals: []
   });
 
   return (
@@ -21,8 +21,8 @@ export const PersonDataProvider = ({ children }) => {
 };
 
 PersonDataProvider.propTypes = {
-  children: PropTypes.object.isRequired,
-}
+  children: PropTypes.object.isRequired
+};
 export const usePersonData = () => {
   return useContext(PersonDataContext);
 };

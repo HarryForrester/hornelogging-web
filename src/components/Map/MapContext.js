@@ -28,8 +28,8 @@ export const MapProvider = ({ children }) => {
 };
 
 MapProvider.propTypes = {
-  children: PropTypes.object.isRequired,
-}
+  children: PropTypes.object.isRequired
+};
 
 export const useMap = () => {
   return useContext(MapContext);

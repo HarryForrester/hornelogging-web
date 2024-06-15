@@ -145,6 +145,7 @@ const PDFViewer = ({ hazards, percentage }) => {
   };
 
   const submitSelectedHazards = async (selectedHazards) => {
+    console.log("hey harry cunt, there are the hazards you wanted", selectedHazards);
     const id = new Date().getTime();
     setTempHazards(mapState.generalHazardsData);
 
@@ -440,7 +441,11 @@ const PDFViewer = ({ hazards, percentage }) => {
                 onLoadSuccess={(page) => {
                   const { width, height } = page;
                   //console.log("width: " + width + " height: " + height)
-                  setMapState((prevState) => ({...prevState, originalWidth: width, originalHeight: height}))
+                  setMapState((prevState) => ({
+                    ...prevState,
+                    originalWidth: width,
+                    originalHeight: height
+                  }));
                   setPdfSize({ width, height });
                 }}
               />

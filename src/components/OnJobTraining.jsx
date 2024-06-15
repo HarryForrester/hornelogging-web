@@ -10,7 +10,7 @@ const OnJobTraining = ({ person, onjobs, showModal, updateOnjobTrainingRecords }
   const [selectedRows, setSelectedRows] = useState([]);
   const { id: userId } = useParams();
   const { setAlertMessageState } = useAlertMessage();
-  
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
@@ -215,7 +215,7 @@ const OnJobTraining = ({ person, onjobs, showModal, updateOnjobTrainingRecords }
 
   return (
     <div>
-      <div style={{paddingBottom: '50px'}}>
+      <div style={{ paddingBottom: '50px' }}>
         <br />
         <div style={{ float: 'left' }}>
           <h3>On-job Training</h3>

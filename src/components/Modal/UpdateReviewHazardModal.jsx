@@ -72,6 +72,6 @@ const UpdateReviewHazardModal = ({ submit }) => {
 
 UpdateReviewHazardModal.propTypes = {
   submit: PropTypes.func.isRequired
-}
+};
 
 export default UpdateReviewHazardModal;

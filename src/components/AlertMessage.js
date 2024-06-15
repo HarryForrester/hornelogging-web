@@ -22,8 +22,8 @@ export const AlertMessageProvider = ({ children }) => {
 };
 
 AlertMessageProvider.propTypes = {
-  children: PropTypes.func.isRequired,
-}
+  children: PropTypes.func.isRequired
+};
 
 export const useAlertMessage = () => {
   return useContext(AlertMessageContext);

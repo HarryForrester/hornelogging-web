@@ -47,7 +47,6 @@ ToggleWithLabel.propTypes = {
   isFormEnabled: PropTypes.bool.isRequired,
   availableOnDevice: PropTypes.any.isRequired,
   toggle: PropTypes.func.isRequired
-
-}
+};
 
 export default ToggleWithLabel;

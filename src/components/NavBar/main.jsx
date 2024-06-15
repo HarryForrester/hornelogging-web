@@ -43,6 +43,9 @@ const NavBar = ({ username }) => {
               <Nav.Link as={Link} to="/training">
                 Training
               </Nav.Link>
+              <Nav.Link as={Link} to="/tasks">
+                Tasks
+              </Nav.Link>
               <Nav.Link as={Link} to="/profile">
                 Profile
               </Nav.Link>

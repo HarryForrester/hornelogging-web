@@ -121,5 +121,5 @@ const EditGeneralHazardModal = ({ submitGeneralHazardModal, handleClose }) => {
 EditGeneralHazardModal.propTypes = {
   submitGeneralHazardModal: PropTypes.func.isRequired,
   handleClose: PropTypes.func.isRequired
-}
+};
 export default EditGeneralHazardModal;

@@ -83,7 +83,7 @@ const Maps = () => {
     const points = map.points;
     console.log('Map Clicked: ', mapState);
 
-    const parsePoints = JSON.parse(points);
+    const parsePoints = points;
     console.log('parsePOint: ', parsePoints);
     var pdfButtons = document.querySelectorAll('.pdf-button');
 

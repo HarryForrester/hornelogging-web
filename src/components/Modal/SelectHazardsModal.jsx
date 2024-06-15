@@ -5,6 +5,7 @@ import { useSkidModal } from './Skid/SkidModalContext';
 import { useMap } from '../Map/MapContext';
 import PropTypes from 'prop-types';
 import { faZ } from '@fortawesome/free-solid-svg-icons';
+import { joinPaths } from '@remix-run/router';
 
 const SelectHazardsModal = ({ hazards, submitSelectedHazards }) => {
   const [searchCriteria, setSearchCriteria] = useState('');
@@ -44,6 +45,7 @@ const SelectHazardsModal = ({ hazards, submitSelectedHazards }) => {
   };
 
   const handleCheckboxChange = (hazardId) => {
+    console.log("handleCHeckboxChange: ", hazardId);
     // Toggle the selection of the hazard with hazardId
     setSelectedHazards((prevSelectedHazards) => {
       if (prevSelectedHazards.includes(hazardId)) {
@@ -83,7 +85,7 @@ const SelectHazardsModal = ({ hazards, submitSelectedHazards }) => {
           <br />
           <div className="modal-hazards">
             {mapState.hazards.map((hazard) => (
-              <div className="card" style={{ marginBottom: '10px' }} key={hazard.id}>
+              <div className="card" style={{ marginBottom: '10px' }} key={hazard._id}>
                 <div className="search-text" style={{ display: 'none' }}>
                   {hazard.searchText}
                 </div>
@@ -92,9 +94,9 @@ const SelectHazardsModal = ({ hazards, submitSelectedHazards }) => {
                     <input
                       type="checkbox"
                       name="selectedHazards[]"
-                      value={hazard.id}
-                      onChange={() => handleCheckboxChange(hazard.id)}
-                      checked={selectedHazards.includes(hazard.id)}
+                      value={hazard._id}
+                      onChange={() => handleCheckboxChange(hazard._id)}
+                      checked={selectedHazards.includes(hazard._id)}
                     />
                     <b>
                       {hazard.id}: <em>{hazard.title}</em>
@@ -126,7 +128,7 @@ const SelectHazardsModal = ({ hazards, submitSelectedHazards }) => {
 
 SelectHazardsModal.propTypes = {
   hazards: PropTypes.array.isRequired,
-  submitSelectedHazards: PropTypes.func.isRequired, 
-}
+  submitSelectedHazards: PropTypes.func.isRequired
+};
 
 export default SelectHazardsModal;

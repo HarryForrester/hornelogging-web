@@ -65,6 +65,6 @@ HazardCard.propTypes = {
   hazard: PropTypes.object.isRequired,
   selectAll: PropTypes.object.isRequired,
   handleHazardChange: PropTypes.func.isRequired
-}
+};
 
 export default HazardCard;

@@ -39,7 +39,7 @@ const AddOnjobTrainingRecordModal = ({
     // Handle saving data here
     console.log('Form data:', formData);
     // Clear form data
-    
+
     try {
       console.log('form data ok:)', formData);
       const response = await axios.post(
@@ -84,7 +84,6 @@ const AddOnjobTrainingRecordModal = ({
         confirmTime: '',
         competence: 'Constant Supervision Required'
       });
-  
     } catch (err) {
       setAlertMessageState((prevState) => ({
         ...prevState,

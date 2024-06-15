@@ -49,6 +49,6 @@ HazardReviewModal.propTypes = {
   show: PropTypes.bool.isRequired,
   onHide: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired
-}
+};
 
 export default HazardReviewModal;

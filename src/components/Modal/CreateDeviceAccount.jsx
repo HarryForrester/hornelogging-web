@@ -17,6 +17,10 @@ const CreateDeviceAccount = ({ crewsData, submit, show, close }) => {
 
   const { alertMessageState, setAlertMessageState } = useAlertMessage();
 
+  const handleEmailChange = (event) => {
+    setSelectedPersonEmail(event.target.value)
+  }
+
   const handleCheckboxChange = () => {
     setEmailLoginDetails(!emailLoginDetails);
   };
@@ -95,7 +99,7 @@ const CreateDeviceAccount = ({ crewsData, submit, show, close }) => {
               </FormGroup>
               <FormGroup controlId="personEmail">
                 <FormLabel>Enter Email</FormLabel>
-                <FormControl type="text" value={selectedPersonEmail} readOnly />
+                <FormControl type="text" value={selectedPersonEmail} onChange={handleEmailChange} />
               </FormGroup>
 
               <label>Select Account Type</label>

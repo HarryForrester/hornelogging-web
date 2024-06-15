@@ -7,7 +7,6 @@ import { useMap } from '../Map/MapContext';
 import axios from 'axios';
 import PropTypes from 'prop-types';
 
-
 /**
  * Removes a Crew
  * @returns
@@ -171,7 +170,7 @@ const RemoveCrewButton = ({ crew }) => {
 
 RemoveCrewButton.propTypes = {
   crew: PropTypes.object.isRequired,
-  person: PropTypes.object.isRequired,
-}
+  person: PropTypes.object.isRequired
+};
 
 export default RemoveCrewButton;

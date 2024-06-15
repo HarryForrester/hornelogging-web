@@ -86,6 +86,6 @@ const AddCutPlanModal = ({ submitCutPlan }) => {
 
 AddCutPlanModal.propTypes = {
   submitCutPlan: PropTypes.func.isRequired
-}
+};
 
 export default AddCutPlanModal;

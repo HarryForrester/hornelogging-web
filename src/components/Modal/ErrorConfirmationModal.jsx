@@ -10,7 +10,9 @@ const ErrorConfirmationModal = ({ message, show }) => {
   //confirmModalMessage: null,
   //confirmed: false
 
-  const handleClose = () => {console.log("close")};
+  const handleClose = () => {
+    console.log('close');
+  };
 
   return (
     <>
@@ -45,6 +47,6 @@ const ErrorConfirmationModal = ({ message, show }) => {
 ErrorConfirmationModal.propTypes = {
   message: PropTypes.string.isRequired,
   show: PropTypes.func.isRequired
-}
+};
 
 export default ErrorConfirmationModal;

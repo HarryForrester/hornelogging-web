@@ -37,8 +37,8 @@ export const SkidModalProvider = ({ children }) => {
 };
 
 SkidModalProvider.propTypes = {
-  children: PropTypes.object.isRequired,
-}
+  children: PropTypes.object.isRequired
+};
 
 export const useSkidModal = () => {
   return useContext(SkidModalContext);

@@ -110,6 +110,6 @@ const AddDocModal = ({ docSumbit }) => {
 
 AddDocModal.propTypes = {
   docSumbit: PropTypes.func.isRequired
-}
+};
 
 export default AddDocModal;

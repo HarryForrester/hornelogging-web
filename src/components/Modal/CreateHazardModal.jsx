@@ -225,7 +225,7 @@ const CreateHazardModal = ({ handleSubmit }) => {
                     {harm.description.map((description, descriptionIndex) => {
                       return (
                         <div
-                        key={descriptionIndex}
+                          key={descriptionIndex}
                           style={{
                             display: 'flex',
                             alignItems: 'stretch',
@@ -259,7 +259,7 @@ const CreateHazardModal = ({ handleSubmit }) => {
                                 color: '#fff',
                                 border: 'none',
                                 height: '100%',
-                                background: 'none',
+                                background: 'none'
                               }}
                             >
                               <FontAwesomeIcon color="red" size="lg" icon={faCircleMinus} />
@@ -295,6 +295,6 @@ const CreateHazardModal = ({ handleSubmit }) => {
 };
 
 CreateHazardModal.propTypes = {
-  handleSubmit: PropTypes.func.isRequired,
-}
+  handleSubmit: PropTypes.func.isRequired
+};
 export default CreateHazardModal;

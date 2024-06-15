@@ -31,7 +31,6 @@ SelectWithLabel.propTypes = {
   value: PropTypes.any.isRequired,
   onChange: PropTypes.func.isRequired,
   crewTypes: PropTypes.array.isRequired
-
-}
+};
 
 export default SelectWithLabel;

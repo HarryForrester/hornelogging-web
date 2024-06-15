@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-
 /**
  * Used for editing a person and editing their
  * @param {*} param0
@@ -27,7 +26,7 @@ const FileInputWithLabel = ({ label, name, onChange }) => {
 FileInputWithLabel.propTypes = {
   label: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
-}
+  onChange: PropTypes.func.isRequired
+};
 
 export default FileInputWithLabel;

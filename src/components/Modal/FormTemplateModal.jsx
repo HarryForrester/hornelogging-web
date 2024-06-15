@@ -24,6 +24,6 @@ FormTemplateModal.propTypes = {
   show: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   form: PropTypes.object.isRequired
-}
+};
 
 export default FormTemplateModal;

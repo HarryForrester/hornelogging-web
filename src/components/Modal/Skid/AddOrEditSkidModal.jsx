@@ -396,6 +396,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, resetMarker }) => {
                   >
                     <Anchor
                       key={`${file._id}-link`}
+                      // eslint-disable-next-line no-undef
                       href={process.env.REACT_APP_URL + file.uri}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -517,7 +518,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, resetMarker }) => {
 AddOrEditSkidModal.propTypes = {
   editSkid: PropTypes.any.isRequired,
   resetMarker: PropTypes.func.isRequired,
-  mousePosition: PropTypes.object.isRequired,
-}
+  mousePosition: PropTypes.object.isRequired
+};
 
 export default AddOrEditSkidModal;

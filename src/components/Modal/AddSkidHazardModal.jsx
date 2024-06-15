@@ -4,7 +4,7 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { useSkidModal } from './Skid/SkidModalContext';
 
-const AddSkidHazardModal = ({ hazards, sumbitSkidHazard }) => {
+const AddSkidHazardModal = ( hazards, sumbitSkidHazard ) => {
   const { skidModalState, setSkidModalState } = useSkidModal();
 
   console.log('hazards: ', hazards);
@@ -55,7 +55,7 @@ const AddSkidHazardModal = ({ hazards, sumbitSkidHazard }) => {
                         <em>{hazard.title}</em>
                       </>
                     }
-                    id={`hazard-checkbox-${hazard.id}`}
+                    id={`hazard-checkbox-${hazard._id}`}
                   />
                   <small>{hazard.sev}</small>
                 </div>
