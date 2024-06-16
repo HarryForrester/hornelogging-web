@@ -13,7 +13,7 @@ const EditGeneralHazardModal = ({ submitGeneralHazardModal, handleClose }) => {
   const { mapState, setMapState } = useMap();
 
   /**
-   * Opens the Add Site Hazard Modal and hides the Edit General Hazards Modal by updating the state.
+   * Opens the SelectHazardsModal.jsx and hides the Edit General Hazards Modal (EditGeneralHazardsModal.jsx) by updating the state.
    * @function openDocModal
    * @returns {void}
    */

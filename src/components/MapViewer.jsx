@@ -220,10 +220,15 @@ const PDFViewer = ({ hazards, percentage }) => {
     const id = new Date().getTime();
 
     const updatedGeneralHazards = [
-      ...mapState.generalHazards,
-      ...tempHazards.map((hazard) => hazard.id),
-      ...mapState.generalHazardsData.map((hazard) => hazard.id)
+      ...new Set([
+        ...mapState.generalHazards,
+        ...tempHazards.map(hazard => hazard._id),
+        ...mapState.generalHazardsData.map(hazard => hazard._id)
+      ])
     ];
+    
+
+    console.log("Updated General Hazards: ", updatedGeneralHazards);
     try {
       const resp = await axios.post(
         'http://localhost:3001/submitGeneralHazards',
@@ -399,12 +404,32 @@ const PDFViewer = ({ hazards, percentage }) => {
     }
   }, [mapState]);
 
+  /* useEffect(() => {
+    const getGeneralHazards = async () => {
+      // eslint-disable-next-line no-undef
+      const response = await axios.get(`${process.env.REACT_APP_URL}/getGeneralHazards`, {withCredentials: true});
+
+      console.log("response for general hazards: ", response.data.hazards);
+
+      const tempGenHaz = mapState.hazards.filter(hazard => 
+        response.data.hazards.hazards.includes(hazard._id)
+      );
+            console.log("temGenHaz", tempGenHaz);
+
+            setMapState((prevState) => ({
+              ...prevState,
+              generalHazardsData: tempGenHaz
+            }));
+    }
+    getGeneralHazards();
+  }, []); */
+
   return (
     <>
       
       <AddDocModal docSumbit={submitDoc} />
       <AddCutPlanModal submitCutPlan={submitCutPlan} />
-      <SelectHazardsModal hazards={hazards} submitSelectedHazards={submitSelectedHazards} />
+      <SelectHazardsModal submitSelectedHazards={submitSelectedHazards} />
       <HazardModal />
      
       <EditGeneralHazardModal

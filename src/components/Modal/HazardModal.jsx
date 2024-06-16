@@ -14,7 +14,16 @@ function HazardModal() {
    * @returns {void}
    */
   const handleClose = () => {
-    setSkidModalState((prevState) => ({ ...prevState, hazardModalVisible: false, isSkidModalVisible: true}));
+    if(skidModalState.isSelectHazardsGeneral) {
+      setSkidModalState((prevState) => ({ ...prevState, hazardModalVisible: false, isGeneralHazardsModalVisible: true}));
+
+    } else if (skidModalState.isSkidModalEdit) {
+      setSkidModalState((prevState) => ({ ...prevState, hazardModalVisible: false, isSkidModalVisible: true}));
+
+    } else {
+      setSkidModalState((prevState) => ({ ...prevState, hazardModalVisible: false}));
+
+    }
   };
 
   return (
