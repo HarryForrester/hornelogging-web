@@ -129,6 +129,7 @@ const EditPersonModal = () => {
 
     try {
       const response = await axios.post(
+        // eslint-disable-next-line no-undef
         process.env.REACT_APP_URL + '/update-person/' + formState.id,
         formData,
         {
@@ -161,8 +162,6 @@ const EditPersonModal = () => {
           ...prevState,
           isEditPersonModalVisible: false
         }));
-      } else {
-        alert('An Error has occurred. Please try again.');
       }
     } catch (error) {
       setAlertMessageState((prevState) => ({
@@ -212,6 +211,7 @@ const EditPersonModal = () => {
             <Form.Group className="col-md-3">
               <Form.Label htmlFor="imgurl" className="image-container">
                 <Image
+                  // eslint-disable-next-line no-undef
                   src={formState?.imgPreview || process.env.REACT_APP_URL + '/' + person?.imgUrl}
                   className="figure-img img-fluid z-depth-1 rounded mb-0 border border-dark"
                   alt="..."
