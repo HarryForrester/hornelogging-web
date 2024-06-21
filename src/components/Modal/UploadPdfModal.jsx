@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import React, { useState } from 'react';
 import InputWithLabel from '../Input/InputWithLabel';
 import FileInputWithLabel from '../Input/FileInputWithLabel';
@@ -9,6 +10,7 @@ import { useAlertMessage } from '../AlertMessage';
 import { useMap } from '../Map/MapContext';
 import Feedback from 'react-bootstrap/esm/Feedback';
 import DragAndDropUpload from '../DragAndDropUpload';
+import { getPresignedUrl, uploadToPresignedUrl } from '../../hooks/useFileUpload';
 const UploadPdfModal = () => {
   const [pdfName, setPdfName] = useState(null);
   //const [selectedPdf, setSelectedPdf] = useState(null);
@@ -29,7 +31,10 @@ const UploadPdfModal = () => {
     setPdfName(event);
     setPdfNameIsValid(event ? true : null);
   };
-
+  const getFilePathFromUrl = (url) => {
+    const urlObject = new URL(url);
+    return `${urlObject.origin}${urlObject.pathname}`;
+  };
   const handlePdfInputChange = (event) => {
     const file = event.target.files[0];
     //setSelectedPdf(file);
@@ -51,12 +56,18 @@ const UploadPdfModal = () => {
     } else if (!selectedFile) {
       setPdfFileIsValid(false);
     } else {
+      const presignedUrl = await getPresignedUrl();
+        const filePath = getFilePathFromUrl(presignedUrl);
+        console.log('filepath of the file', filePath);
+        uploadToPresignedUrl(presignedUrl, selectedFile);
       const formData = new FormData();
       formData.append('file', selectedFile);
       formData.append('id', pdfName);
+      formData.append('url',filePath )
 
       try {
-        const response = await axios.post(process.env.REACT_APP_URL + '/loadpdf', formData, {
+        
+          const response = await axios.post(process.env.REACT_APP_URL + '/loadpdf', formData, {
           withCredentials: true,
           onUploadProgress: (progressEvent) => {
             const percentage = Math.round((progressEvent.loaded * 100) / progressEvent.total);
@@ -92,7 +103,7 @@ const UploadPdfModal = () => {
             ...prevState,
             isUploadMapModalVisible: false
           }));
-        }
+        } 
       } catch (error) {
         setAlertMessageState((prevState) => ({
           ...prevState,

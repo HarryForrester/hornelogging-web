@@ -15,7 +15,7 @@ const PersonInfoCard = ({ person }) => {
   ];
   const getPersonImageUrl = (person) => {
     // eslint-disable-next-line no-undef
-    return person.imgUrl.length > 0 ? `${process.env.REACT_APP_URL}/${person.imgUrl}` : '/img/default.jpg';
+    return person.imgUrl > 0 ? `${process.env.REACT_APP_URL}/${person.imgUrl}` : '/img/default.jpg';
   };
   return <InfoCard data={data} imageSrc={getPersonImageUrl(person)} />;
 };

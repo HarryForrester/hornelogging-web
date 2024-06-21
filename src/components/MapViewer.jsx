@@ -18,7 +18,7 @@ import SkidMarkerCrewPopover from './Popover/SkidMarkerCrewPopover';
 import SkidMarkerPersonPopover from './Popover/SkidMarkerPersonPopover';
 
 const PDFViewer = ({ hazards, percentage }) => {
-  const [pdfData, setPdfData] = useState(null);
+  //const [pdfData, setPdfData] = useState(null);
   const { skidModalState, setSkidModalState } = useSkidModal();
   const { skidMarkerState, setSkidMarkerState } = useSkidMarker();
   const { mapState, setMapState } = useMap();
@@ -297,17 +297,17 @@ const PDFViewer = ({ hazards, percentage }) => {
         if (mapState.currentMapUrl) {
           console.log('current MAP URL: ' + mapState.currentMapUrl);
           const response = await axios.get(mapState.currentMapUrl, {
-            responseType: 'arraybuffer', // Set the responseType to 'arraybuffer' for binary data
-            withCredentials: true // Include credentials (cookies) in the request
+            //responseType: 'arraybuffer', // Set the responseType to 'arraybuffer' for binary data
+            //withCredentials: true // Include credentials (cookies) in the request
           });
-
+          console.log('repsone of the fucking', response);
           if (response.status !== 200) {
             throw new Error(`Error loading PDF: ${response.statusText}`);
           }
 
           // Convert the arraybuffer to a Blob
-          const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
-          setPdfData(pdfBlob);
+          //const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
+          //setPdfData(pdfBlob);
         }
       } catch (error) {
         console.error('Error fetching PDF data:', error);
@@ -441,7 +441,7 @@ const PDFViewer = ({ hazards, percentage }) => {
         editSkid={skidMarkerState.editSkid}
       />
       {percentage >= 100 ? (
-        pdfData && mapState.currentMapName ? (
+        mapState.currentMapName ? (
           <div
             id="pdf-container"
             style={{
@@ -457,7 +457,7 @@ const PDFViewer = ({ hazards, percentage }) => {
               transform: 'translate(-50%, 0%)'
             }}
           >
-            <Document file={pdfData} onMouseMove={handleMouseMove}>
+            <Document file={mapState.currentMapUrl} onMouseMove={handleMouseMove}>
               <Page
                 pageNumber={1}
                 renderMode="canvas"

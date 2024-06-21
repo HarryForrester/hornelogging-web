@@ -235,8 +235,8 @@ const Maps = () => {
       //          navigate('/login');
       if (res.status === 200) {
         if (map.pdfData.map) {
-          const pdfBlob = new Blob([map.pdfData.map], { type: 'application/pdf' });
-          const pdfUrl = `http://localhost:3001${map.pdfData.map}`;
+          // pdfBlob = new Blob([map.pdfData.map], { type: 'application/pdf' });
+          const pdfUrl = map.pdfData.map;
 
           setMapState((prevState) => ({
             ...prevState,
