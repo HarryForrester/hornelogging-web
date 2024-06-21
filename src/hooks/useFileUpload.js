@@ -6,9 +6,13 @@ export const getPresignedUrl = async () => {
     method: "GET",
     // eslint-disable-next-line no-undef
     url: 'https://zhba20ij25.execute-api.ap-southeast-2.amazonaws.com/hornePresignedUrlUpload',
+    params: { contentType: "application/pdf",
+    folderPath: "maps/"
+
+    }
   });
   const presignedUrl = response.data.presignedUrl;
-  const url = response.data.key;
+  const url = response.data.presignedUrl;
   console.log('im a fat cat',response);
   return presignedUrl;
 };
