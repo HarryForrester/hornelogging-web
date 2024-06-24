@@ -59,7 +59,7 @@ const UploadPdfModal = (_account) => {
       const presignedUrl = await getPresignedUrl(_account._account._account+"/maps");
         const filePath = getFilePathFromUrl(presignedUrl);
         console.log('filepath of the file', filePath);
-        uploadToPresignedUrl(presignedUrl, selectedFile);
+        await uploadToPresignedUrl(presignedUrl, selectedFile);
       const formData = new FormData();
       formData.append('file', selectedFile);
       formData.append('id', pdfName);
@@ -93,10 +93,11 @@ const UploadPdfModal = (_account) => {
               }
             ]
           }));
-
+          
           setMapState((prevState) => ({
             ...prevState,
-            maps: response.data.maps
+            maps: response.data.maps,
+            currentMapUrl: filePath
           }));
 
           setSkidModalState((prevState) => ({

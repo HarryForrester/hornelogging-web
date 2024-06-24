@@ -22,14 +22,14 @@ import { useAlertMessage } from './components/AlertMessage.js';
 import DeleteConfirmationModal from './components/Modal/DeleteConfirmationModal.jsx';
 import PrivateRoute from './components/PrivateRoute.jsx';
 import { AuthProvider } from './context/AuthContext.js';
-
+import { useAuth } from './context/AuthContext.js';
 function App() {
   pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
   const { alertMessageState, setAlertMessageState } = useAlertMessage();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [accessToken, setAccessToken] = useState(null);
   const [username, setUsername] = useState('');
-  
+  const { session } = useAuth();
 
   const handleSubmit = async (username, password) => {
     console.log('handmleSumiu');
@@ -86,7 +86,7 @@ function App() {
             path="/"
             element={
               <React.Fragment>
-                <NavBar username={username}/>
+                <NavBar/>
                 <Crews />
               </React.Fragment>
             }
@@ -95,7 +95,7 @@ function App() {
             path="/person/:id"
             element={
               <React.Fragment>
-                <NavBar username={username} />
+                <NavBar/>
                 <Person />
               </React.Fragment>
             }
@@ -104,7 +104,7 @@ function App() {
             path="/maps"
             element={
               <React.Fragment>
-                <NavBar username={username} />
+                <NavBar />
                 <Maps />
               </React.Fragment>
             }
@@ -113,7 +113,7 @@ function App() {
             path="/hazards"
             element={
               <React.Fragment>
-                <NavBar username={username} />
+                <NavBar/>
                 <Hazards />
               </React.Fragment>
             }
@@ -122,7 +122,7 @@ function App() {
             path="/forms"
             element={
               <React.Fragment>
-                <NavBar username={username} />
+                <NavBar />
                 <Forms />
               </React.Fragment>
             }
@@ -131,7 +131,7 @@ function App() {
             path="/library"
             element={
               <React.Fragment>
-                <NavBar username={username} />
+                <NavBar />
                 <Library />
               </React.Fragment>
             }
@@ -140,7 +140,7 @@ function App() {
             path="/profile"
             element={
               <React.Fragment>
-                <NavBar username={username} />
+                <NavBar />
                 <Profile />
               </React.Fragment>
             }
@@ -149,7 +149,7 @@ function App() {
             path="/tasks"
             element={
               <React.Fragment>
-                <NavBar username={username} />
+                <NavBar />
                 <Tasks />
               </React.Fragment>
             }
@@ -159,7 +159,7 @@ function App() {
             path="/training/:id?"
             element={
               <React.Fragment>
-                <NavBar username={username} />
+                <NavBar />
                 <Training />
               </React.Fragment>
             }

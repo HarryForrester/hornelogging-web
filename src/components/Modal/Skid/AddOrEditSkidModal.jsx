@@ -10,7 +10,7 @@ import { useAlertMessage } from '../../AlertMessage';
 import { useSkidMarker } from '../../SkidMarkerContext';
 import PropTypes from 'prop-types';
 
-const AddOrEditSkidModal = ({ mousePosition, editSkid, resetMarker }) => {
+const AddOrEditSkidModal = ({ mousePosition, editSkid }) => {
   const { skidModalState, setSkidModalState } = useSkidModal();
   const { mapState, setMapState } = useMap();
   const { alertMessageState, setAlertMessageState } = useAlertMessage();
@@ -517,7 +517,6 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, resetMarker }) => {
 
 AddOrEditSkidModal.propTypes = {
   editSkid: PropTypes.any.isRequired,
-  resetMarker: PropTypes.func.isRequired,
   mousePosition: PropTypes.object.isRequired
 };
 

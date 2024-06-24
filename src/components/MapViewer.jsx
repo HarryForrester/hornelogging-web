@@ -17,7 +17,7 @@ import SkidMarkerPopover from './Popover/SkidMarkerPopover';
 import SkidMarkerCrewPopover from './Popover/SkidMarkerCrewPopover';
 import SkidMarkerPersonPopover from './Popover/SkidMarkerPersonPopover';
 
-const PDFViewer = ({ hazards, percentage }) => {
+const PDFViewer = ({ percentage }) => {
   //const [pdfData, setPdfData] = useState(null);
   const { skidModalState, setSkidModalState } = useSkidModal();
   const { skidMarkerState, setSkidMarkerState } = useSkidMarker();
@@ -26,6 +26,7 @@ const PDFViewer = ({ hazards, percentage }) => {
   const [tempHazards, setTempHazards] = useState([]);
   const [pdfSize, setPdfSize] = useState({ width: 0, height: 0 });
   const pdfContainerRef = useRef();
+  const [pdf, setPdf] = useState(null);
 
   /**
    * Handles the mouse move even when user is adding a point to a pdf
@@ -292,22 +293,10 @@ const PDFViewer = ({ hazards, percentage }) => {
   };
 
   useEffect(() => {
-    const fetchPdfData = async () => {
+     const fetchPdfData = async () => {
       try {
         if (mapState.currentMapUrl) {
-          console.log('current MAP URL: ' + mapState.currentMapUrl);
-          const response = await axios.get(mapState.currentMapUrl, {
-            //responseType: 'arraybuffer', // Set the responseType to 'arraybuffer' for binary data
-            //withCredentials: true // Include credentials (cookies) in the request
-          });
-          console.log('repsone of the fucking', response);
-          if (response.status !== 200) {
-            throw new Error(`Error loading PDF: ${response.statusText}`);
-          }
-
-          // Convert the arraybuffer to a Blob
-          //const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
-          //setPdfData(pdfBlob);
+          setPdf(mapState.currentMapUrl)
         }
       } catch (error) {
         console.error('Error fetching PDF data:', error);
@@ -375,6 +364,7 @@ const PDFViewer = ({ hazards, percentage }) => {
     fetchFiles();
     fetchPdfData();
     fetchCrewData();
+    console.log('hello there you fucking meme', mapState.currentMapUrl)
   }, [mapState.currentMapUrl]);
   const canvasElement = document.querySelector('.react-pdf__Page__canvas');
 
@@ -457,7 +447,7 @@ const PDFViewer = ({ hazards, percentage }) => {
               transform: 'translate(-50%, 0%)'
             }}
           >
-            <Document file={mapState.currentMapUrl} onMouseMove={handleMouseMove}>
+            <Document file={pdf} onMouseMove={handleMouseMove}>
               <Page
                 pageNumber={1}
                 renderMode="canvas"
@@ -558,7 +548,6 @@ const PDFViewer = ({ hazards, percentage }) => {
 };
 
 PDFViewer.propTypes = {
-  hazards: PropTypes.array.isRequired,
   percentage: PropTypes.number.isRequired
 };
 

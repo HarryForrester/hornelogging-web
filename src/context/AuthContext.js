@@ -9,20 +9,23 @@ export const AuthProvider = ({ children }) => {
   const [username, setUsername] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
-
-  /* useEffect(() => {
+  const [session, setSession] = useState(null);
+  useEffect(() => {
     const fetchSession = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_URL}/session`);
-        console.log('the session was fetched as is: ', response.data);
-        setIsLoggedIn(response.data.isLoggedIn);
-        setUsername(response.data.username);
+        const response = await axios.get(`${process.env.REACT_APP_URL}/session`, {
+          withCredentials: true,
+        });
+        console.log(response.data);
+        setSession(response.data)
       } catch (error) {
-        console.error('An error occurred while fetching session', error);
+        console.error('Error fetching session:', error);
       }
     };
+
     fetchSession();
-  }, []); */
+  }, []);
+
 
   const login = async (username, password) => {
     try {
@@ -34,9 +37,10 @@ export const AuthProvider = ({ children }) => {
         console.log('user: ', response.data);
         const responsel = await axios.get(`${process.env.REACT_APP_URL}/session`);
         console.log('the session was fetched as is: ', responsel.data);
+        setSession(response.data)
 
-        setUsername(response.data.username);
-        setIsLoggedIn(response.data.isLoggedIn);
+        //setUsername(response.data.username);
+        //setIsLoggedIn(response.data.isLoggedIn);
       }
     } catch (error) {
       console.error(error);
@@ -46,18 +50,19 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       await axios.post(`${process.env.REACT_APP_URL}/logout`, {}, { withCredentials: true });
-      setUsername(null);
-      setIsLoggedIn(false);
+      //setUsername(null);
+      //setIsLoggedIn(false);
+      setSession(null)
+
     } catch (error) {
       console.error(error);
     }
   };
 
   const contextValue = {
-    username,
+    session,
     login,
     logout,
-    isLoggedIn
   };
 
   return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;

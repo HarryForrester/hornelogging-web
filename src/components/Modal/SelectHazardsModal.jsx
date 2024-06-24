@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 import { faZ } from '@fortawesome/free-solid-svg-icons';
 import { joinPaths } from '@remix-run/router';
 
-const SelectHazardsModal = ({ hazards, submitSelectedHazards }) => {
+const SelectHazardsModal = ({ submitSelectedHazards }) => {
   const [searchCriteria, setSearchCriteria] = useState('');
   const [selectedHazards, setSelectedHazards] = useState([]);
   const { skidModalState, setSkidModalState } = useSkidModal();
@@ -127,7 +127,6 @@ const SelectHazardsModal = ({ hazards, submitSelectedHazards }) => {
 };
 
 SelectHazardsModal.propTypes = {
-  hazards: PropTypes.array.isRequired,
   submitSelectedHazards: PropTypes.func.isRequired
 };
 

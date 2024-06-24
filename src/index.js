@@ -15,10 +15,11 @@ import { AlertMessageProvider } from './components/AlertMessage';
 import { PersonDataProvider } from './components/PersonData';
 import { SkidMarkerProvider } from './components/SkidMarkerContext';
 import { HazardProvider } from './components/HazardContext';
-
+import { AuthProvider } from './context/AuthContext';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <StrictMode>
+    <AuthProvider>
     <SkidModalProvider>
       <MapProvider>
         <ConfirmationModalProvider>
@@ -34,6 +35,7 @@ root.render(
         </ConfirmationModalProvider>
       </MapProvider>
     </SkidModalProvider>
+    </AuthProvider>
   </StrictMode>
 );
 
