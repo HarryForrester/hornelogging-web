@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import PropTypes from 'prop-types';
@@ -9,7 +10,7 @@ export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  /* useEffect(() => {
     const fetchSession = async () => {
       try {
         const response = await axios.get(`${process.env.REACT_APP_URL}/session`);
@@ -21,7 +22,7 @@ export const AuthProvider = ({ children }) => {
       }
     };
     fetchSession();
-  }, []);
+  }, []); */
 
   const login = async (username, password) => {
     try {

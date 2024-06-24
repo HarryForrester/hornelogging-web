@@ -39,6 +39,7 @@ const RemovePersonButton = ({ person }) => {
       if (confirmationModalState.confirmed && person._id !== null) {
         try {
           const response = await axios.delete(
+            // eslint-disable-next-line no-undef
             process.env.REACT_APP_URL + `/deleteperson/${person._id}`,
             { withCredentials: true }
           );
@@ -108,7 +109,7 @@ const RemovePersonButton = ({ person }) => {
 };
 
 RemovePersonButton.propTypes = {
-  person: PropTypes.object.isRequired
+  person: PropTypes.any.isRequired
 };
 
 export default RemovePersonButton;

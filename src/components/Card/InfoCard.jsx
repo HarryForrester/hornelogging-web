@@ -40,8 +40,8 @@ const InfoCard = ({ data, imageSrc }) => {
 InfoCard.propTypes = {
   data: PropTypes.arrayOf(
     PropTypes.shape({
-      label: PropTypes.string.isRequired,
-      value: PropTypes.any.isRequired
+      label: PropTypes.string,
+      value: PropTypes.any
     })
   ).isRequired,
   imageSrc: PropTypes.string.isRequired

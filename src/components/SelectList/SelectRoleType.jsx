@@ -41,7 +41,7 @@ const SelectRoleType = ({ selectedRole, onChange }) => {
 };
 
 SelectRoleType.propTypes = {
-  selectedRole: PropTypes.string.isRequired,
+  selectedRole: PropTypes.string,
   onChange: PropTypes.func.isRequired
 };
 export default SelectRoleType;

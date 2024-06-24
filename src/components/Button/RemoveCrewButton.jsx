@@ -92,6 +92,7 @@ const RemoveCrewButton = ({ crew }) => {
 
         try {
           const response = await axios.delete(
+            // eslint-disable-next-line no-undef
             process.env.REACT_APP_URL + `/deletecrew/${crewId}/${crewName}`,
             { withCredentials: true }
           );
@@ -170,7 +171,6 @@ const RemoveCrewButton = ({ crew }) => {
 
 RemoveCrewButton.propTypes = {
   crew: PropTypes.object.isRequired,
-  person: PropTypes.object.isRequired
 };
 
 export default RemoveCrewButton;

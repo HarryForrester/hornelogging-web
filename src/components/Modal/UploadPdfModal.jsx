@@ -11,7 +11,7 @@ import { useMap } from '../Map/MapContext';
 import Feedback from 'react-bootstrap/esm/Feedback';
 import DragAndDropUpload from '../DragAndDropUpload';
 import { getPresignedUrl, uploadToPresignedUrl } from '../../hooks/useFileUpload';
-const UploadPdfModal = () => {
+const UploadPdfModal = (_account) => {
   const [pdfName, setPdfName] = useState(null);
   //const [selectedPdf, setSelectedPdf] = useState(null);
   const [showErrorModal, setShowErrorModal] = useState(false);
@@ -56,7 +56,7 @@ const UploadPdfModal = () => {
     } else if (!selectedFile) {
       setPdfFileIsValid(false);
     } else {
-      const presignedUrl = await getPresignedUrl();
+      const presignedUrl = await getPresignedUrl(_account._account._account+"/maps");
         const filePath = getFilePathFromUrl(presignedUrl);
         console.log('filepath of the file', filePath);
         uploadToPresignedUrl(presignedUrl, selectedFile);

@@ -28,10 +28,8 @@ function App() {
   const { alertMessageState, setAlertMessageState } = useAlertMessage();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [accessToken, setAccessToken] = useState(null);
-
-  useEffect(() => {
-    console.log('accessToken is: ', accessToken);
-  }, [accessToken]);
+  const [username, setUsername] = useState('');
+  
 
   const handleSubmit = async (username, password) => {
     console.log('handmleSumiu');
@@ -59,6 +57,7 @@ function App() {
 
         //setMessage(response.data.message);
       } */
+      setUsername(response.data.username);
       console.log('resp: ', response.data);
       setAccessToken(response.data.accessToken);
     } catch (error) {
@@ -87,7 +86,7 @@ function App() {
             path="/"
             element={
               <React.Fragment>
-                <NavBar />
+                <NavBar username={username}/>
                 <Crews />
               </React.Fragment>
             }
@@ -96,7 +95,7 @@ function App() {
             path="/person/:id"
             element={
               <React.Fragment>
-                <NavBar />
+                <NavBar username={username} />
                 <Person />
               </React.Fragment>
             }
@@ -105,7 +104,7 @@ function App() {
             path="/maps"
             element={
               <React.Fragment>
-                <NavBar />
+                <NavBar username={username} />
                 <Maps />
               </React.Fragment>
             }
@@ -114,7 +113,7 @@ function App() {
             path="/hazards"
             element={
               <React.Fragment>
-                <NavBar />
+                <NavBar username={username} />
                 <Hazards />
               </React.Fragment>
             }
@@ -123,7 +122,7 @@ function App() {
             path="/forms"
             element={
               <React.Fragment>
-                <NavBar />
+                <NavBar username={username} />
                 <Forms />
               </React.Fragment>
             }
@@ -132,7 +131,7 @@ function App() {
             path="/library"
             element={
               <React.Fragment>
-                <NavBar />
+                <NavBar username={username} />
                 <Library />
               </React.Fragment>
             }
@@ -141,7 +140,7 @@ function App() {
             path="/profile"
             element={
               <React.Fragment>
-                <NavBar />
+                <NavBar username={username} />
                 <Profile />
               </React.Fragment>
             }
@@ -150,7 +149,7 @@ function App() {
             path="/tasks"
             element={
               <React.Fragment>
-                <NavBar />
+                <NavBar username={username} />
                 <Tasks />
               </React.Fragment>
             }
@@ -160,7 +159,7 @@ function App() {
             path="/training/:id?"
             element={
               <React.Fragment>
-                <NavBar />
+                <NavBar username={username} />
                 <Training />
               </React.Fragment>
             }

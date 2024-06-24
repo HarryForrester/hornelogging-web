@@ -41,10 +41,10 @@ const ToggleWithLabel = ({ type, personId, form, isFormEnabled, toggle, availabl
 };
 
 ToggleWithLabel.propTypes = {
-  type: PropTypes.string.isRequired,
-  personId: PropTypes.number.isRequired,
+  type: PropTypes.string,
+  personId: PropTypes.string.isRequired,
   form: PropTypes.object.isRequired,
-  isFormEnabled: PropTypes.bool.isRequired,
+  isFormEnabled: PropTypes.func.isRequired,
   availableOnDevice: PropTypes.any.isRequired,
   toggle: PropTypes.func.isRequired
 };

@@ -24,7 +24,7 @@ const Maps = () => {
   const { confirmationModalState, setConfirmationModalState } = useConfirmationModal();
   const { alertMessageState, setAlertMessageState } = useAlertMessage();
   const [showSpinner, setShowSpinner] = useState(false); // shows spinner while submitting to server
-
+  const [account, setAccount] = useState('');
   const navigate = useNavigate();
   useEffect(() => {
     const fetchData = async () => {
@@ -39,7 +39,7 @@ const Maps = () => {
 
         if (response.data.isLoggedIn) {
           const data = response.data;
-
+          setAccount(data._account);
           setMapState((prevState) => ({
             ...prevState,
             files: data.files,
@@ -81,10 +81,8 @@ const Maps = () => {
     const mapId = map._id;
     const mapName = map.name;
     const points = map.points;
-    console.log('Map Clicked: ', mapState);
 
     const parsePoints = points;
-    console.log('parsePOint: ', parsePoints);
     var pdfButtons = document.querySelectorAll('.pdf-button');
 
     pdfButtons.forEach((button) => {
@@ -107,7 +105,6 @@ const Maps = () => {
   };
 
   const openConfirmRemoveMap = async () => {
-    console.log('remove map');
 
     try {
       //TODO add confirm modal
@@ -119,7 +116,6 @@ const Maps = () => {
         message: `Are you sure you want to delete ${mapState.currentMapName}?`,
         confirmed: false
       }));
-      console.log('con: ', confirmationModalState);
 
       //setSkidModalState((prevState) => ({ ...prevState, isConfirmModalVisible: true }));
     } catch (err) {
@@ -292,7 +288,7 @@ const Maps = () => {
                 </Button>
               )}
 
-              <UploadMapButton />
+              <UploadMapButton _account={account} />
 
               {isErrorConfirmationModalVisible && (
                 <ErrorConfirmationModal

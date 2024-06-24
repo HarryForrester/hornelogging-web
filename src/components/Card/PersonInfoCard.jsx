@@ -21,7 +21,7 @@ const PersonInfoCard = ({ person }) => {
 };
 
 PersonInfoCard.propTypes = {
-  person: PropTypes.object.isRequired
+  person: PropTypes.any.isRequired
 };
 
 export default PersonInfoCard;

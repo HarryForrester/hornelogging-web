@@ -26,7 +26,6 @@ const Crews = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get('http://localhost:3001/', { withCredentials: true }); // Replace with your API endpoint
-        console.log('resp', response);
         if (response.data.isLoggedIn) {
           setMapState((prevState) => ({
             ...prevState,

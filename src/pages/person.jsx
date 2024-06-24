@@ -27,6 +27,7 @@ const Person = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // eslint-disable-next-line no-undef
         const response = await axios.get(`${process.env.REACT_APP_URL}/person/${id}`, {
           withCredentials: true
         });

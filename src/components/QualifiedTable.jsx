@@ -15,6 +15,7 @@ const QualifiedTable = ({ quals, person }) => {
 
     try {
       const response = await axios.post(
+        // eslint-disable-next-line no-undef
         `${process.env.REACT_APP_URL}/complete-qualification`,
         { _id, complete, employee: personDataState.person._id },
         { withCredentials: true }
@@ -59,6 +60,7 @@ const QualifiedTable = ({ quals, person }) => {
 
     try {
       const response = await axios.post(
+        // eslint-disable-next-line no-undef
         `${process.env.REACT_APP_URL}/remove-qualification`,
         { _id, employee: person?._id },
         { withCredentials: true }
@@ -114,7 +116,7 @@ const QualifiedTable = ({ quals, person }) => {
   return (
     <div>
       <h3>Qualified</h3>
-      <Table striped bordered condensed>
+      <Table striped bordered condensed="true">
         <thead>
           <tr>
             <th>Title</th>
@@ -165,7 +167,7 @@ const QualifiedTable = ({ quals, person }) => {
       </Table>
 
       <h3>Working towards</h3>
-      <Table striped bordered condensed>
+      <Table striped bordered condensed="true">
         <thead>
           <tr>
             <th>Title</th>
@@ -213,7 +215,7 @@ const QualifiedTable = ({ quals, person }) => {
 };
 
 QualifiedTable.propTypes = {
-  quals: PropTypes.object.isRequired,
-  person: PropTypes.object.isRequired
+  quals: PropTypes.any.isRequired,
+  person: PropTypes.any.isRequired
 };
 export default QualifiedTable;
