@@ -3,9 +3,12 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import { useSkidModal } from './Skid/SkidModalContext';
 import PropTypes from 'prop-types';
+import DragAndDropUpload from '../DragAndDropUpload';
 
 const AddCutPlanModal = ({ submitCutPlan }) => {
   const { skidModalState, setSkidModalState } = useSkidModal();
+  const [pdfNameIsValid, setPdfNameIsValid] = useState(null);
+  const [fileIsValid, setFileIsValid] = useState(null);
 
   const [selectedFile, setSelectedFile] = useState(null);
   const [fileName, setFileName] = useState('');
@@ -42,7 +45,9 @@ const AddCutPlanModal = ({ submitCutPlan }) => {
     // Close the modal
     handleClose();
   };
-
+  const removeUploadedFile = () => {
+    setSelectedFile(null);
+  };
   return (
     <Modal show={skidModalState.isAddCutPlanModalVisible} onHide={handleClose}>
       <Modal.Header closeButton>
@@ -52,13 +57,20 @@ const AddCutPlanModal = ({ submitCutPlan }) => {
       <Modal.Body>
         <form id="file-upload-form" onSubmit={handleSubmit}>
           <label htmlFor="file-upload">Upload PDF:</label>
-          <input
+          {/* <input
             type="file"
             className="form-control"
             id="file-upload"
             accept=".pdf"
             onChange={handleFileChange}
-          />
+          /> */}
+          <DragAndDropUpload
+              setSelectedFile={setSelectedFile}
+              setFileIsValid={setFileIsValid}
+              selectedFile={selectedFile}
+              removeUploadedFile={removeUploadedFile}
+              fileTypes={{ 'application/pdf': [] }}
+            />
 
           <label htmlFor="file-name">File Name:</label>
           <input

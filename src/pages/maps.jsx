@@ -254,8 +254,9 @@ const Maps = () => {
 
   // selects first map in list and calls handleMapClick to render the first map
   useEffect(() => {
-    if (mapState.maps.length > 0) {
-      const firstMap = mapState.maps[0];
+    const length = mapState.maps.length
+    if (length > 0) {
+      const firstMap = mapState.maps[length-1];
       handleMapClick(firstMap);
     } else {
       setShowAddPoint(false);

@@ -188,7 +188,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid }) => {
       isSelectHazardModalVisible: false,
       hazardModalVisible: false,
       selectedDocuments: [],
-      selectedCutPlan: [],
+      selectedCutPlan: null,
       skidName: '',
       selectedCrew: [],
       selectedSkidHazards: [],
@@ -275,8 +275,9 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid }) => {
 
   //Used for viewing pdf in a new tab - Add/Edit Skid Cut Plan Viewer
   const openPdfInNewTab = (item) => {
+    console.log('openPDFinnewTab', item);
     // Remove "data:" URL prefix if present
-    const cleanBase64String = item.base64String.replace(/data:.*;base64,/, '');
+    /* const cleanBase64String = item.base64String.replace(/data:.*;base64,/, '');
 
     const byteCharacters = atob(cleanBase64String);
     const byteArrays = [];
@@ -296,7 +297,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid }) => {
     const blob = new Blob(byteArrays, { type: 'application/pdf' });
     const objectUrl = URL.createObjectURL(blob);
 
-    window.open(objectUrl, '_blank');
+    window.open(objectUrl, '_blank'); */
   };
 
   const handleHazardClick = (hazard) => {
@@ -433,25 +434,19 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid }) => {
             </Form.Group>
 
             <Form.Group className="col-md-12">
-              <ListGroup className="cutplan-list list-group list-group-flush">
-                {skidModalState.selectedCutPlan !== null && (
-                  <ListGroup
-                    className="list-group"
-                    style={{ maxHeight: '100px', overflowY: 'auto' }}
-                  >
-                    {skidModalState.selectedCutPlan.map((item, index) => (
-                      <ListGroupItem
-                        key={index}
-                        className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
-                        onClick={() => openPdfInNewTab(item)}
-                        style={{ cursor: 'pointer' }}
-                      >
-                        {item.fileName}
-                      </ListGroupItem>
-                    ))}
-                  </ListGroup>
-                )}
-              </ListGroup>
+            <ListGroup className="cutplan-list list-group list-group-flush">
+  {skidModalState.selectedCutPlan !== null && (
+    <ListGroup className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
+      <ListGroupItem
+        className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
+        onClick={() => openPdfInNewTab(skidModalState.selectedCutPlan)}
+        style={{ cursor: 'pointer' }}
+      >
+        {skidModalState.selectedCutPlan.name}
+      </ListGroupItem>
+    </ListGroup>
+  )}
+</ListGroup>
             </Form.Group>
 
             <Form.Group className="col-md-12">

@@ -123,7 +123,18 @@ const PDFViewer = ({ percentage }) => {
    * @returns {void}
    */
   const submitCutPlan = (fileName, selectedFile) => {
-    const reader = new FileReader();
+    const tempFile = new File([selectedFile], fileName, {
+      type: selectedFile.type,
+      lastModified: selectedFile.lastModified
+    });
+
+    setSkidModalState((prevState) => ({
+      ...prevState,
+      isAddDocModalVisible: false,
+      isSkidModalVisible: true,
+      selectedCutPlan: tempFile
+    }));
+    /* const reader = new FileReader();
     reader.onload = () => {
       const base64String = reader.result.substring('data:application/pdf;base64,'.length);
       setSkidModalState((prevState) => ({
@@ -142,7 +153,7 @@ const PDFViewer = ({ percentage }) => {
       console.warn('File reading aborted');
     };
 
-    reader.readAsDataURL(selectedFile);
+    reader.readAsDataURL(selectedFile); */
   };
 
   const submitSelectedHazards = async (selectedHazards) => {

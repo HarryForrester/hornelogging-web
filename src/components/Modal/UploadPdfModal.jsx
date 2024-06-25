@@ -14,9 +14,9 @@ import { getPresignedUrl, uploadToPresignedUrl } from '../../hooks/useFileUpload
 const UploadPdfModal = (_account) => {
   const [pdfName, setPdfName] = useState(null);
   //const [selectedPdf, setSelectedPdf] = useState(null);
-  const [showErrorModal, setShowErrorModal] = useState(false);
+  //const [showErrorModal, setShowErrorModal] = useState(false);
   const [pdfNameIsValid, setPdfNameIsValid] = useState(null);
-  const [pdfFileIsValid, setPdfFileIsValid] = useState(null);
+  //const [pdfFileIsValid, setPdfFileIsValid] = useState(null);
   const [showProgressBar, setShowProgressBar] = useState(false); // shows spinner while submitting to server
   const [uploadPercentage, setUploadPercentage] = useState(0);
 
