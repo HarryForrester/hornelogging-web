@@ -44,19 +44,24 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
     console.log('submitted selectedSkidHazards: ', selectedFile);
 
     setShowSpinner(true);
-
-    const presignedUrl = await getPresignedUrl(_account+"/maps/skids");
-        const filePath = getFilePathFromUrl(presignedUrl);
-        console.log('filepath of the file', filePath);
-        await uploadToPresignedUrl(presignedUrl, selectedFile);
-
+    var cutPlans;
+    if(selectedFile.name) {
+      const presignedUrl = await getPresignedUrl(_account+"/maps/skids");
+      const filePath = getFilePathFromUrl(presignedUrl);
+      console.log('filepath of the file', filePath);
+      await uploadToPresignedUrl(presignedUrl, selectedFile);
+      cutPlans = {fileName: selectedFile.name, url: filePath};
+    } else {
+      cutPlans =  skidModalState.selectedCutPlan
+    }
+   
 
     const skidObj = {
       _id: skidModalState._id,
       mapName: mapState.currentMapName,
       info: {
         crews: skidModalState.selectedCrew,
-        cutPlans: {fileName: selectedFile.name, url: filePath},
+        cutPlans: cutPlans,
         pointName: skidModalState.skidName,
         selectedDocuments: skidModalState.selectedDocuments,
         siteHazards: skidModalState.selectedSkidHazards //TODO: need to change hazardData to siteHazards
@@ -78,15 +83,16 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
         });
 
         if (resp.status === 200) {
+          console.log("hello there u cunt", resp.data);
           setMapState((prevState) => {
             const existingIndex = prevState.currentMapMarkers.findIndex(
-              (marker) => marker._id === skidObj._id
+              (marker) => marker._id === resp.data._id
             );
 
             if (existingIndex !== -1) {
               // If the marker with the same _id exists, update it
               const updatedMarkers = [...prevState.currentMapMarkers];
-              updatedMarkers[existingIndex] = skidObj;
+              updatedMarkers[existingIndex] = resp.data;
 
               return {
                 ...prevState,
@@ -96,7 +102,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
               // If the marker with the same _id does not exist, add it
               return {
                 ...prevState,
-                currentMapMarkers: [...prevState.currentMapMarkers, skidObj]
+                currentMapMarkers: [...prevState.currentMapMarkers, resp.data]
               };
             }
           });

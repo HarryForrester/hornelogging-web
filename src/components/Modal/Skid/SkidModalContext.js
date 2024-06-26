@@ -22,7 +22,7 @@ export const SkidModalProvider = ({ children }) => {
     isEditPersonModalVisible: false,
     isAddCrewModalVisible: false,
     selectedDocuments: [],
-    selectedCutPlan: [],
+    selectedCutPlan: null,
     skidName: '',
     selectedCrew: [],
     selectedSkidHazards: [],
