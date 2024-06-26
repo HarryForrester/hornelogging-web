@@ -46,7 +46,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
     setShowSpinner(true);
     var cutPlans;
     if(selectedFile.name) {
-      const presignedUrl = await getPresignedUrl(_account+"/maps/skids");
+      const presignedUrl = await getPresignedUrl(`${_account}/maps/skids`);
       const filePath = getFilePathFromUrl(presignedUrl);
       console.log('filepath of the file', filePath);
       await uploadToPresignedUrl(presignedUrl, selectedFile);

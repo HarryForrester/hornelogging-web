@@ -16,7 +16,7 @@ const UploadPdfModal = (_account) => {
   //const [selectedPdf, setSelectedPdf] = useState(null);
   //const [showErrorModal, setShowErrorModal] = useState(false);
   const [pdfNameIsValid, setPdfNameIsValid] = useState(null);
-  //const [pdfFileIsValid, setPdfFileIsValid] = useState(null);
+  const [pdfFileIsValid, setPdfFileIsValid] = useState(null);
   const [showProgressBar, setShowProgressBar] = useState(false); // shows spinner while submitting to server
   const [uploadPercentage, setUploadPercentage] = useState(0);
 

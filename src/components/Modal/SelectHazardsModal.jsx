@@ -14,9 +14,12 @@ const SelectHazardsModal = ({ submitSelectedHazards }) => {
   const { mapState, setMapState } = useMap();
 
   const submitHazards = (selectedHazards) => {
-    submitSelectedHazards(selectedHazards);
-    setSelectedHazards([]);
-    setSearchCriteria('');
+    if (selectedHazards.length > 0) {
+      submitSelectedHazards(selectedHazards);
+      setSelectedHazards([]);
+      setSearchCriteria('');
+  
+    }
   };
 
   /**
