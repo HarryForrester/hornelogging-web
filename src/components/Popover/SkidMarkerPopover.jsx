@@ -33,7 +33,8 @@ const SkidMarkerPopover = () => {
 
   // Used to convert base64String to  blob to view file on new tab
   const openPdfInNewTab = (item) => {
-    const byteCharacters = atob(item.base64String);
+    window.open(item.url, '_blank');
+  /*   const byteCharacters = atob(item.base64String);
     const byteArrays = [];
 
     for (let offset = 0; offset < byteCharacters.length; offset += 512) {
@@ -51,21 +52,36 @@ const SkidMarkerPopover = () => {
     const blob = new Blob(byteArrays, { type: 'application/pdf' });
     const objectUrl = URL.createObjectURL(blob);
 
-    window.open(objectUrl, '_blank');
+    window.open(item, '_blank'); */
   };
 
   const editSelectedSkid = async () => {
     const id = new Date().getTime();
 
     try {
-      const response = await axios.get('http://localhost:3001/findhazard', {
-        params: {
-          name: skidMarkerState.selectedMarker.info.siteHazards.join(',') // Convert the array to a comma-separated string
-        },
-        withCredentials: true
-      });
-
-      if (response.status === 200) {
+      if(skidMarkerState.selectedMarker.info.siteHazards.length > 0) {
+        const response = await axios.get('http://localhost:3001/findhazard', {
+          params: {
+            name: skidMarkerState.selectedMarker.info.siteHazards.join(',') // Convert the array to a comma-separated string
+          },
+          withCredentials: true
+        });
+  
+        if (response.status === 200) {
+          setSkidModalState((prevState) => ({
+            ...prevState,
+            _id: skidMarkerState.selectedMarker._id,
+            isSkidModalVisible: true,
+            skidName: skidMarkerState.selectedMarker.info.pointName,
+            selectedCrew: skidMarkerState.selectedMarker.info.crews,
+            selectedDocuments: skidMarkerState.selectedMarker.info.selectedDocuments,
+            selectedSiteHazards: skidMarkerState.selectedMarker.info.siteHazards,
+            selectedSkidHazardsData: response.data,
+            selectedCutPlan: skidMarkerState.selectedMarker.info.cutPlans,
+            isSkidModalEdit: true
+          }));
+        }
+      } else {
         setSkidModalState((prevState) => ({
           ...prevState,
           _id: skidMarkerState.selectedMarker._id,
@@ -74,11 +90,11 @@ const SkidMarkerPopover = () => {
           selectedCrew: skidMarkerState.selectedMarker.info.crews,
           selectedDocuments: skidMarkerState.selectedMarker.info.selectedDocuments,
           selectedSiteHazards: skidMarkerState.selectedMarker.info.siteHazards,
-          selectedSkidHazardsData: response.data,
           selectedCutPlan: skidMarkerState.selectedMarker.info.cutPlans,
           isSkidModalEdit: true
         }));
       }
+      
     } catch (error) {
       setAlertMessageState((prevState) => ({
         ...prevState,
@@ -215,7 +231,7 @@ const SkidMarkerPopover = () => {
                 .filter((crew) => mapState.crewTypes.some((mapCrew) => mapCrew === crew))
                 .map((crew) => (
                   <li
-                    key={crew._id}
+                    key={crew}
                     className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
                     onClick={() => toggleSkidCrew(crew)}
                     style={{ cursor: 'pointer' }}
@@ -266,16 +282,13 @@ const SkidMarkerPopover = () => {
             <div>
               {skidMarkerState.selectedMarker.info.cutPlans !== null && (
                 <ul className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
-                  {skidMarkerState.selectedMarker.info.cutPlans.map((item, index) => (
                     <li
-                      key={index}
                       className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
-                      onClick={() => openPdfInNewTab(item)}
+                      onClick={() => openPdfInNewTab(skidMarkerState.selectedMarker.info.cutPlans)}
                       style={{ cursor: 'pointer' }}
                     >
-                      {item.fileName}
+                      {skidMarkerState.selectedMarker.info.cutPlans.fileName}
                     </li>
-                  ))}
                 </ul>
               )}
             </div>
@@ -295,7 +308,7 @@ const SkidMarkerPopover = () => {
               <ul className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
                 {mapState.generalHazardsData.map((hazard) => (
                   <li
-                    key={hazard.id}
+                    key={hazard._id}
                     className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
                     style={{ textAlign: 'center' }}
                     onClick={() => handleHazardClick(hazard)}

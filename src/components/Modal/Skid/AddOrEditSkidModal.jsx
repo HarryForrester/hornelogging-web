@@ -9,14 +9,19 @@ import { Anchor, ListGroup, ListGroupItem, Spinner } from 'react-bootstrap';
 import { useAlertMessage } from '../../AlertMessage';
 import { useSkidMarker } from '../../SkidMarkerContext';
 import PropTypes from 'prop-types';
+import { getPresignedUrl, uploadToPresignedUrl } from '../../../hooks/useFileUpload';
 
-const AddOrEditSkidModal = ({ mousePosition, editSkid }) => {
+const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
   const { skidModalState, setSkidModalState } = useSkidModal();
   const { mapState, setMapState } = useMap();
   const { alertMessageState, setAlertMessageState } = useAlertMessage();
   const { skidMarkerState, setSkidMarkerState } = useSkidMarker();
   const [showSpinner, setShowSpinner] = useState(false); // shows spinner while submitting to server
-
+  const [previewUrl, setPreviewUrl] = useState('');
+  const getFilePathFromUrl = (url) => {
+    const urlObject = new URL(url);
+    return `${urlObject.origin}${urlObject.pathname}`;
+  };
   const resetAddSkidModal = () => {
     //resetMarker();
     handleClose();
@@ -35,16 +40,23 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid }) => {
 
   const submitSkidModal = async () => {
     const id = new Date().getTime();
-
-    console.log('submitted selectedSkidHazards: ', skidModalState.selectedSkidHazards);
+    const selectedFile = skidModalState.selectedCutPlan;
+    console.log('submitted selectedSkidHazards: ', selectedFile);
 
     setShowSpinner(true);
+
+    const presignedUrl = await getPresignedUrl(_account+"/maps/skids");
+        const filePath = getFilePathFromUrl(presignedUrl);
+        console.log('filepath of the file', filePath);
+        await uploadToPresignedUrl(presignedUrl, selectedFile);
+
+
     const skidObj = {
       _id: skidModalState._id,
       mapName: mapState.currentMapName,
       info: {
         crews: skidModalState.selectedCrew,
-        cutPlans: skidModalState.selectedCutPlan,
+        cutPlans: {fileName: selectedFile.name, url: filePath},
         pointName: skidModalState.skidName,
         selectedDocuments: skidModalState.selectedDocuments,
         siteHazards: skidModalState.selectedSkidHazards //TODO: need to change hazardData to siteHazards
@@ -273,10 +285,13 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid }) => {
     });
   };
 
+  
+
   //Used for viewing pdf in a new tab - Add/Edit Skid Cut Plan Viewer
   const openPdfInNewTab = (item) => {
     console.log('openPDFinnewTab', item);
-    // Remove "data:" URL prefix if present
+    const fileURL = URL.createObjectURL(item);
+    window.open(fileURL, '_blank');
     /* const cleanBase64String = item.base64String.replace(/data:.*;base64,/, '');
 
     const byteCharacters = atob(cleanBase64String);
@@ -434,19 +449,19 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid }) => {
             </Form.Group>
 
             <Form.Group className="col-md-12">
-            <ListGroup className="cutplan-list list-group list-group-flush">
-  {skidModalState.selectedCutPlan !== null && (
-    <ListGroup className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
-      <ListGroupItem
-        className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
-        onClick={() => openPdfInNewTab(skidModalState.selectedCutPlan)}
-        style={{ cursor: 'pointer' }}
-      >
-        {skidModalState.selectedCutPlan.name}
-      </ListGroupItem>
-    </ListGroup>
-  )}
-</ListGroup>
+              <ListGroup className="cutplan-list list-group list-group-flush">
+                {skidModalState.selectedCutPlan !== null && (
+                  <ListGroup className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
+                    <ListGroupItem
+                      className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
+                      onClick={() => openPdfInNewTab(skidModalState.selectedCutPlan)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      {skidModalState.selectedCutPlan.name}
+                    </ListGroupItem>
+                  </ListGroup>
+                )}
+              </ListGroup>
             </Form.Group>
 
             <Form.Group className="col-md-12">
@@ -467,7 +482,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid }) => {
 
             <Form.Group className="col-md-12">
               <ListGroup className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
-                {skidModalState.selectedSkidHazardsData.map((hazard) => (
+                {skidModalState.selectedSkidHazardsData && skidModalState.selectedSkidHazardsData.map((hazard) => (
                   <ListGroupItem
                     key={hazard.id}
                     className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
@@ -512,7 +527,8 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid }) => {
 
 AddOrEditSkidModal.propTypes = {
   editSkid: PropTypes.any.isRequired,
-  mousePosition: PropTypes.object.isRequired
+  mousePosition: PropTypes.object.isRequired,
+  _account: PropTypes.any,
 };
 
 export default AddOrEditSkidModal;

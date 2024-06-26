@@ -24,7 +24,7 @@ const Maps = () => {
   const { confirmationModalState, setConfirmationModalState } = useConfirmationModal();
   const { alertMessageState, setAlertMessageState } = useAlertMessage();
   const [showSpinner, setShowSpinner] = useState(false); // shows spinner while submitting to server
-  const [account, setAccount] = useState('');
+  const [account, setAccount] = useState(null);
   const navigate = useNavigate();
   useEffect(() => {
     const fetchData = async () => {
@@ -321,7 +321,7 @@ const Maps = () => {
           </div>
         </div>
         <div ref={pdfContainerRef} id="pdf-container" className="pdf-container">
-          <MapViewer percentage={percentage} />
+          <MapViewer percentage={percentage} _account={account} />
         </div>
       </div>
     </>

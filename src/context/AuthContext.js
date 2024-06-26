@@ -16,7 +16,6 @@ export const AuthProvider = ({ children }) => {
         const response = await axios.get(`${process.env.REACT_APP_URL}/session`, {
           withCredentials: true,
         });
-        console.log(response.data);
         setSession(response.data)
       } catch (error) {
         console.error('Error fetching session:', error);
@@ -34,9 +33,7 @@ export const AuthProvider = ({ children }) => {
         password
       });
       if (response.status === 200) {
-        console.log('user: ', response.data);
         const responsel = await axios.get(`${process.env.REACT_APP_URL}/session`);
-        console.log('the session was fetched as is: ', responsel.data);
         setSession(response.data)
 
         //setUsername(response.data.username);

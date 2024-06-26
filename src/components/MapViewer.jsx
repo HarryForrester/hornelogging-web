@@ -17,7 +17,7 @@ import SkidMarkerPopover from './Popover/SkidMarkerPopover';
 import SkidMarkerCrewPopover from './Popover/SkidMarkerCrewPopover';
 import SkidMarkerPersonPopover from './Popover/SkidMarkerPersonPopover';
 
-const PDFViewer = ({ percentage }) => {
+const PDFViewer = ({ percentage, _account }) => {
   //const [pdfData, setPdfData] = useState(null);
   const { skidModalState, setSkidModalState } = useSkidModal();
   const { skidMarkerState, setSkidMarkerState } = useSkidMarker();
@@ -74,25 +74,28 @@ const PDFViewer = ({ percentage }) => {
         popoverVisible: false
       }));
 
-      try {
-        const response = await axios.get('http://localhost:3001/findhazard', {
-          params: {
-            name: clickedPoint.info.siteHazards.join(',') // Convert the array to a comma-separated string
-          },
-          withCredentials: true
-        });
-
+      if (clickedPoint.info.siteHazards.length > 0) {
+        try {
+          const response = await axios.get('http://localhost:3001/findhazard', {
+            params: {
+              name: clickedPoint.info.siteHazards.join(',') // Convert the array to a comma-separated string
+            },
+            withCredentials: true
+          });
+  
+          setSkidMarkerState((prevState) => ({
+            ...prevState,
+            selectedMarkerSiteHazards: response.data
+          }));
+        } catch (error) {
+          console.error('Error fetching hazard data:', error);
+        }
         setSkidMarkerState((prevState) => ({
           ...prevState,
-          selectedMarkerSiteHazards: response.data
+          popoverVisible: true
         }));
-      } catch (error) {
-        console.error('Error fetching hazard data:', error);
       }
-      setSkidMarkerState((prevState) => ({
-        ...prevState,
-        popoverVisible: true
-      }));
+      
     }
 
     setSkidMarkerState((prevState) => ({
@@ -157,7 +160,6 @@ const PDFViewer = ({ percentage }) => {
   };
 
   const submitSelectedHazards = async (selectedHazards) => {
-    console.log("hey harry cunt, there are the hazards you wanted", selectedHazards);
     const id = new Date().getTime();
     setTempHazards(mapState.generalHazardsData);
 
@@ -195,10 +197,7 @@ const PDFViewer = ({ percentage }) => {
             const newData = response.data.filter(
               (newHazard) => !existingIds.includes(newHazard._id)
             );
-            console.log('exisinfIds: ', existingIds);
-            console.log('newData:', newData);
-            console.log('selectHazaaa', selectedHazards);
-
+  
             return {
               ...prevState,
               isSelectHazardModalVisible: false,
@@ -239,8 +238,6 @@ const PDFViewer = ({ percentage }) => {
       ])
     ];
     
-
-    console.log("Updated General Hazards: ", updatedGeneralHazards);
     try {
       const resp = await axios.post(
         'http://localhost:3001/submitGeneralHazards',
@@ -375,7 +372,6 @@ const PDFViewer = ({ percentage }) => {
     fetchFiles();
     fetchPdfData();
     fetchCrewData();
-    console.log('hello there you fucking meme', mapState.currentMapUrl)
   }, [mapState.currentMapUrl]);
   const canvasElement = document.querySelector('.react-pdf__Page__canvas');
 
@@ -393,18 +389,16 @@ const PDFViewer = ({ percentage }) => {
   }, [mapState.maps]);
    */
 
-  // Use useEffect to get the width and height after the component has mounted
+  /* // Use useEffect to get the width and height after the component has mounted
   useEffect(() => {
     if (pdfContainerRef.current) {
-      console.log('pdf: ', pdfContainerRef);
       const width = pdfContainerRef.current.offsetWidth;
       const height = pdfContainerRef.current.offsetHeight;
 
       // Do something with the width and height values, such as logging them
-      console.log('Width:', width, 'Height:', height);
     }
   }, [mapState]);
-
+ */
   /* useEffect(() => {
     const getGeneralHazards = async () => {
       // eslint-disable-next-line no-undef
@@ -440,6 +434,7 @@ const PDFViewer = ({ percentage }) => {
  <AddOrEditSkidModal
         mousePosition={skidMarkerState.mousePosition}
         editSkid={skidMarkerState.editSkid}
+        _account={_account}
       />
       {percentage >= 100 ? (
         mapState.currentMapName ? (
@@ -559,7 +554,8 @@ const PDFViewer = ({ percentage }) => {
 };
 
 PDFViewer.propTypes = {
-  percentage: PropTypes.number.isRequired
+  percentage: PropTypes.number.isRequired,
+  _account: PropTypes.any,
 };
 
 export default PDFViewer;
