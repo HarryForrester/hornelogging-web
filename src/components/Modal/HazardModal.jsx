@@ -17,7 +17,7 @@ function HazardModal() {
     if(skidModalState.isSelectHazardsGeneral) {
       setSkidModalState((prevState) => ({ ...prevState, hazardModalVisible: false, isGeneralHazardsModalVisible: true}));
 
-    } else if (skidModalState.isSkidModalEdit) {
+    } else if (skidModalState.isSkidModalEdit || skidModalState.isSkidModalAdd) {
       setSkidModalState((prevState) => ({ ...prevState, hazardModalVisible: false, isSkidModalVisible: true}));
 
     } else {

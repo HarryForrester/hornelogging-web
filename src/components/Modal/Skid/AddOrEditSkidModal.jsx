@@ -289,9 +289,15 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
 
   //Used for viewing pdf in a new tab - Add/Edit Skid Cut Plan Viewer
   const openPdfInNewTab = (item) => {
-    console.log('openPDFinnewTab', item);
-    const fileURL = URL.createObjectURL(item);
-    window.open(fileURL, '_blank');
+    if (item instanceof File) {
+      console.log('openPDFinnewTab', item);
+      const fileURL = URL.createObjectURL(item);
+      window.open(fileURL, '_blank');
+    } else {
+      window.open(item.url, '_blank');
+
+    }
+    
     /* const cleanBase64String = item.base64String.replace(/data:.*;base64,/, '');
 
     const byteCharacters = atob(cleanBase64String);
@@ -457,7 +463,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
                       onClick={() => openPdfInNewTab(skidModalState.selectedCutPlan)}
                       style={{ cursor: 'pointer' }}
                     >
-                      {skidModalState.selectedCutPlan.name}
+                      {skidModalState.selectedCutPlan.fileName || skidModalState.selectedCutPlan.name}
                     </ListGroupItem>
                   </ListGroup>
                 )}

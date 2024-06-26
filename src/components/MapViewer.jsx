@@ -52,7 +52,8 @@ const PDFViewer = ({ percentage, _account }) => {
     setSkidModalState((prevState) => ({
       ...prevState,
       isSkidModalVisible: true,
-      isSkidModalEdit: false
+      isSkidModalEdit: false,
+      isSkidModalAdd: true
     }));
   };
 
@@ -62,6 +63,7 @@ const PDFViewer = ({ percentage, _account }) => {
    * @param {*} clickedPoint
    */
   const handleMarkerClick = async (clickedPoint) => {
+    console.log('handleMarkerClick has been called');
     if (skidMarkerState.selectedMarker === clickedPoint) {
       setSkidMarkerState((prevState) => ({
         ...prevState,
@@ -71,7 +73,7 @@ const PDFViewer = ({ percentage, _account }) => {
       // If it's a different point, close the popover and then open it for the new point
       setSkidMarkerState((prevState) => ({
         ...prevState,
-        popoverVisible: false
+        popoverVisible: true
       }));
 
       if (clickedPoint.info.siteHazards.length > 0) {
