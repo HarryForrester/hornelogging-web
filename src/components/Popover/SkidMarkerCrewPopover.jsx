@@ -76,7 +76,7 @@ const SkidMarkerCrewPopover = () => {
               <ul className="list-group" style={{ maxHeight: '200px', overflowY: 'auto' }}>
                 {skidMarkerState.peopleByCrew[skidMarkerState.selectedSkidCrew].map((crew) => (
                   <li
-                    key={crew.id}
+                    key={crew._id}
                     className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
                     style={{ textAlign: 'center' }}
                     onClick={() => handleSkidPersonClick(crew)}

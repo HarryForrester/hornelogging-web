@@ -84,7 +84,7 @@ const SkidMarkerPersonPopover = () => {
                           .filter((item) => item.type === type)
                           .map((item) => (
                             <li
-                              key={item.id}
+                              key={item._id}
                               className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
                               onClick={() =>
                                 window.open('http://localhost:3001' + item.uri, '_blank')

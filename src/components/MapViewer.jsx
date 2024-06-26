@@ -63,7 +63,6 @@ const PDFViewer = ({ percentage, _account }) => {
    * @param {*} clickedPoint
    */
   const handleMarkerClick = async (clickedPoint) => {
-    console.log('handleMarkerClick has been called');
     if (skidMarkerState.selectedMarker === clickedPoint) {
       setSkidMarkerState((prevState) => ({
         ...prevState,
