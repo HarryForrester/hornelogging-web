@@ -57,7 +57,7 @@ const SkidMarkerPopover = () => {
 
   const editSelectedSkid = async () => {
     const id = new Date().getTime();
-
+    console.log('dddddddd',skidMarkerState.selectedMarker.info.siteHazards)
     try {
       if(skidMarkerState.selectedMarker.info.siteHazards.length > 0) {
         const response = await axios.get('http://localhost:3001/findhazard', {
@@ -75,7 +75,7 @@ const SkidMarkerPopover = () => {
             skidName: skidMarkerState.selectedMarker.info.pointName,
             selectedCrew: skidMarkerState.selectedMarker.info.crews,
             selectedDocuments: skidMarkerState.selectedMarker.info.selectedDocuments,
-            selectedSiteHazards: skidMarkerState.selectedMarker.info.siteHazards,
+            selectedSkidHazards: skidMarkerState.selectedMarker.info.siteHazards,
             selectedSkidHazardsData: response.data,
             selectedCutPlan: skidMarkerState.selectedMarker.info.cutPlans,
             isSkidModalEdit: true
@@ -249,7 +249,7 @@ const SkidMarkerPopover = () => {
                 paddingBottom: '10px'
               }}
             >
-              Site Hazard Docs:
+              Site Documents:
             </div>
 
             <div>
@@ -332,7 +332,7 @@ const SkidMarkerPopover = () => {
 
             <div>
               <ul className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
-                {skidMarkerState.selectedMarkerSiteHazards.map((hazard) => (
+                {skidMarkerState.selectedSkidHazardsData && skidMarkerState.selectedSkidHazardsData.map((hazard) => (
                   <li
                     key={hazard.id}
                     className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"

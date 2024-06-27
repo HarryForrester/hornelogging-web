@@ -83,10 +83,11 @@ const PDFViewer = ({ percentage, _account }) => {
             },
             withCredentials: true
           });
+          console.log("site hazards: ", response.data)
   
           setSkidMarkerState((prevState) => ({
             ...prevState,
-            selectedMarkerSiteHazards: response.data
+            selectedSkidHazardsData: response.data
           }));
         } catch (error) {
           console.error('Error fetching hazard data:', error);
@@ -161,6 +162,7 @@ const PDFViewer = ({ percentage, _account }) => {
   };
 
   const submitSelectedHazards = async (selectedHazards) => {
+    console.log("haha sleeted", selectedHazards);
     const id = new Date().getTime();
     setTempHazards(mapState.generalHazardsData);
 
@@ -198,7 +200,7 @@ const PDFViewer = ({ percentage, _account }) => {
             const newData = response.data.filter(
               (newHazard) => !existingIds.includes(newHazard._id)
             );
-  
+            console.log("new dtat:", newData)
             return {
               ...prevState,
               isSelectHazardModalVisible: false,
@@ -492,7 +494,7 @@ const PDFViewer = ({ percentage, _account }) => {
               ></div>
             )}
             {/* Renders map of markers onto map */}
-            {mapState.currentMapMarkers.map((point, index) => (
+            {Array.isArray(mapState.currentMapMarkers) && mapState.currentMapMarkers.map((point, index) => (
               <div
                 key={index}
                 className="red-dot"

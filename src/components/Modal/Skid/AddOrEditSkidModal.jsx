@@ -45,7 +45,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
 
     setShowSpinner(true);
     var cutPlans;
-    if(selectedFile.name) {
+    if(selectedFile && selectedFile.name) {
       const presignedUrl = await getPresignedUrl(`${_account}/maps/skids`);
       const filePath = getFilePathFromUrl(presignedUrl);
       console.log('filepath of the file', filePath);
@@ -75,6 +75,8 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
         y: mousePosition.y
       }
     };
+
+    console.log("hello there harry: ", skidObj.info.siteHazards);
 
     try {
       if (editSkid) {
@@ -161,10 +163,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
             }
           });
 
-        /*
-         */
-
-        // Set success state to true on successful post
+        
       }
 
       console.log('currentMapMarekrs: ', mapState.currentMapMarkers);
@@ -193,7 +192,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
           toasts: prevState.toasts.filter((toast) => toast.id !== id)
         }));
       }, 10000);
-    }
+    } 
   };
 
   const handleClose = () => {
@@ -279,14 +278,19 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
    */
   const removeSkidHazard = (event, hazardToRemove) => {
     event.stopPropagation();
-
+    console.log('hazard tobe removed', skidModalState.selectedSkidHazards)
     setSkidModalState((prevState) => {
-      const updatedHazards = prevState.selectedSkidHazards.filter(
-        (hazard) => hazard.id !== hazardToRemove
+      const updatedHazards = prevState.selectedSkidHazardsData.filter(
+        (hazard) => hazard._id!== hazardToRemove
       );
+      console.log('ytda', updatedHazards);
+
+      const hazardsIds = updatedHazards.map(hazard => hazard._id);
+
       return {
         ...prevState,
-        selectedSkidHazards: updatedHazards
+        selectedSkidHazardsData: updatedHazards,
+        selectedSkidHazards: hazardsIds
       };
     });
   };
@@ -415,8 +419,8 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
               </Form.Group>
             </Form.Group>
 
-            <Form.Group className="col-md-12">
-              <ListGroup className="doc-list list-group list-group-flush">
+            <Form.Group>
+              <ListGroup className="doc-list list-group">
                 {skidModalState.selectedDocuments.map((file) => (
                   <ListGroupItem
                     key={file._id}
@@ -461,7 +465,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
             </Form.Group>
 
             <Form.Group className="col-md-12">
-              <ListGroup className="cutplan-list list-group list-group-flush">
+              <ListGroup className="cutplan-list list-group">
                 {skidModalState.selectedCutPlan !== null && (
                   <ListGroup className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
                     <ListGroupItem
@@ -507,7 +511,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
                     <Button
                       type="button"
                       className="btn btn-danger btn-sm"
-                      onClick={(event) => removeSkidHazard(event, hazard.id)}
+                      onClick={(event) => removeSkidHazard(event, hazard._id)}
                     >
                       Remove
                     </Button>

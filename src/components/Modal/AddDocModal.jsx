@@ -52,7 +52,7 @@ const AddDocModal = ({ docSumbit }) => {
   };
 
   return (
-    <Modal show={skidModalState.isAddDocModalVisible} onHide={handleClose} backdrop="static">
+    <Modal show={skidModalState.isAddDocModalVisible} onHide={handleClose}>
       <Modal.Header closeButton>
         <Modal.Title>Add Doc</Modal.Title>
       </Modal.Header>
