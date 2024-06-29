@@ -5,6 +5,7 @@ const MapContext = createContext();
 export const MapProvider = ({ children }) => {
   const [mapState, setMapState] = useState({
     currentMapId: null,
+    currentMapKey: null,
     currentMapName: null,
     originalWidth: null,
     originalHeight: null,

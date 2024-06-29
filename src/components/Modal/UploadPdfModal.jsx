@@ -56,14 +56,15 @@ const UploadPdfModal = (_account) => {
     } else if (!selectedFile) {
       setPdfFileIsValid(false);
     } else {
-      const presignedUrl = await getPresignedUrl(_account._account._account+"/maps");
+      const [presignedUrl, key] = await getPresignedUrl(_account._account._account+"/maps");
         const filePath = getFilePathFromUrl(presignedUrl);
         console.log('filepath of the file', filePath);
         await uploadToPresignedUrl(presignedUrl, selectedFile);
       const formData = new FormData();
       formData.append('file', selectedFile);
       formData.append('id', pdfName);
-      formData.append('url',filePath )
+      formData.append('url',filePath);
+      formData.append('key', key);
 
       try {
         

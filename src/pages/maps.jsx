@@ -11,6 +11,7 @@ import { useConfirmationModal } from '../components/ConfirmationModalContext.js'
 import { Button } from 'react-bootstrap';
 import AddSkidButton from '../components/Button/AddSkidButton.jsx';
 import { useAlertMessage } from '../components/AlertMessage.js';
+import { deletePresignedUrl } from '../hooks/useFileDelete.js';
 
 const Maps = () => {
   const [isErrorConfirmationModalVisible, setIsErrorConfirmationModalVisible] = useState(false);
@@ -81,6 +82,8 @@ const Maps = () => {
     const mapId = map._id;
     const mapName = map.name;
     const points = map.points;
+    const mapKey = map.map.key
+    console.log('a key u nneeed', mapKey);
 
     const parsePoints = points;
     var pdfButtons = document.querySelectorAll('.pdf-button');
@@ -97,6 +100,7 @@ const Maps = () => {
     setMapState((prevState) => ({
       ...prevState,
       currentMapId: mapId,
+      currentMapKey: mapKey,
       currentMapName: mapName,
       currentMapMarkers: parsePoints
     }));
@@ -144,6 +148,7 @@ const Maps = () => {
             withCredentials: true
           });
           if (resp.status === 200) {
+            await deletePresignedUrl([mapState.currentMapKey])
             setAlertMessageState((prevState) => ({
               ...prevState,
               toasts: [

@@ -11,7 +11,7 @@ import { deletePresignedUrl } from '../../hooks/useFileDelete';
 const SkidMarkerPopover = () => {
   const { skidModalState, setSkidModalState } = useSkidModal();
   const { mapState, setMapState } = useMap();
-  const { alertMessageState, setAlertMessageState } = useAlertMessage();
+  const { setAlertMessageState } = useAlertMessage();
   const { skidMarkerState, setSkidMarkerState } = useSkidMarker();
 
   const toggleSkidCrew = (crew) => {
@@ -129,11 +129,8 @@ const SkidMarkerPopover = () => {
 
   const removeSelectedSkid = async () => {
     const id = new Date().getTime();
-    const cutPlanUrl = skidMarkerState.selectedMarker.info.cutPlans.url;
     const cutPlanKey = skidMarkerState.selectedMarker.info.cutPlans.key;
-    //var a = [];
-    //a.push(cutPlanKey)
-    //console.log("key g", a);
+
     await deletePresignedUrl([cutPlanKey]);
     const skidObj = {
       _id: skidModalState._id,
@@ -159,7 +156,6 @@ const SkidMarkerPopover = () => {
     );
 
     if (response.status === 200) {
-      //await deletePresignedUrl('41cb0b2d-548a-4348-af95-e06ece3965e2.pdf')
       //call api to delete file 
       setMapState((prevState) => {
         const updatedMarkers = prevState.currentMapMarkers.filter(
@@ -187,8 +183,6 @@ const SkidMarkerPopover = () => {
       }));
     }
 
-    //setPopoverVisible(false);
-    //setSelectedMarker(null);
     setSkidMarkerState((prevState) => ({
       ...prevState,
       popoverVisible: false,
