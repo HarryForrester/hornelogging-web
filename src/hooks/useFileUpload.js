@@ -12,9 +12,9 @@ export const getPresignedUrl = async (folderPath) => {
     }
   });
   const presignedUrl = response.data.presignedUrl;
-  const url = response.data.presignedUrl;
+  const key = response.data.key;
   console.log('im a fat cat',response);
-  return presignedUrl;
+  return [presignedUrl, key];
 };
 
  // Function to upload the selected file using the generated presigned url

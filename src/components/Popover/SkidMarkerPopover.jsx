@@ -130,9 +130,12 @@ const SkidMarkerPopover = () => {
   const removeSelectedSkid = async () => {
     const id = new Date().getTime();
     const cutPlanUrl = skidMarkerState.selectedMarker.info.cutPlans.url;
-    console.log("hjeleleo", cutPlanUrl);
-    await deletePresignedUrl(cutPlanUrl);
-    /* const skidObj = {
+    const cutPlanKey = skidMarkerState.selectedMarker.info.cutPlans.key;
+    //var a = [];
+    //a.push(cutPlanKey)
+    //console.log("key g", a);
+    await deletePresignedUrl([cutPlanKey]);
+    const skidObj = {
       _id: skidModalState._id,
       mapName: mapState.currentMapName,
       info: {
@@ -195,7 +198,7 @@ const SkidMarkerPopover = () => {
     setMapState((prevState) => ({
       ...prevState,
       enableMarker: false
-    })); */
+    }));  
   };
 
   return (
