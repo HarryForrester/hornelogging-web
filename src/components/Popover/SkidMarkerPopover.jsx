@@ -6,6 +6,7 @@ import { useMap } from '../Map/MapContext';
 import { useAlertMessage } from '../AlertMessage';
 import { useSkidMarker } from '../SkidMarkerContext';
 import axios from 'axios';
+import { deletePresignedUrl } from '../../hooks/useFileDelete';
 
 const SkidMarkerPopover = () => {
   const { skidModalState, setSkidModalState } = useSkidModal();
@@ -128,8 +129,10 @@ const SkidMarkerPopover = () => {
 
   const removeSelectedSkid = async () => {
     const id = new Date().getTime();
-
-    const skidObj = {
+    const cutPlanUrl = skidMarkerState.selectedMarker.info.cutPlans.url;
+    console.log("hjeleleo", cutPlanUrl);
+    await deletePresignedUrl(cutPlanUrl);
+    /* const skidObj = {
       _id: skidModalState._id,
       mapName: mapState.currentMapName,
       info: {
@@ -153,6 +156,8 @@ const SkidMarkerPopover = () => {
     );
 
     if (response.status === 200) {
+      //await deletePresignedUrl('41cb0b2d-548a-4348-af95-e06ece3965e2.pdf')
+      //call api to delete file 
       setMapState((prevState) => {
         const updatedMarkers = prevState.currentMapMarkers.filter(
           (marker) => marker._id !== skidMarkerState.selectedMarker._id
@@ -190,7 +195,7 @@ const SkidMarkerPopover = () => {
     setMapState((prevState) => ({
       ...prevState,
       enableMarker: false
-    }));
+    })); */
   };
 
   return (
