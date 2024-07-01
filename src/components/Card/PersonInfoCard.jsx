@@ -1,8 +1,19 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import InfoCard from './InfoCard';
 import PropTypes from 'prop-types';
 
 const PersonInfoCard = ({ person }) => {
+  const [imageSrc, setImageSrc] = useState('/img/default.jpg');
+  
+  useEffect(() => {
+    const imgUrl = person?.imgUrl;
+    if (imgUrl?.url) {
+      setImageSrc(person.imgUrl.url);
+    } else {
+      setImageSrc('/img/default.jpg');
+    }
+  }, [person?.imgUrl]);
+
   const data = [
     { label: 'Crew', value: person?.crew },
     { label: 'Role', value: person?.role },
@@ -13,11 +24,8 @@ const PersonInfoCard = ({ person }) => {
     { label: 'Doctor', value: person?.doctor },
     { label: 'Medical Issues', value: person?.medical }
   ];
-  const getPersonImageUrl = (person) => {
-    // eslint-disable-next-line no-undef
-    return person.imgUrl > 0 ? `${process.env.REACT_APP_URL}/${person.imgUrl}` : '/img/default.jpg';
-  };
-  return <InfoCard data={data} imageSrc={getPersonImageUrl(person)} />;
+  
+  return <InfoCard data={data} imageSrc={imageSrc} />;
 };
 
 PersonInfoCard.propTypes = {

@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import React, { useState } from 'react';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -7,7 +8,8 @@ import { useAlertMessage } from '../AlertMessage';
 import { usePersonData } from '../PersonData';
 import { Card, Button, ListGroup } from 'react-bootstrap';
 import UploadUserDocumentModal from '../Modal/UploadUserDocument';
-const PersonDocumentCard = () => {
+import { deletePresignedUrl } from '../../hooks/useFileDelete';
+const PersonDocumentCard = (_account) => {
   const [uploadPercentage, setUploadPercentage] = useState(0);
   const { alertMessageState, setAlertMessageState } = useAlertMessage();
   const { personDataState, setPersonDataState } = usePersonData();
@@ -140,14 +142,15 @@ const PersonDocumentCard = () => {
     }
   };
 
-  const handleFileDelete = async (fileName, fileId) => {
+  const handleFileDelete = async (file) => {
+    console.log('the fiole ok', file)
     const id = new Date().getTime();
 
-    const userConfirmed = window.confirm('Are you sure you want to remove file: ' + fileName);
+    const userConfirmed = window.confirm('Are you sure you want to remove file: ' + file.fileName);
     if (userConfirmed) {
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_URL}/person/deletefile/${personDataState.person._id}/${fileId}`,
+          `${process.env.REACT_APP_URL}/person/deletefile/${file._id}`,
           {
             withCredentials: true
           }
@@ -155,6 +158,9 @@ const PersonDocumentCard = () => {
 
         if (response.status === 200) {
           //window.location.reload();
+          console.log('the response', response.data)
+
+          await deletePresignedUrl([file.key]);
           setPersonDataState((prevState) => ({
             ...prevState,
             files: prevState.files.filter((file) => file._id !== response.data.file._id)
@@ -167,7 +173,7 @@ const PersonDocumentCard = () => {
                 id: id,
                 heading: 'Person Document Removed',
                 show: true,
-                message: `Success! ${fileName} has been removed to ${personDataState.person.name} documents `,
+                message: `Success! ${file.fileName} has been removed to ${personDataState.person.name} documents `,
                 background: 'success',
                 color: 'white'
               }
@@ -219,6 +225,7 @@ const PersonDocumentCard = () => {
         <UploadUserDocumentModal
           show={isUploadFileModalVisible}
           close={() => setUploadFileModalVisible(false)}
+          _account={_account}
         />
 
         {/* Upload button */}
@@ -244,7 +251,7 @@ const PersonDocumentCard = () => {
                     <div className="d-flex">
                       {/* View */}
                       <a
-                        href={process.env.REACT_APP_URL + file.uri}
+                        href={file.fileUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="btn btn-outline-secondary btn-sm text-decoration-none me-2"
@@ -254,7 +261,7 @@ const PersonDocumentCard = () => {
                       </a>
                       {/* Download */}
                       <a
-                        href={`${process.env.REACT_APP_URL}${file.uri}?download=true`}
+                        href={`${file.uri}?download=true`}
                         download={file.fileName}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -269,7 +276,7 @@ const PersonDocumentCard = () => {
                   <Button
                     variant="danger"
                     size="sm"
-                    onClick={() => handleFileDelete(file.fileName, file._id)}
+                    onClick={() => handleFileDelete(file)}
                   >
                     <FontAwesomeIcon icon={faTrash} className="me-1" />
                     Delete

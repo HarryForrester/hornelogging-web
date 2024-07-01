@@ -9,7 +9,8 @@ import { useMap } from '../Map/MapContext';
 import { usePersonData } from '../PersonData';
 import { useAlertMessage } from '../AlertMessage';
 import { faL } from '@fortawesome/free-solid-svg-icons';
-import { getPresignedUrl, uploadToPresignedUrl } from '../../hooks/useFileUpload';
+import { getPresignedUrl, uploadToPresignedUrl, getFilePathFromUrl } from '../../hooks/useFileUpload';
+import { deletePresignedUrl } from '../../hooks/useFileDelete';
 const EditPersonModal = (_account) => {
   const { skidModalState, setSkidModalState } = useSkidModal();
   const { personDataState, setPersonDataState } = usePersonData();
@@ -118,25 +119,26 @@ const EditPersonModal = (_account) => {
     console.log('meme was here', formState)
 
     const id = new Date().getTime();
-    const formData = new FormData();
+    //const formData = new FormData();
 
-    Object.entries(formState).forEach(([key, value]) => {
-      formData.append(key, value);
-    });
+    //Object.entries(formState).forEach(([key, value]) => {
+      //formData.append(key, value);
+   // });
 
    /*  if (formState.imgFile) {
       formData.append('fileupload', formState.imgFile, 'fileupload');
     } */
 
-    const [presignedUrl, key] = await getPresignedUrl(`${_account._account}/person/${formState.id}`)
-    await uploadToPresignedUrl(presignedUrl, formState.imgFile);
-    formData.append('imgUrl', presignedUrl);
-
+    const [presignedUrl, key] = await getPresignedUrl(`${_account._account}/person/${formState.id}`,'image/png')
+    await uploadToPresignedUrl(presignedUrl, formState.imgFile,'image/png');
+    const filePath = getFilePathFromUrl(presignedUrl)
+    //formData.append('imgUrl', {key: key, url: filePath});
+    //console.log("jshhaah", formData)
     try {
       const response = await axios.post(
         // eslint-disable-next-line no-undef
         process.env.REACT_APP_URL + '/update-person/' + formState.id,
-        formData,
+        {...formState, imgUrl: {key: key, url: filePath} },
         {
           withCredentials: true,
           
@@ -144,6 +146,8 @@ const EditPersonModal = (_account) => {
       );
 
       if (response.status === 200) {
+        if(person.imgUrl !== null)
+        await deletePresignedUrl([person.imgUrl.key]); // removes the old profile image if existing imgUrl exisits
         setAlertMessageState((prevState) => ({
           ...prevState,
           toasts: [
@@ -158,8 +162,9 @@ const EditPersonModal = (_account) => {
             }
           ]
         }));
-
-        updatePerson(formState);
+        
+        updatePerson(response.data.updatedPerson);
+        console.log('hey aaa', response.data.updatedPerson.imgUrl)
         resetForm();
         setSkidModalState((prevState) => ({
           ...prevState,
@@ -197,6 +202,7 @@ const EditPersonModal = (_account) => {
     setFormState({ ...formState, [name]: value });
   };
 
+  const imgUrl = person?.imgUrl;
   return (
     <Modal
       show={skidModalState.isEditPersonModalVisible}
@@ -215,7 +221,7 @@ const EditPersonModal = (_account) => {
               <Form.Label htmlFor="imgurl" className="image-container">
                 <Image
                   // eslint-disable-next-line no-undef
-                  src={formState?.imgPreview || process.env.REACT_APP_URL + '/' + person?.imgUrl}
+                  src={formState?.imgPreview || imgUrl?.url || '/img/default.jpg'}
                   className="figure-img img-fluid z-depth-1 rounded mb-0 border border-dark"
                   alt="..."
                   id="img-preview"

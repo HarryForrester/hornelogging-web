@@ -11,7 +11,8 @@ const PersonCard = ({ people }) => {
   };
   const getPersonImageUrl = (person) => {
     // eslint-disable-next-line no-undef
-    return person.imgUrl.length > 0 ? `${process.env.REACT_APP_URL}/${person.imgUrl}` : '/img/default.jpg';
+    const imgUrl = person.imgUrl;
+    return imgUrl.url ? `${person.imgUrl.url}` : '/img/default.jpg';
   };
   return (
     <Card.Body className="card-padding">

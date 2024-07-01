@@ -10,7 +10,7 @@ import { useAlertMessage } from '../AlertMessage';
 import { useMap } from '../Map/MapContext';
 import Feedback from 'react-bootstrap/esm/Feedback';
 import DragAndDropUpload from '../DragAndDropUpload';
-import { getPresignedUrl, uploadToPresignedUrl } from '../../hooks/useFileUpload';
+import { getPresignedUrl, uploadToPresignedUrl, getFilePathFromUrl } from '../../hooks/useFileUpload';
 const UploadPdfModal = (_account) => {
   const [pdfName, setPdfName] = useState(null);
   //const [selectedPdf, setSelectedPdf] = useState(null);
@@ -31,10 +31,7 @@ const UploadPdfModal = (_account) => {
     setPdfName(event);
     setPdfNameIsValid(event ? true : null);
   };
-  const getFilePathFromUrl = (url) => {
-    const urlObject = new URL(url);
-    return `${urlObject.origin}${urlObject.pathname}`;
-  };
+  
   const handlePdfInputChange = (event) => {
     const file = event.target.files[0];
     //setSelectedPdf(file);

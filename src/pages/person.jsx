@@ -84,7 +84,7 @@ const Person = () => {
       <br style={{ clear: 'left' }} />
       <PersonInfoCard person={personDataState.person} />
       <br />
-      <PersonDocumentCard />
+      <PersonDocumentCard _account={_account}/>
       <br />
       <QualificationsCard person={personDataState.person} />
 

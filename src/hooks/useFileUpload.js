@@ -1,13 +1,14 @@
 import axios from "axios";
 
-export const getPresignedUrl = async (folderPath) => {
+export const getPresignedUrl = async (folderPath, contentType) => {
   // GET request: presigned URL
   const response = await axios({
     method: "GET",
     // eslint-disable-next-line no-undef
     url: 'https://zhba20ij25.execute-api.ap-southeast-2.amazonaws.com/hornePresignedUrlUpload',
-    params: { contentType: "application/pdf",
-    folderPath: folderPath
+    params: { 
+      contentType: contentType,
+      folderPath: folderPath
 
     }
   });
@@ -18,13 +19,18 @@ export const getPresignedUrl = async (folderPath) => {
 };
 
  // Function to upload the selected file using the generated presigned url
- export const uploadToPresignedUrl = async (presignedUrl, selectedFile) => {
+ export const uploadToPresignedUrl = async (presignedUrl, selectedFile,contentType) => {
     // Upload file to pre-signed URL
     const uploadResponse = await axios.put(presignedUrl, selectedFile, {
       headers: {
-        "Content-Type": "application/pdf",
+        "Content-Type": contentType,
       },
      
     });
     console.log(uploadResponse);
+  };
+
+  export const getFilePathFromUrl = (url) => {
+    const urlObject = new URL(url);
+    return `${urlObject.origin}${urlObject.pathname}`;
   };
