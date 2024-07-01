@@ -9,8 +9,8 @@ import { useMap } from '../Map/MapContext';
 import { usePersonData } from '../PersonData';
 import { useAlertMessage } from '../AlertMessage';
 import { faL } from '@fortawesome/free-solid-svg-icons';
-
-const EditPersonModal = () => {
+import { getPresignedUrl, uploadToPresignedUrl } from '../../hooks/useFileUpload';
+const EditPersonModal = (_account) => {
   const { skidModalState, setSkidModalState } = useSkidModal();
   const { personDataState, setPersonDataState } = usePersonData();
   const { mapState, setMapState } = useMap();
@@ -115,6 +115,7 @@ const EditPersonModal = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setShowSpinner(true);
+    console.log('meme was here', formState)
 
     const id = new Date().getTime();
     const formData = new FormData();
@@ -123,9 +124,13 @@ const EditPersonModal = () => {
       formData.append(key, value);
     });
 
-    if (formState.imgFile) {
+   /*  if (formState.imgFile) {
       formData.append('fileupload', formState.imgFile, 'fileupload');
-    }
+    } */
+
+    const [presignedUrl, key] = await getPresignedUrl(`${_account._account}/person/${formState.id}`)
+    await uploadToPresignedUrl(presignedUrl, formState.imgFile);
+    formData.append('imgUrl', presignedUrl);
 
     try {
       const response = await axios.post(
@@ -134,9 +139,7 @@ const EditPersonModal = () => {
         formData,
         {
           withCredentials: true,
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
+          
         }
       );
 
@@ -187,7 +190,7 @@ const EditPersonModal = () => {
           toasts: prevState.toasts.filter((toast) => toast.id !== id)
         }));
       }, 10000);
-    }
+    } 
   };
 
   const handleInputChange = (name, value) => {

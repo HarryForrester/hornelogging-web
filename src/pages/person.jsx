@@ -15,6 +15,7 @@ const Person = () => {
   const { id } = useParams();
   const { skidModalState, setSkidModalState } = useSkidModal();
   const { personDataState, setPersonDataState } = usePersonData();
+  const [_account, setAccount] = useState(null);
   const navigate = useNavigate();
 
   const handleEditPerson = () => {
@@ -43,6 +44,7 @@ const Person = () => {
             forms: data.forms,
             quals: data.quals
           }));
+          setAccount(data._account);
         } else {
           navigate('/login');
         }
@@ -87,7 +89,7 @@ const Person = () => {
       <QualificationsCard person={personDataState.person} />
 
       <PersonFormAccessCard />
-      <EditPersonModal />
+      <EditPersonModal _account={_account} />
     </div>
   );
 };
