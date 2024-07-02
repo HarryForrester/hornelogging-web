@@ -8,7 +8,7 @@ import { useAlertMessage } from '../AlertMessage';
 import { usePersonData } from '../PersonData';
 import UploadUserDocumentModal from '../Modal/UploadUserDocument';
 import { deletePresignedUrl } from '../../hooks/useFileDelete';
-
+import { createHandleDownloadClick } from '../../hooks/useFileDownload';
 const PersonDocumentCard = (_account) => {
   const [uploadPercentage, setUploadPercentage] = useState(0);
   const { alertMessageState, setAlertMessageState } = useAlertMessage();
@@ -213,37 +213,9 @@ const PersonDocumentCard = (_account) => {
     filesByType[file.type].push(file);
   });
 
-  // Function to get the presigned URL
-  const getPresignedUrl = async (fileKey) => {
-    console.log('AHAHA', fileKey);
-    try {
-      const response = await axios.get('https://h0djh63zwj.execute-api.ap-southeast-2.amazonaws.com/hornePresignedUrlDownload', {
-        params: { file_key: fileKey },
-      });
-      console.log("REPSONSE:", response)
-      return response.data.url;
-    } catch (error) {
-      console.error('Error getting presigned URL:', error);
-      throw error;
-    }
-  };
 
-  // Wrap handleDownloadClick to pass file as parameter
-  const createHandleDownloadClick = (file) => async (event) => {
-    console.log("pressed file o", file)
-    event.preventDefault();
-    try {
-      const presignedUrl = await getPresignedUrl(file.key);
-      const link = document.createElement('a');
-      link.href = presignedUrl;
-      link.download = file.fileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (error) {
-      console.error('Error downloading file:', error);
-    }
-  };
+
+  
 
   return (
     <Card>

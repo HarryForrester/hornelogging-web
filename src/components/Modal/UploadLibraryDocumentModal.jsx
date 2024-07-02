@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Form, Modal, Button, ProgressBar } from 'react-bootstrap';
@@ -5,8 +6,8 @@ import { useAlertMessage } from '../AlertMessage';
 import { usePersonData } from '../PersonData';
 import PropTypes from 'prop-types';
 import DragAndDropUpload from '../DragAndDropUpload';
-
-const UploadLibraryDocumentModal = ({ show, close, docTypes: fileTypes, updateLibraryFiles }) => {
+import { getPresignedUrl, getFilePathFromUrl,uploadToPresignedUrl } from '../../hooks/useFileUpload';
+const UploadLibraryDocumentModal = ({ show, close, docTypes: fileTypes, updateLibraryFiles, _account }) => {
   const [fileName, setFileName] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
   const [fileTypeIsValid, setFileTypeIsValid] = useState(null);
@@ -54,17 +55,25 @@ const UploadLibraryDocumentModal = ({ show, close, docTypes: fileTypes, updateLi
     else if (selectedFileType === 'defaultFileType')
       setFileTypeIsValid(false); //name is not valid
     else {
-      const formData = new FormData();
+      console.log('ajahjajha', _account)
+      const [presignedUrl, key] = await getPresignedUrl(`${_account}/library`,selectedFile.type)
+      await uploadToPresignedUrl(presignedUrl, selectedFile,selectedFile.type);
+      const filePath = getFilePathFromUrl(presignedUrl)
+
+      const data = {
+        fileName: fileName || selectedFile.name,
+        fileType: fileTypeValue,
+        fileUrl: filePath,
+        key: key
+      }
+      /* const formData = new FormData();
       formData.append('fileupload', selectedFile);
       formData.append('fileName', fileName);
-      formData.append('fileType', fileTypeValue);
+      formData.append('fileType', fileTypeValue); */
 
       try {
-        const response = await axios.post(`${process.env.REACT_APP_URL}/library/upload`, formData, {
+        const response = await axios.post(`${process.env.REACT_APP_URL}/library/upload`, data, {
           withCredentials: true,
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          },
           onUploadProgress: (progressEvent) => {
             const percentage = Math.round((progressEvent.loaded * 100) / progressEvent.total);
             setUploadPercentage(percentage);
@@ -219,7 +228,8 @@ UploadLibraryDocumentModal.propTypes = {
   show: PropTypes.bool.isRequired,
   close: PropTypes.func.isRequired,
   docTypes: PropTypes.array.isRequired,
-  updateLibraryFiles: PropTypes.func.isRequired
-};
+  updateLibraryFiles: PropTypes.func.isRequired,
+  _account: PropTypes.number.isRequired,
+  };
 
 export default UploadLibraryDocumentModal;
