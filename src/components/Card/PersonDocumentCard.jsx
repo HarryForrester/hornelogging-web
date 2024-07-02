@@ -3,12 +3,12 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDownload, faEye, faTrash, faUpload } from '@fortawesome/free-solid-svg-icons';
-import { InputGroup, FormControl, ProgressBar, Form } from 'react-bootstrap';
+import { Card, Button, ListGroup } from 'react-bootstrap';
 import { useAlertMessage } from '../AlertMessage';
 import { usePersonData } from '../PersonData';
-import { Card, Button, ListGroup } from 'react-bootstrap';
 import UploadUserDocumentModal from '../Modal/UploadUserDocument';
 import { deletePresignedUrl } from '../../hooks/useFileDelete';
+
 const PersonDocumentCard = (_account) => {
   const [uploadPercentage, setUploadPercentage] = useState(0);
   const { alertMessageState, setAlertMessageState } = useAlertMessage();
@@ -143,10 +143,9 @@ const PersonDocumentCard = (_account) => {
   };
 
   const handleFileDelete = async (file) => {
-    console.log('the fiole ok', file)
     const id = new Date().getTime();
-
     const userConfirmed = window.confirm('Are you sure you want to remove file: ' + file.fileName);
+
     if (userConfirmed) {
       try {
         const response = await axios.get(
@@ -157,13 +156,10 @@ const PersonDocumentCard = (_account) => {
         );
 
         if (response.status === 200) {
-          //window.location.reload();
-          console.log('the response', response.data)
-
           await deletePresignedUrl([file.key]);
           setPersonDataState((prevState) => ({
             ...prevState,
-            files: prevState.files.filter((file) => file._id !== response.data.file._id)
+            files: prevState.files.filter((f) => f._id !== file._id)
           }));
           setAlertMessageState((prevState) => ({
             ...prevState,
@@ -173,7 +169,7 @@ const PersonDocumentCard = (_account) => {
                 id: id,
                 heading: 'Person Document Removed',
                 show: true,
-                message: `Success! ${file.fileName} has been removed to ${personDataState.person.name} documents `,
+                message: `Success! ${file.fileName} has been removed from ${personDataState.person.name} documents `,
                 background: 'success',
                 color: 'white'
               }
@@ -217,6 +213,38 @@ const PersonDocumentCard = (_account) => {
     filesByType[file.type].push(file);
   });
 
+  // Function to get the presigned URL
+  const getPresignedUrl = async (fileKey) => {
+    console.log('AHAHA', fileKey);
+    try {
+      const response = await axios.get('https://h0djh63zwj.execute-api.ap-southeast-2.amazonaws.com/hornePresignedUrlDownload', {
+        params: { file_key: fileKey },
+      });
+      console.log("REPSONSE:", response)
+      return response.data.url;
+    } catch (error) {
+      console.error('Error getting presigned URL:', error);
+      throw error;
+    }
+  };
+
+  // Wrap handleDownloadClick to pass file as parameter
+  const createHandleDownloadClick = (file) => async (event) => {
+    console.log("pressed file o", file)
+    event.preventDefault();
+    try {
+      const presignedUrl = await getPresignedUrl(file.key);
+      const link = document.createElement('a');
+      link.href = presignedUrl;
+      link.download = file.fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+    }
+  };
+
   return (
     <Card>
       <Card.Header>Employee Files</Card.Header>
@@ -230,7 +258,6 @@ const PersonDocumentCard = (_account) => {
 
         {/* Upload button */}
         <Button onClick={() => setUploadFileModalVisible(true)} className="mb-3">
-          {' '}
           <FontAwesomeIcon icon={faUpload} color="white" className="me-1" />
           Upload File
         </Button>
@@ -261,10 +288,8 @@ const PersonDocumentCard = (_account) => {
                       </a>
                       {/* Download */}
                       <a
-                        href={`${file.uri}?download=true`}
-                        download={file.fileName}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        href="#"
+                        onClick={createHandleDownloadClick(file)}
                         className="btn btn-outline-secondary btn-sm text-decoration-none me-2"
                       >
                         <FontAwesomeIcon icon={faDownload} className="me-1" />
