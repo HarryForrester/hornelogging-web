@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import React, { useState, useEffect } from 'react';
 import SelectRoleType from '../SelectList/SelectRoleType';
 import InputWithLabel from '../Input/InputWithLabel';
@@ -116,38 +117,41 @@ const EditPersonModal = (_account) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setShowSpinner(true);
-    console.log('meme was here', formState)
-
     const id = new Date().getTime();
-    //const formData = new FormData();
-
-    //Object.entries(formState).forEach(([key, value]) => {
-      //formData.append(key, value);
-   // });
-
-   /*  if (formState.imgFile) {
-      formData.append('fileupload', formState.imgFile, 'fileupload');
-    } */
-
-    const [presignedUrl, key] = await getPresignedUrl(`${_account._account}/person/${formState.id}`,'image/png')
-    await uploadToPresignedUrl(presignedUrl, formState.imgFile,'image/png');
-    const filePath = getFilePathFromUrl(presignedUrl)
-    //formData.append('imgUrl', {key: key, url: filePath});
-    //console.log("jshhaah", formData)
+  
     try {
-      const response = await axios.post(
-        // eslint-disable-next-line no-undef
-        process.env.REACT_APP_URL + '/update-person/' + formState.id,
-        {...formState, imgUrl: {key: key, url: filePath} },
-        {
-          withCredentials: true,
-          
-        }
-      );
-
+      let response;
+  
+      if (formState.imgFile) {
+        // Upload new image and update with imgUrl
+        const [presignedUrl, key] = await getPresignedUrl(`${_account._account}/person/${formState.id}`, 'image/png');
+        await uploadToPresignedUrl(presignedUrl, formState.imgFile, 'image/png');
+        const filePath = getFilePathFromUrl(presignedUrl);
+  
+        response = await axios.post(
+          `${process.env.REACT_APP_URL}/update-person/${formState.id}`,
+          {
+            ...formState,
+            imgUrl: { key: key, url: filePath }
+          },
+          { withCredentials: true }
+        );
+      } else {
+        // Update without changing the imgUrl
+        response = await axios.post(
+          `${process.env.REACT_APP_URL}/update-person/${formState.id}`,
+          { ...formState },
+          { withCredentials: true }
+        );
+      }
+  
       if (response.status === 200) {
-        if(person.imgUrl !== null)
-        await deletePresignedUrl([person.imgUrl.key]); // removes the old profile image if existing imgUrl exisits
+        // Delete old profile image if it exists
+        if (person.imgUrl) {
+          await deletePresignedUrl([person.imgUrl.key]);
+        }
+  
+        // Update UI state after successful update
         setAlertMessageState((prevState) => ({
           ...prevState,
           toasts: [
@@ -163,15 +167,15 @@ const EditPersonModal = (_account) => {
           ]
         }));
         
-        updatePerson(response.data.updatedPerson);
-        console.log('hey aaa', response.data.updatedPerson.imgUrl)
-        resetForm();
+        updatePerson(response.data.updatedPerson); // Update person data in UI
+        resetForm(); // Reset form fields
         setSkidModalState((prevState) => ({
           ...prevState,
           isEditPersonModalVisible: false
         }));
       }
     } catch (error) {
+      // Handle errors
       setAlertMessageState((prevState) => ({
         ...prevState,
         toasts: [
@@ -180,7 +184,7 @@ const EditPersonModal = (_account) => {
             id: id,
             heading: 'Update Person',
             show: true,
-            message: `Error! Updating ${formState.name}  from ${formState.crew}`,
+            message: `Error! Updating ${formState.name} from ${formState.crew}`,
             background: 'danger',
             color: 'white'
           }
@@ -189,14 +193,16 @@ const EditPersonModal = (_account) => {
       console.error('Error:', error);
     } finally {
       setShowSpinner(false);
+      // Remove alert after 10 seconds
       setTimeout(() => {
         setAlertMessageState((prevState) => ({
           ...prevState,
           toasts: prevState.toasts.filter((toast) => toast.id !== id)
         }));
       }, 10000);
-    } 
+    }
   };
+  
 
   const handleInputChange = (name, value) => {
     setFormState({ ...formState, [name]: value });

@@ -78,7 +78,7 @@ const Person = () => {
         >
           Edit
         </Button>
-        <RemovePersonButton person={personDataState.person} />
+        <RemovePersonButton person={personDataState.person} _account={_account} />
       </div>
 
       <br style={{ clear: 'left' }} />

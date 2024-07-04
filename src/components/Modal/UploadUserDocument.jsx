@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Form, Modal, Button, ProgressBar } from 'react-bootstrap';
+import { Form, Modal, Button, Spinner } from 'react-bootstrap';
 import { useAlertMessage } from '../AlertMessage';
 import { usePersonData } from '../PersonData';
 import PropTypes from 'prop-types';
@@ -12,7 +12,7 @@ const UploadUserDocumentModal = ({ show, close, _account}) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [fileTypeIsValid, setFileTypeIsValid] = useState(null);
   const [fileIsValid, setFileIsValid] = useState(null);
-  const [showProgressBar, setShowProgressBar] = useState(false); // shows spinner while submitting to server
+  const [showSpinner, setShowSpinner] = useState(false); // shows spinner while submitting to server
   const [uploadPercentage, setUploadPercentage] = useState(0);
   const [fileTypeValue, setFileTypeValue] = useState(null);
   const [selectedFileType, setSelectedFileType] = useState('defaultFileType'); // default value
@@ -48,13 +48,14 @@ const UploadUserDocumentModal = ({ show, close, _account}) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    setShowProgressBar(true); // show progress bar
     const id = new Date().getTime(); // creates id for alert messages
 
     if (!selectedFile) setFileIsValid(false);
     else if (selectedFileType === 'defaultFileType')
       setFileTypeIsValid(false); //name is not valid
     else {
+      setShowSpinner(true); // show progress bar
+
       //const formData = new FormData();
       //formData.append('fileupload', selectedFile);
       ///formData.append('fileName', fileName);
@@ -128,12 +129,14 @@ const UploadUserDocumentModal = ({ show, close, _account}) => {
 
         console.error('Error submitting form:', error);
       } finally {
+        setShowSpinner(false);
         setTimeout(() => {
           setAlertMessageState((prevState) => ({
             ...prevState,
             toasts: prevState.toasts.filter((toast) => toast.id !== id)
           }));
         }, 10000);
+
       }
     }
   };
@@ -221,16 +224,20 @@ const UploadUserDocumentModal = ({ show, close, _account}) => {
           onClick={handleSubmit}
           style={{ height: '38px', width: '100px', padding: 0, fontSize: 14 }}
         >
-          {showProgressBar ? (
-            <ProgressBar
-              animated
-              now={uploadPercentage}
-              label={`${uploadPercentage}%`}
-              style={{ width: '100%', height: '100%', padding: 0 }}
-            />
-          ) : (
-            'Upload File'
-          )}
+          {showSpinner ? (
+                <>
+                  <Spinner
+                    as="span"
+                    animation="border"
+                    size="sm"
+                    role="status"
+                    aria-hidden="true"
+                  />
+                  <span className="visually-hidden">Loading...</span>
+                </>
+              ) : (
+                'Upload'
+              )}
         </Button>
       </Modal.Footer>
     </Modal>
@@ -240,7 +247,7 @@ const UploadUserDocumentModal = ({ show, close, _account}) => {
 UploadUserDocumentModal.propTypes = {
   show: PropTypes.bool.isRequired,
   close: PropTypes.func.isRequired,
-  _account: PropTypes.number.isRequired,
+  _account: PropTypes.object.isRequired,
 };
 
 export default UploadUserDocumentModal;

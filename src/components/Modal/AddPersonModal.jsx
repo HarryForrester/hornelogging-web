@@ -53,6 +53,7 @@ const AddPersonModal = () => {
     }))
  */
     try {
+      // eslint-disable-next-line no-undef
       const response = await axios.post(process.env.REACT_APP_URL + '/createperson', formData, {
         withCredentials: true
       });

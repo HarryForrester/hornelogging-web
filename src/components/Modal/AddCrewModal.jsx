@@ -10,7 +10,7 @@ const AddCrewModal = () => {
   const { mapState, setMapState } = useMap();
   const { alertMessageState, setAlertMessageState } = useAlertMessage();
   const [showSpinner, setShowSpinner] = useState(false);
-  const [crew, setCrew] = useState(null);
+  const [crew, setCrew] = useState('');
 
   const handleInputChange = (e) => {
     setCrew(e.target.value);
@@ -48,6 +48,7 @@ const AddCrewModal = () => {
       } // if crew does not exist then add the send crew to server.
       else {
         const response = await axios.post(
+          // eslint-disable-next-line no-undef
           process.env.REACT_APP_URL + '/createcrew',
           {
             name: crew

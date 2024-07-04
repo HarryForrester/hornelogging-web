@@ -68,7 +68,7 @@ const AddDocModal = ({ docSumbit }) => {
         <br />
         <div className="modal-hazards">
           {mapState.files.map((file) => (
-            <div className="card" style={{ marginBottom: '10px' }} key={file.uri}>
+            <div className="card" style={{ marginBottom: '10px' }} key={file._id}>
               <div className="search-text-doc" style={{ display: 'none' }}>
                 {file.searchText}
               </div>
@@ -77,7 +77,7 @@ const AddDocModal = ({ docSumbit }) => {
                   <input
                     type="checkbox"
                     name="selectedDocs[]"
-                    value={file.uri}
+                    value={file?.uri}
                     data-filename={file.fileName}
                     onChange={() => handleCheckboxChange(file)}
                   />

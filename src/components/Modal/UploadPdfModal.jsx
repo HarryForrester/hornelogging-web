@@ -4,7 +4,7 @@ import InputWithLabel from '../Input/InputWithLabel';
 import FileInputWithLabel from '../Input/FileInputWithLabel';
 import ErrorConfirmationModal from './ErrorConfirmationModal';
 import axios from 'axios';
-import { Form, Modal, Button, ProgressBar } from 'react-bootstrap';
+import { Form, Modal, Button, Spinner } from 'react-bootstrap';
 import { SkidModalProvider, useSkidModal } from './Skid/SkidModalContext';
 import { useAlertMessage } from '../AlertMessage';
 import { useMap } from '../Map/MapContext';
@@ -12,12 +12,12 @@ import Feedback from 'react-bootstrap/esm/Feedback';
 import DragAndDropUpload from '../DragAndDropUpload';
 import { getPresignedUrl, uploadToPresignedUrl, getFilePathFromUrl } from '../../hooks/useFileUpload';
 const UploadPdfModal = (_account) => {
-  const [pdfName, setPdfName] = useState(null);
+  const [pdfName, setPdfName] = useState('');
   //const [selectedPdf, setSelectedPdf] = useState(null);
   //const [showErrorModal, setShowErrorModal] = useState(false);
   const [pdfNameIsValid, setPdfNameIsValid] = useState(null);
   const [pdfFileIsValid, setPdfFileIsValid] = useState(null);
-  const [showProgressBar, setShowProgressBar] = useState(false); // shows spinner while submitting to server
+  const [showSpinner, setShowSpinner] = useState(false); // shows spinner while submitting to server
   const [uploadPercentage, setUploadPercentage] = useState(0);
 
   const { skidModalState, setSkidModalState } = useSkidModal();
@@ -40,7 +40,7 @@ const UploadPdfModal = (_account) => {
   };
 
   const handleSubmit = async (event) => {
-    setShowProgressBar(true);
+    setShowSpinner(true);
 
     const id = new Date().getTime();
 
@@ -53,10 +53,11 @@ const UploadPdfModal = (_account) => {
     } else if (!selectedFile) {
       setPdfFileIsValid(false);
     } else {
-      const [presignedUrl, key] = await getPresignedUrl(_account._account._account+"/maps");
+      console.log("the _id you bro man: ", _account._account)
+      const [presignedUrl, key] = await getPresignedUrl(_account._account._account+"/maps", selectedFile.type);
         const filePath = getFilePathFromUrl(presignedUrl);
         console.log('filepath of the file', filePath);
-        await uploadToPresignedUrl(presignedUrl, selectedFile);
+        await uploadToPresignedUrl(presignedUrl, selectedFile, selectedFile.type);
       const formData = new FormData();
       formData.append('file', selectedFile);
       formData.append('id', pdfName);
@@ -120,7 +121,7 @@ const UploadPdfModal = (_account) => {
         }));
         console.error('Error submitting form:', error);
       } finally {
-        setShowProgressBar(false);
+        setShowSpinner(false);
         resetForm();
 
         setTimeout(() => {
@@ -232,16 +233,20 @@ const UploadPdfModal = (_account) => {
           onClick={handleSubmit}
           style={{ height: '38px', width: '100px', padding: 0, fontSize: 14 }}
         >
-          {showProgressBar ? (
-            <ProgressBar
-              animated
-              now={uploadPercentage}
-              label={`${uploadPercentage}%`}
-              style={{ width: '100%', height: '100%', padding: 0 }}
-            />
-          ) : (
-            'Upload Map'
-          )}
+          {showSpinner ? (
+                <>
+                  <Spinner
+                    as="span"
+                    animation="border"
+                    size="sm"
+                    role="status"
+                    aria-hidden="true"
+                  />
+                  <span className="visually-hidden">Loading...</span>
+                </>
+              ) : (
+                'Upload'
+              )}
         </Button>
       </Modal.Footer>
       {/*             <ErrorConfirmationModal message={message} onClose={closeErrorModal} show={showErrorModal}/>

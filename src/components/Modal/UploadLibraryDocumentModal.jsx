@@ -229,7 +229,7 @@ UploadLibraryDocumentModal.propTypes = {
   close: PropTypes.func.isRequired,
   docTypes: PropTypes.array.isRequired,
   updateLibraryFiles: PropTypes.func.isRequired,
-  _account: PropTypes.number.isRequired,
+  _account: PropTypes.object.isRequired,
   };
 
 export default UploadLibraryDocumentModal;

@@ -8,12 +8,13 @@ import { useNavigate } from 'react-router-dom';
 import { useAlertMessage } from '../AlertMessage';
 import PropTypes from 'prop-types';
 import axios from 'axios';
+import { deletePresignedUrl } from '../../hooks/useFileDelete';
 
 /**
  * Removes a Person
  * @returns
  */
-const RemovePersonButton = ({ person }) => {
+const RemovePersonButton = ({ person, _account }) => {
   const { confirmationModalState, setConfirmationModalState } = useConfirmationModal();
   const { alertMessageStart, setAlertMessageState } = useAlertMessage();
   const navigate = useNavigate();
@@ -37,13 +38,16 @@ const RemovePersonButton = ({ person }) => {
       const id = new Date().getTime();
 
       if (confirmationModalState.confirmed && person._id !== null) {
-        try {
+        await deletePresignedUrl([`${_account}/person/${person._id}/`]);
+         try {
           const response = await axios.delete(
             // eslint-disable-next-line no-undef
             process.env.REACT_APP_URL + `/deleteperson/${person._id}`,
             { withCredentials: true }
           );
           if (response.status === 200) {
+              await deletePresignedUrl([`${person._id}/`]);
+            
             navigate('/');
             setAlertMessageState((prevState) => ({
               ...prevState,
@@ -87,7 +91,7 @@ const RemovePersonButton = ({ person }) => {
               toasts: prevState.toasts.filter((toast) => toast.id !== id)
             }));
           }, 10000);
-        }
+        } 
       }
     };
 
@@ -109,7 +113,8 @@ const RemovePersonButton = ({ person }) => {
 };
 
 RemovePersonButton.propTypes = {
-  person: PropTypes.any.isRequired
+  person: PropTypes.any.isRequired,
+  _account: PropTypes.string.isRequired
 };
 
 export default RemovePersonButton;
