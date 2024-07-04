@@ -315,11 +315,11 @@ const EditPersonModal = (_account) => {
               <Form.Select
                 id="crewInput"
                 name="crew"
-                value={formState.crew || 'Unassigned'}
+                value={formState.crew || 'default'}
                 onChange={handleCrewChange}
                 required
               >
-                <option value="Unassigned" disabled>
+                <option value="default" disabled>
                   Select Crew
                 </option>
                 {personDataState &&
@@ -329,6 +329,9 @@ const EditPersonModal = (_account) => {
                       {option}
                     </option>
                   ))}
+                <option value="Unassigned">
+                  Unassigned
+                </option>
               </Form.Select>
             </Form.Group>
             <SelectRoleType
