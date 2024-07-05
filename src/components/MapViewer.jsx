@@ -477,10 +477,11 @@ const PDFViewer = ({ percentage, _account }) => {
                 renderMode="canvas"
                 renderTextLayer={false}
                 renderAnnotationLayer={false}
-                width={mapState.originalWidth}
+                width={1200}
+                height={1200}
                 onLoadSuccess={(page) => {
                   const { width, height } = page;
-                  //console.log("width: " + width + " height: " + height)
+                  console.log("width: " + width + " height: " + height)
                   setMapState((prevState) => ({
                     ...prevState,
                     originalWidth: width,
