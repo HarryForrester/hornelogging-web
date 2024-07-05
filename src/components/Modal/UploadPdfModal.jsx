@@ -24,7 +24,7 @@ const UploadPdfModal = (_account) => {
   const { alertMessageState, setAlertMessageState } = useAlertMessage();
   const { mapState, setMapState } = useMap();
 
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(undefined);
   const [fileIsValid, setFileIsValid] = useState(null);
 
   const handlePdfNameChange = (event) => {

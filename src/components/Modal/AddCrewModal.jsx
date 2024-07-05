@@ -60,6 +60,11 @@ const AddCrewModal = () => {
           handleClose();
           setMapState((prevState) => ({
             ...prevState,
+            crews: response.data.crews,
+            archivedPeople: response.data.archivedPeople
+          }));
+          /* setMapState((prevState) => ({
+            ...prevState,
             crews: [
               ...prevState.crews,
               {
@@ -67,7 +72,7 @@ const AddCrewModal = () => {
                 people: []
               }
             ]
-          }));
+          })); */
 
           setAlertMessageState((prevState) => ({
             ...prevState,

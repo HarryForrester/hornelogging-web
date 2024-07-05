@@ -121,7 +121,7 @@ const EditPersonModal = (_account) => {
   
     try {
       let response;
-  
+      console.log('this sis the form state',formState)
       if (formState.imgFile) {
         // Upload new image and update with imgUrl
         const [presignedUrl, key] = await getPresignedUrl(`${_account._account}/person/${formState.id}`, 'image/png');

@@ -129,9 +129,13 @@ const SkidMarkerPopover = () => {
 
   const removeSelectedSkid = async () => {
     const id = new Date().getTime();
-    const cutPlanKey = skidMarkerState.selectedMarker.info.cutPlans.key;
 
-    await deletePresignedUrl([cutPlanKey]);
+    if (skidMarkerState.selectedMarker.info.cutPlans) {
+      const cutPlanKey = skidMarkerState.selectedMarker.info.cutPlans.key;
+
+      await deletePresignedUrl([cutPlanKey]);
+    }
+    
     const skidObj = {
       _id: skidModalState._id,
       mapName: mapState.currentMapName,

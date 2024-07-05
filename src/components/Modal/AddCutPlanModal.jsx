@@ -1,53 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import { useSkidModal } from './Skid/SkidModalContext';
 import PropTypes from 'prop-types';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
 import DragAndDropUpload from '../DragAndDropUpload';
 
 const AddCutPlanModal = ({ submitCutPlan }) => {
   const { skidModalState, setSkidModalState } = useSkidModal();
-  const [pdfNameIsValid, setPdfNameIsValid] = useState(null);
-  const [fileIsValid, setFileIsValid] = useState(null);
-
   const [selectedFile, setSelectedFile] = useState(null);
-  const [fileName, setFileName] = useState('');
-
-  const handleFileChange = (e) => {
-    setSelectedFile(e.target.files[0]);
-  };
+  const [fileIsValid, setFileIsValid] = useState(null);
 
   const handleClose = () => {
     setSkidModalState((prevState) => ({
       ...prevState,
       isAddCutPlanModalVisible: false,
-      isSkidModalVisible: true
+      isSkidModalVisible: true,
     }));
-    // Reset the form state when closing the modal
-    setSelectedFile(null);
-    setFileName('');
   };
 
-  const handleFileNameChange = (e) => {
-    setFileName(e.target.value);
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    // Pass the selected file and file name to the submitCutPlan function
-    submitCutPlan(fileName, selectedFile);
-
-    // Reset the form state
-    setSelectedFile(null);
-    setFileName('');
-
-    // Close the modal
-    handleClose();
-  };
   const removeUploadedFile = () => {
     setSelectedFile(null);
   };
+
   return (
     <Modal show={skidModalState.isAddCutPlanModalVisible} onHide={handleClose}>
       <Modal.Header closeButton>
@@ -55,40 +31,61 @@ const AddCutPlanModal = ({ submitCutPlan }) => {
       </Modal.Header>
 
       <Modal.Body>
-        <form id="file-upload-form" onSubmit={handleSubmit}>
-          <label htmlFor="file-upload">Upload PDF:</label>
-          {/* <input
-            type="file"
-            className="form-control"
-            id="file-upload"
-            accept=".pdf"
-            onChange={handleFileChange}
-          /> */}
-          <DragAndDropUpload
-              setSelectedFile={setSelectedFile}
-              setFileIsValid={setFileIsValid}
-              selectedFile={selectedFile}
-              removeUploadedFile={removeUploadedFile}
-              fileTypes={{ 'application/pdf': [] }}
-            />
+        <Formik
+          initialValues={{ fileName: '' }}
+          validationSchema={Yup.object({
+            fileName: Yup.string().required('File name is required'),
+          })}
+          onSubmit={(values, { setSubmitting, resetForm }) => {
+            submitCutPlan(values.fileName, selectedFile);
+            setSubmitting(false);
+            resetForm();
+            handleClose();
+          }}
+        >
+          {({ isSubmitting, setFieldValue }) => (
+            <Form id="file-upload-form">
+              <div className="form-group">
+                <label htmlFor="file-upload">Upload PDF:</label>
+                <DragAndDropUpload
+                  setSelectedFile={setSelectedFile}
+                  setFileIsValid={setFileIsValid}
+                  selectedFile={selectedFile}
+                  removeUploadedFile={removeUploadedFile}
+                  fileTypes={{ 'application/pdf': [] }}
+                />
+              </div>
 
-          <label htmlFor="file-name">File Name:</label>
-          <input
-            type="text"
-            className="form-control"
-            id="file-name"
-            placeholder="Enter file name"
-            value={fileName}
-            onChange={handleFileNameChange}
-          />
-        </form>
+              <div className="form-group">
+                <label htmlFor="file-name">File Name:</label>
+                <Field
+                  type="text"
+                  name="fileName"
+                  className="form-control"
+                  id="file-name"
+                  placeholder="Enter file name"
+                />
+                <ErrorMessage
+                  name="fileName"
+                  component="div"
+                  className="text-danger"
+                />
+              </div>
+            </Form>
+          )}
+        </Formik>
       </Modal.Body>
 
       <Modal.Footer>
         <Button variant="secondary" onClick={handleClose}>
           Close
         </Button>
-        <Button variant="primary" type="submit" form="file-upload-form">
+        <Button
+          variant="primary"
+          type="submit"
+          form="file-upload-form"
+          disabled={!selectedFile}
+        >
           Save changes
         </Button>
       </Modal.Footer>
@@ -97,7 +94,7 @@ const AddCutPlanModal = ({ submitCutPlan }) => {
 };
 
 AddCutPlanModal.propTypes = {
-  submitCutPlan: PropTypes.func.isRequired
+  submitCutPlan: PropTypes.func.isRequired,
 };
 
 export default AddCutPlanModal;

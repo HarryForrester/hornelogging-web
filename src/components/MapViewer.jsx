@@ -16,6 +16,7 @@ import EditGeneralHazardModal from './Modal/EditGeneralHazardsModal';
 import SkidMarkerPopover from './Popover/SkidMarkerPopover';
 import SkidMarkerCrewPopover from './Popover/SkidMarkerCrewPopover';
 import SkidMarkerPersonPopover from './Popover/SkidMarkerPersonPopover';
+import Spinner from 'react-bootstrap/Spinner';
 
 const PDFViewer = ({ percentage, _account }) => {
   //const [pdfData, setPdfData] = useState(null);
@@ -27,6 +28,7 @@ const PDFViewer = ({ percentage, _account }) => {
   const [pdfSize, setPdfSize] = useState({ width: 0, height: 0 });
   const pdfContainerRef = useRef();
   const [pdf, setPdf] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   /**
    * Handles the mouse move even when user is adding a point to a pdf
@@ -439,7 +441,20 @@ const PDFViewer = ({ percentage, _account }) => {
         editSkid={skidMarkerState.editSkid}
         _account={_account}
       />
-      {percentage >= 100 ? (
+                  {loading && <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: '80vh'
+            }}
+          >
+            <h2 style={{ textAlign: 'center', color: '#555', fontSize: '24px' }}>
+              <Spinner animation='border' role='status' />
+            </h2>
+          </div>}
+
+      {percentage <= 100 ? (
         mapState.currentMapName ? (
           <div
             id="pdf-container"
@@ -456,7 +471,7 @@ const PDFViewer = ({ percentage, _account }) => {
               transform: 'translate(-50%, 0%)'
             }}
           >
-            <Document file={pdf} onMouseMove={handleMouseMove}>
+            <Document file={pdf} onMouseMove={handleMouseMove} onLoadSuccess={() => setLoading(false)}>
               <Page
                 pageNumber={1}
                 renderMode="canvas"
