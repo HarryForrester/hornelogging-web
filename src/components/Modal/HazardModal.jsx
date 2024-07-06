@@ -15,12 +15,16 @@ function HazardModal() {
    */
   const handleClose = () => {
     if(skidModalState.isSelectHazardsGeneral) {
+      console.log('fk 1')
       setSkidModalState((prevState) => ({ ...prevState, hazardModalVisible: false, isGeneralHazardsModalVisible: true}));
 
     } else if (skidModalState.isSkidModalEdit || skidModalState.isSkidModalAdd) {
+      console.log('fk 2')
       setSkidModalState((prevState) => ({ ...prevState, hazardModalVisible: false, isSkidModalVisible: true}));
 
     } else {
+
+      console.log('fk 3')
       setSkidModalState((prevState) => ({ ...prevState, hazardModalVisible: false}));
 
     }

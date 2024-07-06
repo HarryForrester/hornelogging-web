@@ -126,6 +126,11 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
           }));
 
           resetAddSkidModal();
+          setSkidModalState((prevState) => ({
+            ...prevState,
+            isSkidModalEdit: false,
+            isSkidModalAdd: false
+          }))
         }
       } else {
         await axios
@@ -146,6 +151,11 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
               });
 
               resetAddSkidModal();
+              setSkidModalState((prevState) => ({
+                ...prevState,
+                isSkidModalEdit: false,
+                isSkidModalAdd: false
+              }))
 
               setAlertMessageState((prevState) => ({
                 ...prevState,

@@ -459,8 +459,8 @@ const PDFViewer = ({ percentage, _account }) => {
           <div
             id="pdf-container"
             style={{
-              width: pdfSize.width,
-              height: pdfSize.height,
+              //width: pdfSize.width,
+              //height: pdfSize.height,
               border: '2px solid #000',
               borderRadius: '8px',
               boxShadow: '0px 0px 10px rgba(0,0,0,0.2)',
@@ -477,8 +477,8 @@ const PDFViewer = ({ percentage, _account }) => {
                 renderMode="canvas"
                 renderTextLayer={false}
                 renderAnnotationLayer={false}
-                width={1200}
-                height={1200}
+                //width={mapState.originalWidth}
+                //height={mapState.originalHeight}
                 onLoadSuccess={(page) => {
                   const { width, height } = page;
                   console.log("width: " + width + " height: " + height)
@@ -521,7 +521,7 @@ const PDFViewer = ({ percentage, _account }) => {
                   width: '10px',
                   height: '10px',
                   backgroundColor: 'red',
-                  transform: 'translate(-50%, -50%)'
+                  transform: 'translate(-50%, -50%)',
                 }}
                 onClick={() => handleMarkerClick(point)}
                 data-bs-toggle="popover"
@@ -531,9 +531,7 @@ const PDFViewer = ({ percentage, _account }) => {
               ></div>
             ))}
 
-            <SkidMarkerPopover />
-            <SkidMarkerCrewPopover />
-            <SkidMarkerPersonPopover />
+    
           </div>
         ) : (
           <div
@@ -566,8 +564,13 @@ const PDFViewer = ({ percentage, _account }) => {
               className="mt-2"
             />
           )}
+          
         </div>
+        
       )}
+              <SkidMarkerPopover />
+            <SkidMarkerCrewPopover />
+            <SkidMarkerPersonPopover />
     </>
   );
 };
