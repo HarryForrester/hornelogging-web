@@ -12,7 +12,7 @@ import { Button } from 'react-bootstrap';
 import AddSkidButton from '../components/Button/AddSkidButton.jsx';
 import { useAlertMessage } from '../components/AlertMessage.js';
 import { deletePresignedUrl } from '../hooks/useFileDelete.js';
-
+import { useSkidMarker } from '../components/SkidMarkerContext.js';
 const Maps = () => {
   const [isErrorConfirmationModalVisible, setIsErrorConfirmationModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -26,6 +26,8 @@ const Maps = () => {
   const { alertMessageState, setAlertMessageState } = useAlertMessage();
   const [showSpinner, setShowSpinner] = useState(false); // shows spinner while submitting to server
   const [account, setAccount] = useState(null);
+  const { skidMarkerState, setSkidMarkerState } = useSkidMarker();
+
   const navigate = useNavigate();
   useEffect(() => {
     const fetchData = async () => {
@@ -102,7 +104,13 @@ const Maps = () => {
       currentMapId: mapId,
       currentMapKey: mapKey,
       currentMapName: mapName,
-      currentMapMarkers: parsePoints
+      currentMapMarkers: parsePoints,
+    }));
+
+    setSkidMarkerState((prevState) => ({
+      ...prevState,
+      popoverVisible: false,
+      selectedMarker: null
     }));
 
     loadFromDB(mapName);
