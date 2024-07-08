@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import React, { useState } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import PropTypes from 'prop-types';
@@ -49,6 +50,7 @@ const AddOnjobTrainingRecordModal = ({
           withCredentials: true
         }
       );
+      console.log('response: ', response.data);
 
       if (response.status === 200) {
         //setTrainingRecords(response.data.onjobTraining);

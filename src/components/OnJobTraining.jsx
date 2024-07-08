@@ -20,8 +20,14 @@ const OnJobTraining = ({ person, onjobs, showModal, updateOnjobTrainingRecords }
   const handleRemoveonjobTraining = async (_id) => {
     const id = new Date().getTime(); // creates id for alert messages
 
+    const userConfirmed = window.confirm('Are you sure you want to remove this On-Job Training record?');
+    if (!userConfirmed) {
+      return; // If user does not confirm, exit the function
+    }
+
     try {
       const resposne = await axios.post(
+        // eslint-disable-next-line no-undef
         `${process.env.REACT_APP_URL}/removeOnjobTraining`,
         { _id, userId },
         { withCredentials: true }
