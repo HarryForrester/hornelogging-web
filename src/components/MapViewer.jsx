@@ -85,7 +85,6 @@ const PDFViewer = ({ percentage, _account }) => {
             },
             withCredentials: true
           });
-          console.log("site hazards: ", response.data)
   
           setSkidMarkerState((prevState) => ({
             ...prevState,
@@ -164,7 +163,6 @@ const PDFViewer = ({ percentage, _account }) => {
   };
 
   const submitSelectedHazards = async (selectedHazards) => {
-    console.log("haha sleeted", selectedHazards);
     const id = new Date().getTime();
     setTempHazards(mapState.generalHazardsData);
 
@@ -202,7 +200,6 @@ const PDFViewer = ({ percentage, _account }) => {
             const newData = response.data.filter(
               (newHazard) => !existingIds.includes(newHazard._id)
             );
-            console.log("new dtat:", newData)
             return {
               ...prevState,
               isSelectHazardModalVisible: false,
@@ -481,7 +478,6 @@ const PDFViewer = ({ percentage, _account }) => {
                 //height={mapState.originalHeight}
                 onLoadSuccess={(page) => {
                   const { width, height } = page;
-                  console.log("width: " + width + " height: " + height)
                   setMapState((prevState) => ({
                     ...prevState,
                     originalWidth: width,
@@ -499,8 +495,8 @@ const PDFViewer = ({ percentage, _account }) => {
                   position: 'absolute',
                   left: `${skidMarkerState.mousePosition.x}px`,
                   top: `${skidMarkerState.mousePosition.y}px`,
-                  width: '10px',
-                  height: '10px',
+                  width: '20px',
+                  height: '20px',
                   backgroundColor: 'red',
                   transform: 'translate(-50%, -50%)' // Center the marker on the mouse position
                 }}
@@ -518,8 +514,8 @@ const PDFViewer = ({ percentage, _account }) => {
                   position: 'absolute',
                   left: `${point.point.x}px`,
                   top: `${point.point.y}px`,
-                  width: '10px',
-                  height: '10px',
+                  width: '20px',
+                  height: '20px',
                   backgroundColor: 'red',
                   transform: 'translate(-50%, -50%)',
                 }}

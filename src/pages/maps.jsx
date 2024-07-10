@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import NavBar from '../components/NavBar/main.jsx';
 import ErrorConfirmationModal from '../components/Modal/ErrorConfirmationModal';
 import MapViewer from '../components/MapViewer.jsx';
 import UploadMapButton from '../components/Button/UploadMapButton';
@@ -85,7 +84,6 @@ const Maps = () => {
     const mapName = map.name;
     const points = map.points;
     const mapKey = map.map.key
-    console.log('a key u nneeed', mapKey);
 
     const parsePoints = points;
     var pdfButtons = document.querySelectorAll('.pdf-button');

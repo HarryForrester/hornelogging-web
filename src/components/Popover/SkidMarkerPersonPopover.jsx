@@ -87,7 +87,7 @@ const SkidMarkerPersonPopover = () => {
                               key={item._id}
                               className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
                               onClick={() =>
-                                window.open('http://localhost:3001' + item.uri, '_blank')
+                                window.open(item.fileUrl, '_blank')
                               }
                             >
                               {item.fileName}

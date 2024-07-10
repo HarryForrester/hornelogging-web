@@ -10,6 +10,8 @@ import { useAlertMessage } from '../../AlertMessage';
 import { useSkidMarker } from '../../SkidMarkerContext';
 import PropTypes from 'prop-types';
 import { getPresignedUrl, uploadToPresignedUrl } from '../../../hooks/useFileUpload';
+import { Formik,useFormik } from 'formik';
+import * as Yup from 'yup';
 
 const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
   const { skidModalState, setSkidModalState } = useSkidModal();
@@ -371,64 +373,110 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
         </Modal.Header>
 
         <Modal.Body>
-          <Form id="add-skid-form" className="row g-3">
-            <Form.Group className="col-md-12">
-              <Form.Label>Add Skid name:</Form.Label>
-              <Form.Control
-                type="text"
-                className="form-control"
-                placeholder="Enter Skid Name"
-                title="Map Name"
-                id="mapname-input"
-                value={skidModalState.skidName}
-                onChange={(e) =>
-                  setSkidModalState((prevState) => ({ ...prevState, skidName: e.target.value }))
+          <Formik
+            initialValues={ {
+              skidName: '',
+              selectedCrew: []
+            }}
+            validationSchema={Yup.object({
+              skidName: Yup.string()
+                .max(15, 'Must be 15 characters or less')
+                .required('Required'),
+              selectedCrew: Yup.array().min(1, 'At least one crew member is required'),
+
+            })}
+            onSubmit={values => {
+              console.log(JSON.stringify(values, null, 2));
+            }}
+          >
+            {formik => (
+              <Form id="add-skid-form" className="row g-3">
+              <Form.Group className="col-md-12">
+                <Form.Label>Add Skid name:</Form.Label>
+                <Form.Control
+                  type="text"
+                  id="skidName"
+                  {...formik.getFieldProps('skidName')}
+                  isInvalid={formik.touched.skidName && formik.errors.skidName}
+                  />
+                {
+                  formik.touched.skidName && formik.errors.skidName ? (
+                    <div className="invalid-feedback d-block">{formik.errors.skidName}</div>
+                  ) : null
                 }
-              />
-            </Form.Group>
-            <Form.Group className="col-md-12">
-              <Form.Label className="form-label">Select Crew</Form.Label>
-              <Form.Group id="crew-checkboxes" className="d-flex justify-content-center">
-                {mapState.crewTypes.map((crewMember) => (
-                  <Form.Group className="form-check form-check-inline" key={crewMember}>
-                    <Form.Control
-                      className="form-check-input crew-checkbox"
-                      type="checkbox"
-                      id={crewMember}
-                      value={crewMember}
-                      checked={skidModalState.selectedCrew.includes(crewMember)}
-                      onChange={(e) => {
-                        const updatedCrew = e.target.checked
-                          ? [...skidModalState.selectedCrew, crewMember]
-                          : skidModalState.selectedCrew.filter((name) => name !== crewMember);
-                        setSkidModalState((prevState) => ({
-                          ...prevState,
-                          selectedCrew: updatedCrew
-                        }));
-                      }}
-                    />
-                    <Form.Label className="form-check-label" htmlFor={crewMember}>
-                      {crewMember}
-                    </Form.Label>
-                  </Form.Group>
-                ))}
+
               </Form.Group>
-            </Form.Group>
-            <Form.Group className="col-md-12">
-              <Form.Label htmlFor="siteDocs" className="form-label">
-                Site Documents
-              </Form.Label>
-              <Form.Group className="input-group">
-                <Button
-                  type="button"
-                  id="siteDocs"
-                  className="btn btn-secondary btn-block"
-                  onClick={openDocModal}
-                >
-                  Add Document
-                </Button>
+
+              <Form.Group className="col-md-12">
+                <Form.Label className="form-label">Select Crew</Form.Label>
+                <Form.Group id="crew-checkboxes" className="d-flex justify-content-center">
+                  {mapState.crewTypes.map((crewMember) => (
+                    <Form.Group className="form-check form-check-inline" key={crewMember}>
+                      <Form.Check
+                        className="mb-2"
+                        type="checkbox"
+                        id={crewMember}
+                        value={crewMember}
+                        checked={formik.values.selectedCrew.includes(crewMember)}
+                        onChange={(e) => {
+                          const updatedCrew = e.target.checked
+                            ? [...formik.values.selectedCrew, crewMember]
+                            : formik.values.selectedCrew.filter((name) => name !== crewMember);
+                          formik.setFieldValue('selectedCrew', updatedCrew);
+                        }}
+                        isInvalid={formik.touched.selectedCrew && formik.errors.selectedCrew}
+                      />
+                      <Form.Label className="form-check-label" htmlFor={crewMember}>
+                        {crewMember}
+                      </Form.Label>
+                    </Form.Group>
+                  ))}
+                </Form.Group>
+                {
+                  formik.touched.skidName && formik.errors.skidName ? (
+                    <div className="invalid-feedback d-block">{formik.errors.selectedCrew}</div>
+                  ) : null
+                }
               </Form.Group>
-            </Form.Group>
+
+              <Form.Group className="col-md-12">
+                <Form.Label htmlFor="siteDocs" className="form-label">
+                  Site Documents
+                </Form.Label>
+                <Form.Group className="input-group">
+                  <Button
+                    type="button"
+                    id="siteDocs"
+                    className="btn btn-secondary btn-block"
+                    onClick={openDocModal}
+                  >
+                    Add Document
+                  </Button>
+                </Form.Group>
+              </Form.Group>
+
+
+
+              <Button variant="primary" onClick={formik.handleSubmit}>
+            {showSpinner ? (
+              <>
+                <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
+                <span className="visually-hidden">Loading...</span>
+              </>
+            ) : (
+              'Save changes'
+            )}
+          </Button>
+            </Form>
+
+            )}
+
+            
+            </Formik>
+          {/* Form id="add-skid-form" className="row g-3">
+           
+            
+            
 
             <Form.Group>
               <ListGroup className="doc-list list-group">
@@ -529,13 +577,13 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
                 ))}
               </ListGroup>
             </Form.Group>
-          </Form>
+          </Form> */}
         </Modal.Body>
-        <Modal.Footer>
+        {/* <Modal.Footer>
           <Button variant="danger" onClick={handleClose}>
             Close
           </Button>
-          <Button variant="primary" onClick={submitSkidModal}>
+          <Button variant="primary" onClick={formik.handleSubmit}>
             {showSpinner ? (
               <>
                 <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
@@ -545,7 +593,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
               'Save changes'
             )}
           </Button>
-        </Modal.Footer>
+        </Modal.Footer> */}
       </Modal>
     </>
   );

@@ -60,7 +60,7 @@ const SkidMarkerPopover = () => {
     const id = new Date().getTime();
     console.log('dddddddd',skidMarkerState.selectedMarker.info.siteHazards)
     try {
-      if(skidMarkerState.selectedMarker.info.siteHazards.length > 0) {
+      if(skidMarkerState.selectedMarker.info.siteHazards && skidMarkerState.selectedMarker.info.siteHazards.length > 0) {
         const response = await axios.get('http://localhost:3001/findhazard', {
           params: {
             name: skidMarkerState.selectedMarker.info.siteHazards.join(',') // Convert the array to a comma-separated string
@@ -246,20 +246,23 @@ const SkidMarkerPopover = () => {
                   </li>
                 ))}
             </ul>
-
-            <div
-              style={{
-                fontWeight: 'bold',
-                fontSize: '100%',
-                textAlign: 'center',
-                paddingBottom: '10px'
-              }}
-            >
-              Site Documents:
-            </div>
+              
+            
 
             <div>
-              {skidMarkerState.selectedMarker.info.selectedDocuments !== null && (
+              {skidMarkerState.selectedMarker.info.selectedDocuments && skidMarkerState.selectedMarker.info.selectedDocuments.length > 0 && (
+                <>
+                <div
+                style={{
+                  fontWeight: 'bold',
+                  fontSize: '100%',
+                  textAlign: 'center',
+                  paddingBottom: '10px'
+                }}
+              >
+                Site Documents:
+              </div>
+              
                 <ul className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
                   {skidMarkerState.selectedMarker.info.selectedDocuments.map((item, index) => (
                     <li
@@ -270,23 +273,26 @@ const SkidMarkerPopover = () => {
                       {item.fileName}
                     </li>
                   ))}
-                </ul>
+                </ul></>
               )}
             </div>
 
-            <div
-              style={{
-                fontWeight: 'bold',
-                fontSize: '100%',
-                textAlign: 'center',
-                paddingBottom: '10px'
-              }}
-            >
-              Weekly Cut Plans:
-            </div>
+            
 
             <div>
               {skidMarkerState.selectedMarker.info.cutPlans !== null && (
+                <>
+                <div
+                style={{
+                  fontWeight: 'bold',
+                  fontSize: '100%',
+                  textAlign: 'center',
+                  paddingBottom: '10px'
+                }}
+              >
+                Weekly Cut Plans:
+              </div>
+              
                 <ul className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
                     <li
                       className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
@@ -296,10 +302,13 @@ const SkidMarkerPopover = () => {
                       {skidMarkerState.selectedMarker.info.cutPlans.fileName}
                     </li>
                 </ul>
+                </>
               )}
             </div>
 
-            <div
+            {mapState.generalHazardsData && mapState.generalHazardsData.length > 0 && (
+              <>
+              <div
               style={{
                 fontWeight: 'bold',
                 fontSize: '100%',
@@ -324,8 +333,13 @@ const SkidMarkerPopover = () => {
                 ))}
               </ul>
             </div>
+            </>
+            )}
 
-            <div
+            
+            { skidMarkerState.selectedSkidHazardsData && skidMarkerState.selectedSkidHazardsData.length > 0 && (
+              <>
+               <div
               style={{
                 fontWeight: 'bold',
                 fontSize: '100%',
@@ -338,7 +352,7 @@ const SkidMarkerPopover = () => {
 
             <div>
               <ul className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
-                {skidMarkerState.selectedSkidHazardsData && skidMarkerState.selectedSkidHazardsData.map((hazard) => (
+                {skidMarkerState.selectedSkidHazardsData.map((hazard) => (
                   <li
                     key={hazard.id}
                     className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
@@ -350,6 +364,9 @@ const SkidMarkerPopover = () => {
                 ))}
               </ul>
             </div>
+              </>
+            )}
+           
           </div>
         </div>
       )}
