@@ -12,14 +12,17 @@ import PropTypes from 'prop-types';
 import { getPresignedUrl, uploadToPresignedUrl } from '../../../hooks/useFileUpload';
 import { Formik,useFormik } from 'formik';
 import * as Yup from 'yup';
-
+import { useSkid } from '../../../context/SkidContext';
 const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
   const { skidModalState, setSkidModalState } = useSkidModal();
+  const { skidState, setSkidState } = useSkid(); //holds the information for formik when opening and closing modals to add files, hazards, cutplans to skid
   const { mapState, setMapState } = useMap();
   const { alertMessageState, setAlertMessageState } = useAlertMessage();
   const { skidMarkerState, setSkidMarkerState } = useSkidMarker();
   const [showSpinner, setShowSpinner] = useState(false); // shows spinner while submitting to server
   const [previewUrl, setPreviewUrl] = useState('');
+
+  const [formikState, setFormikState] = useState(null);
   const getFilePathFromUrl = (url) => {
     const urlObject = new URL(url);
     return `${urlObject.origin}${urlObject.pathname}`;
@@ -209,7 +212,13 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
   };
 
   const handleClose = () => {
-    setSkidModalState((prevState) => ({
+    setSkidState((prevState) => ({
+      ...prevState,
+      formik: null,
+      skidModalVisible: false,
+      docModalVisible: false
+    }))
+    /* setSkidModalState((prevState) => ({
       ...prevState,
       _id: null,
       isSkidModalVisible: false,
@@ -224,20 +233,38 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
       selectedSkidHazards: [],
       selectedSkidHazardsData: [],
       selectedHazardData: {}
-    }));
+    })); */
   };
 
+  
   /**
    * Opens the Add Document Modal and hides the Skid Modal by updating the state.
    * @function openDocModal
    * @returns {void}
    */
-  const openDocModal = () => {
-    setSkidModalState((prevState) => ({
+  const openDocModal = (formik) => {
+    console.log('openDocModal called');
+    setSkidState((prevState) => ({
       ...prevState,
-      isAddDocModalVisible: true,
-      isSkidModalVisible: false
-    }));
+      formik: {
+        values: formik.values,
+        touched: formik.touched,
+        errors: formik.errors,
+      },
+      skidModalVisible: false, // hide add/edit skid modal
+      docModalVisible: true, // show doc modal 
+    }))
+    /* setFormikState({
+      values: formik.values,
+      touched: formik.touched,
+      errors: formik.errors,
+    }); */
+
+    /* setSkidModalState((prevState) => ({
+      ...prevState,
+      isSkidModalVisible: false,
+      isAddDocModalVisible: true
+    }));    */
   };
 
   /**
@@ -361,12 +388,19 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
     name = 'Add';
   }
 
+  const initValues = {
+              skidName: skidModalState.skidName || '',
+              selectedCrew: skidModalState.selectedCrew || [],
+              selectedDocuments: skidModalState.selectedDocuments || [],
+            }
+
   return (
     <>
       <Modal
-        show={skidModalState.isSkidModalVisible}
+        show={skidState.skidModalVisible}
         onHide={handleClose}
         backdrop="static"
+        
       >
         <Modal.Header closeButton>
           <Modal.Title>{name} Skid</Modal.Title>
@@ -374,19 +408,19 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
 
         <Modal.Body>
           <Formik
-            initialValues={ {
-              skidName: '',
-              selectedCrew: []
-            }}
-            validationSchema={Yup.object({
+          
+          initialValues={formikState ? formikState.values : initValues}
+
+            /* validationSchema={Yup.object({
               skidName: Yup.string()
                 .max(15, 'Must be 15 characters or less')
                 .required('Required'),
               selectedCrew: Yup.array().min(1, 'At least one crew member is required'),
 
-            })}
+            })} */
             onSubmit={values => {
-              console.log(JSON.stringify(values, null, 2));
+              console.log(values);
+              console.log("ahha bro", skidModalState)
             }}
           >
             {formik => (
@@ -448,37 +482,14 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
                     type="button"
                     id="siteDocs"
                     className="btn btn-secondary btn-block"
-                    onClick={openDocModal}
+                    onClick={() => openDocModal(formik)}
                   >
                     Add Document
                   </Button>
                 </Form.Group>
               </Form.Group>
 
-
-
-              <Button variant="primary" onClick={formik.handleSubmit}>
-            {showSpinner ? (
-              <>
-                <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
-                <span className="visually-hidden">Loading...</span>
-              </>
-            ) : (
-              'Save changes'
-            )}
-          </Button>
-            </Form>
-
-            )}
-
-            
-            </Formik>
-          {/* Form id="add-skid-form" className="row g-3">
-           
-            
-            
-
-            <Form.Group>
+              <Form.Group>
               <ListGroup className="doc-list list-group">
                 {skidModalState.selectedDocuments.map((file) => (
                   <ListGroupItem
@@ -505,6 +516,31 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
                 ))}
               </ListGroup>
             </Form.Group>
+
+
+
+              <Button variant="primary" onClick={formik.handleSubmit}>
+            {showSpinner ? (
+              <>
+                <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
+                <span className="visually-hidden">Loading...</span>
+              </>
+            ) : (
+              'Save changes'
+            )}
+          </Button>
+            </Form>
+
+            )}
+
+            
+            </Formik>
+          {/* Form id="add-skid-form" className="row g-3">
+           
+            
+            
+
+            
 
             <Form.Group className="col-md-12">
               <Form.Label htmlFor="siteDocs" className="form-label">

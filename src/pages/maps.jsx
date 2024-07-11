@@ -12,6 +12,7 @@ import AddSkidButton from '../components/Button/AddSkidButton.jsx';
 import { useAlertMessage } from '../components/AlertMessage.js';
 import { deletePresignedUrl } from '../hooks/useFileDelete.js';
 import { useSkidMarker } from '../components/SkidMarkerContext.js';
+import { SkidProvider } from '../context/SkidContext.js';
 const Maps = () => {
   const [isErrorConfirmationModalVisible, setIsErrorConfirmationModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -332,7 +333,9 @@ const Maps = () => {
           </div>
         </div>
         <div ref={pdfContainerRef} id="pdf-container" className="pdf-container">
+          <SkidProvider>
           <MapViewer percentage={percentage} _account={account} />
+          </SkidProvider>
         </div>
       </div>
     </>

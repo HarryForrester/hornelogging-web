@@ -4,7 +4,7 @@ import Button from 'react-bootstrap/Button';
 import { useSkidModal } from './Skid/SkidModalContext';
 import { useMap } from '../Map/MapContext';
 import PropTypes from 'prop-types';
-
+import { useSkid } from '../../context/SkidContext';
 /**
  * AddDocModal component for handling document selection.
  * @component
@@ -14,7 +14,7 @@ import PropTypes from 'prop-types';
 const AddDocModal = ({ docSumbit }) => {
   const { skidModalState, setSkidModalState } = useSkidModal();
   const { mapState, setMapState } = useMap();
-
+  const { skidState, setSkidState} = useSkid();
   const [selectedFiles, setSelectedFiles] = useState([]);
 
   /**
@@ -23,10 +23,10 @@ const AddDocModal = ({ docSumbit }) => {
    * @returns {void}
    */
   const handleClose = () => {
-    setSkidModalState((prevState) => ({
+    setSkidState((prevState) => ({
       ...prevState,
-      isAddDocModalVisible: false,
-      isSkidModalVisible: true
+      docModalVisible: false,
+      skidModalVisible: true
     }));
   };
 
@@ -37,6 +37,8 @@ const AddDocModal = ({ docSumbit }) => {
    * @returns {void}
    */
   const handleCheckboxChange = (fileUrl) => {
+    const formik = skidState.formik;
+    console.log('handle me ok', fileUrl);
     // Check if the file has a valid _id and is not already in the selectedDocuments array
     if (
       fileUrl._id &&
@@ -48,11 +50,23 @@ const AddDocModal = ({ docSumbit }) => {
         ...prevState,
         selectedDocuments: [...prevState.selectedDocuments, fileUrl]
       }));
+
+      setSkidState((prevState) => ({
+        ...prevState,
+        formik: {
+          ...prevState.formik,
+          values: {
+            ...formik.values,
+            selectedDocuments: [...formik.values.selectedDocuments, fileUrl]
+          }
+          // You may need to update touched and errors as well if applicable
+        }
+      }));
     }
   };
 
   return (
-    <Modal show={skidModalState.isAddDocModalVisible} onHide={handleClose}>
+    <Modal show={skidState.docModalVisible} onHide={handleClose}>
       <Modal.Header closeButton>
         <Modal.Title>Add Doc</Modal.Title>
       </Modal.Header>
@@ -100,7 +114,7 @@ const AddDocModal = ({ docSumbit }) => {
         <Button variant="secondary" onClick={handleClose}>
           Close
         </Button>
-        <Button variant="primary" onClick={() => docSumbit(skidModalState.selectedDocuments)}>
+        <Button variant="primary" onClick={handleClose}>
           Save changes
         </Button>
       </Modal.Footer>

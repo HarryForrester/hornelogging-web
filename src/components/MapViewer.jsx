@@ -17,12 +17,13 @@ import SkidMarkerPopover from './Popover/SkidMarkerPopover';
 import SkidMarkerCrewPopover from './Popover/SkidMarkerCrewPopover';
 import SkidMarkerPersonPopover from './Popover/SkidMarkerPersonPopover';
 import Spinner from 'react-bootstrap/Spinner';
-
+import { useSkid } from '../context/SkidContext';
 const PDFViewer = ({ percentage, _account }) => {
   //const [pdfData, setPdfData] = useState(null);
   const { skidModalState, setSkidModalState } = useSkidModal();
   const { skidMarkerState, setSkidMarkerState } = useSkidMarker();
   const { mapState, setMapState } = useMap();
+  const { skidState, setSkidState } = useSkid();
   const { alertMessageState, setAlertMessageState } = useAlertMessage();
   const [tempHazards, setTempHazards] = useState([]);
   const [pdfSize, setPdfSize] = useState({ width: 0, height: 0 });
@@ -51,9 +52,13 @@ const PDFViewer = ({ percentage, _account }) => {
    * This function opens the add skid modal
    */
   const addPointToPDF = () => {
+    setSkidState((prevState) => ({
+      ...prevState,
+      skidModalVisible: true,
+    }))
     setSkidModalState((prevState) => ({
       ...prevState,
-      isSkidModalVisible: true,
+      //isSkidModalVisible: true,
       isSkidModalEdit: false,
       isSkidModalAdd: true
     }));
@@ -438,6 +443,7 @@ const PDFViewer = ({ percentage, _account }) => {
         editSkid={skidMarkerState.editSkid}
         _account={_account}
       />
+      
                   {loading && <div
             style={{
               display: 'flex',
