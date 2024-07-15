@@ -134,10 +134,24 @@ const PDFViewer = ({ percentage, _account }) => {
    * @returns {void}
    */
   const submitCutPlan = (fileName, selectedFile) => {
+    const formik = skidState.formik;
+
     const tempFile = new File([selectedFile], fileName, {
       type: selectedFile.type,
       lastModified: selectedFile.lastModified
     });
+
+    setSkidState((prevState) => ({
+      ...prevState,
+      formik: {
+        ...prevState.formik,
+        values: {
+          ...formik.values,
+          selectedCutPlan: tempFile
+        }
+        // You may need to update touched and errors as well if applicable
+      }
+    }));
 
     setSkidModalState((prevState) => ({
       ...prevState,

@@ -6,11 +6,12 @@ import { useMap } from '../Map/MapContext';
 import PropTypes from 'prop-types';
 import { faZ } from '@fortawesome/free-solid-svg-icons';
 import { joinPaths } from '@remix-run/router';
-
+import { useSkid } from '../../context/SkidContext';
 const SelectHazardsModal = ({ submitSelectedHazards }) => {
   const [searchCriteria, setSearchCriteria] = useState('');
   const [selectedHazards, setSelectedHazards] = useState([]);
   const { skidModalState, setSkidModalState } = useSkidModal();
+  const { skidState, setSkidState } = useSkid();
   const { mapState, setMapState } = useMap();
 
   const submitHazards = (selectedHazards) => {
@@ -29,16 +30,16 @@ const SelectHazardsModal = ({ submitSelectedHazards }) => {
    */
   const handleClose = () => {
     if (skidModalState.isSelectHazardsGeneral) {
-      setSkidModalState((prevState) => ({
+      setSkidState((prevState) => ({
         ...prevState,
-        isSelectHazardModalVisible: false,
-        isGeneralHazardsModalVisible: true
+        selectHazardModalVisible: false,
+        generalHazardsModalVisible: true
       }));
     } else {
-      setSkidModalState((prevState) => ({
+      setSkidState((prevState) => ({
         ...prevState,
-        isSelectHazardModalVisible: false,
-        isSkidModalVisible: true
+        selectHazardModalVisible: false,
+        skidModalVisible: true
       }));
     }
   };
@@ -48,17 +49,45 @@ const SelectHazardsModal = ({ submitSelectedHazards }) => {
   };
 
   const handleCheckboxChange = (hazardId) => {
-    console.log("handleCHeckboxChange: ", hazardId);
+    const formik = skidState.formik;
+
+    console.log("handleCheckboxChange: ", hazardId);
     // Toggle the selection of the hazard with hazardId
-    setSelectedHazards((prevSelectedHazards) => {
+    /* setSelectedHazards((prevSelectedHazards) => {
       if (prevSelectedHazards.includes(hazardId)) {
         return prevSelectedHazards.filter((id) => id !== hazardId);
       } else {
         return [...prevSelectedHazards, hazardId];
       }
+    }); */
+
+    const updatedHazards = skidState.formik.values.selectedSkidHazards.includes(hazardId)
+    ? skidState.formik.values.selectedSkidHazards.filter((id) => id !== hazardId)
+    : [...skidState.formik.values.selectedSkidHazards, hazardId];
+
+    setSkidModalState((prevState) => ({
+      ...prevState,
+      selectedSkidHazards: updatedHazards
+    }));
+    setSkidState((prevState) => {
+     
+      console.log('hey u cunt', updatedHazards)
+      return {
+        ...prevState,
+        formik: {
+          ...prevState.formik,
+          values: {
+            ...prevState.formik.values,
+            selectedSkidHazards: updatedHazards
+          },
+          // Update touched or errors if needed
+        }
+      };
     });
   };
 
+
+  
   var label;
 
   if (skidModalState.isSelectHazardsGeneral) {
@@ -68,7 +97,7 @@ const SelectHazardsModal = ({ submitSelectedHazards }) => {
   }
 
   return (
-    <Modal show={skidModalState.isSelectHazardModalVisible} onHide={handleClose}>
+    <Modal show={skidState.selectHazardModalVisible} onHide={handleClose}>
       <Modal.Header closeButton>
         <Modal.Title>Select {label} Hazards</Modal.Title>
       </Modal.Header>
@@ -99,7 +128,7 @@ const SelectHazardsModal = ({ submitSelectedHazards }) => {
                       name="selectedHazards[]"
                       value={hazard._id}
                       onChange={() => handleCheckboxChange(hazard._id)}
-                      checked={selectedHazards.includes(hazard._id)}
+                      checked={skidState.formik?.values?.selectedSkidHazards?.includes(hazard._id)}
                     />
                     <b>
                       {hazard.id}: <em>{hazard.title}</em>
@@ -121,7 +150,7 @@ const SelectHazardsModal = ({ submitSelectedHazards }) => {
         <Button variant="secondary" onClick={handleClose}>
           Close
         </Button>
-        <Button variant="primary" onClick={() => submitHazards(selectedHazards)}>
+        <Button variant="primary" onClick={handleClose}>
           Save changes
         </Button>
       </Modal.Footer>

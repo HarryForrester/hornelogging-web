@@ -8,7 +8,9 @@ export const SkidProvider = ({ children }) => {
   const [skidState, setSkidState] = useState({
    formik: null,
    skidModalVisible: false,
-   docModalVisible: false
+   docModalVisible: false,
+   cutPlanModalVisible: false,
+   selectHazardModalVisible: false,
    
   });
 

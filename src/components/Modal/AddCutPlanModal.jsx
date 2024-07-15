@@ -6,17 +6,23 @@ import PropTypes from 'prop-types';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import DragAndDropUpload from '../DragAndDropUpload';
-
+import { useSkid } from '../../context/SkidContext';
 const AddCutPlanModal = ({ submitCutPlan }) => {
   const { skidModalState, setSkidModalState } = useSkidModal();
   const [selectedFile, setSelectedFile] = useState(null);
   const [fileIsValid, setFileIsValid] = useState(null);
+  const { skidState, setSkidState } = useSkid();
 
   const handleClose = () => {
-    setSkidModalState((prevState) => ({
+   /*  setSkidModalState((prevState) => ({
       ...prevState,
       isAddCutPlanModalVisible: false,
       isSkidModalVisible: true,
+    })); */
+    setSkidState((prevState) => ({
+      ...prevState,
+      cutPlanModalVisible: false,
+      skidModalVisible: true,
     }));
   };
 
@@ -25,7 +31,7 @@ const AddCutPlanModal = ({ submitCutPlan }) => {
   };
 
   return (
-    <Modal show={skidModalState.isAddCutPlanModalVisible} onHide={handleClose}>
+    <Modal show={skidState.cutPlanModalVisible} onHide={handleClose}>
       <Modal.Header closeButton>
         <Modal.Title>Add Cut Plan</Modal.Title>
       </Modal.Header>

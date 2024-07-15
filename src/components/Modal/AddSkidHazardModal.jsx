@@ -3,9 +3,11 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { useSkidModal } from './Skid/SkidModalContext';
+import { useSkid } from '../../context/SkidContext';
 
 const AddSkidHazardModal = ( hazards, sumbitSkidHazard ) => {
   const { skidModalState, setSkidModalState } = useSkidModal();
+  const { skidState, setSkidState } = useSkid();
 
   console.log('hazards: ', hazards);
 
@@ -23,7 +25,7 @@ const AddSkidHazardModal = ( hazards, sumbitSkidHazard ) => {
   };
 
   return (
-    <Modal show={skidModalState.isAddSiteHazardModalVisible} centered>
+    <Modal show={true} centered>
       <Modal.Header>
         <Modal.Title className="fs-5">Add Hazard</Modal.Title>
         <Button variant="link" onClick={handleClose}>

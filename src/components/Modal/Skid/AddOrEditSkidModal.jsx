@@ -243,7 +243,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
    * @returns {void}
    */
   const openDocModal = (formik) => {
-    console.log('openDocModal called');
+    console.log('openDocModal called', formik);
     setSkidState((prevState) => ({
       ...prevState,
       formik: {
@@ -272,12 +272,22 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
    * @function openCutPlanModal
    * @returns {void}
    */
-  const openCutPlanModal = () => {
-    setSkidModalState((prevState) => ({
+  const openCutPlanModal = (formik) => {
+    /* setSkidModalState((prevState) => ({
       ...prevState,
       isAddCutPlanModalVisible: true,
       isSkidModalVisible: false
-    }));
+    })); */
+    setSkidState((prevState) => ({
+      ...prevState,
+      formik: {
+        values: formik.values,
+        touched: formik.touched,
+        errors: formik.errors,
+      },
+      skidModalVisible: false, // hide add/edit skid modal
+      cutPlanModalVisible: true, // show doc modal 
+    }))
   };
 
   /**
@@ -285,14 +295,24 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
    * @function openDocModal
    * @returns {void}
    */
-  const openSelectHazardModal = () => {
+  const openSelectHazardModal = (formik) => {
     setSkidModalState((prevState) => ({
       ...prevState,
       isSkidModalEdit: false,
-      isSelectHazardModalVisible: true,
-      isSkidModalVisible: false,
+      //isSelectHazardModalVisible: true,
+      //isSkidModalVisible: false,
       isSelectHazardsGeneral: false // SelectHazardsModal label will be Add Hazards
     }));
+    setSkidState((prevState) => ({
+      ...prevState,
+      formik: {
+        values: formik.values,
+        touched: formik.touched,
+        errors: formik.errors,
+      },
+      skidModalVisible: false, // hide add/edit skid modal
+      selectHazardModalVisible: true, // show doc modal 
+    }))
   };
 
   /**
@@ -300,17 +320,11 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
    * @param {File} file - The file that needs to be removed.
    * @returns {void}
    */
-  const removeSkidDoc = (file) => {
-    setSkidModalState((prevState) => {
-      const updatedDocs = prevState.selectedDocuments.filter((doc) => doc._id !== file._id);
-
-      return {
-        ...prevState,
-        selectedDocuments: updatedDocs
-      };
-    });
+  const removeSkidDoc = (file, formik) => {
+    const updatedDocs = formik.values.selectedDocuments.filter((doc) => doc !== file._id);
+    formik.setFieldValue('selectedDocuments', updatedDocs);
   };
-
+  
   /**
    * Handles the removal of a skid hazard from the selected skid hazards list.
    * @param {*} event - event of the button click
@@ -387,11 +401,13 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
   } else {
     name = 'Add';
   }
-
+  const form = skidState?.formik?.values;
   const initValues = {
-              skidName: skidModalState.skidName || '',
-              selectedCrew: skidModalState.selectedCrew || [],
-              selectedDocuments: skidModalState.selectedDocuments || [],
+              skidName: form?.skidName || '',
+              selectedCrew: form?.selectedCrew || [],
+              selectedDocuments: form?.selectedDocuments || [],
+              selectedCutPlan: form?.selectedCutPlan || null,
+              selectedSkidHazards: form?.selectedSkidHazards || [],
             }
 
   return (
@@ -420,7 +436,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
             })} */
             onSubmit={values => {
               console.log(values);
-              console.log("ahha bro", skidModalState)
+              //console.log("ahha bro", skidModalState)
             }}
           >
             {formik => (
@@ -491,7 +507,10 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
 
               <Form.Group>
               <ListGroup className="doc-list list-group">
-                {skidModalState.selectedDocuments.map((file) => (
+              {formik.values.selectedDocuments
+                .map(id => mapState.files.find(file => file._id === id))
+                .filter(file => file)
+                .map(file => (
                   <ListGroupItem
                     key={file._id}
                     className="list-group-item d-flex justify-content-between align-items-center"
@@ -508,12 +527,89 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
                     <Button
                       type="button"
                       className="btn btn-danger btn-sm"
-                      onClick={() => removeSkidDoc(file)}
+                      onClick={() => removeSkidDoc(file, formik)}
                     >
                       Remove
                     </Button>
                   </ListGroupItem>
                 ))}
+              </ListGroup>
+            </Form.Group>
+
+            <Form.Group className="col-md-12">
+              <Form.Label htmlFor="siteDocs" className="form-label">
+                Weekly Cut Plan
+              </Form.Label>
+              <Form.Group className="input-group">
+                <Button
+                  type="button"
+                  id="siteCutPlan"
+                  className="btn btn-secondary btn-block"
+                  onClick={() => openCutPlanModal(formik)}
+                >
+                  Add Cut Plan
+                </Button>
+              </Form.Group>
+            </Form.Group>
+
+            <Form.Group className="col-md-12">
+              <ListGroup className="cutplan-list list-group">
+                {formik.values.selectedCutPlan !== null && (
+                  <ListGroup className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
+                    <ListGroupItem
+                      className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
+                      onClick={() => openPdfInNewTab(formik.values.selectedCutPlan)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      {formik.values.selectedCutPlan.fileName || formik.values.selectedCutPlan.name}
+                    </ListGroupItem>
+                  </ListGroup>
+                )}
+              </ListGroup>
+            </Form.Group>
+
+            <Form.Group className="col-md-12">
+              <Form.Label htmlFor="siteHazards" className="form-label">
+                Site Hazards
+              </Form.Label>
+              <Form.Group className="input-group">
+                <Button
+                  type="button"
+                  id="siteHazards"
+                  className="btn btn-secondary btn-block"
+                  onClick={() => openSelectHazardModal(formik)}
+                >
+                  Add Hazard
+                </Button>
+              </Form.Group>
+            </Form.Group>
+
+            <Form.Group className="col-md-12">
+              <ListGroup className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
+              {formik.values.selectedSkidHazards
+                .map(id => mapState.hazards.find(hazard => hazard._id === id))
+                .filter(hazard => hazard)
+                .map(hazard => (
+                  <ListGroupItem
+                    key={hazard.id}
+                    className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
+                    style={{ textAlign: 'center' }}
+                    onClick={() => handleHazardClick(hazard)}
+                  >
+                    <span>
+                      {hazard.id} : {hazard.title}
+                    </span>
+                    <Button
+                      type="button"
+                      className="btn btn-danger btn-sm"
+                      onClick={(event) => removeSkidHazard(event, hazard._id)}
+                    >
+                      Remove
+                    </Button>
+                  </ListGroupItem>
+                  
+                ))}
+               
               </ListGroup>
             </Form.Group>
 
@@ -535,85 +631,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
 
             
             </Formik>
-          {/* Form id="add-skid-form" className="row g-3">
-           
-            
-            
-
-            
-
-            <Form.Group className="col-md-12">
-              <Form.Label htmlFor="siteDocs" className="form-label">
-                Weekly Cut Plan
-              </Form.Label>
-              <Form.Group className="input-group">
-                <Button
-                  type="button"
-                  id="siteCutPlan"
-                  className="btn btn-secondary btn-block"
-                  onClick={openCutPlanModal}
-                >
-                  Add Cut Plan
-                </Button>
-              </Form.Group>
-            </Form.Group>
-
-            <Form.Group className="col-md-12">
-              <ListGroup className="cutplan-list list-group">
-                {skidModalState.selectedCutPlan !== null && (
-                  <ListGroup className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
-                    <ListGroupItem
-                      className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
-                      onClick={() => openPdfInNewTab(skidModalState.selectedCutPlan)}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      {skidModalState.selectedCutPlan.fileName || skidModalState.selectedCutPlan.name}
-                    </ListGroupItem>
-                  </ListGroup>
-                )}
-              </ListGroup>
-            </Form.Group>
-
-            <Form.Group className="col-md-12">
-              <Form.Label htmlFor="siteHazards" className="form-label">
-                Site Hazards
-              </Form.Label>
-              <Form.Group className="input-group">
-                <Button
-                  type="button"
-                  id="siteHazards"
-                  className="btn btn-secondary btn-block"
-                  onClick={openSelectHazardModal}
-                >
-                  Add Hazard
-                </Button>
-              </Form.Group>
-            </Form.Group>
-
-            <Form.Group className="col-md-12">
-              <ListGroup className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
-                {skidModalState.selectedSkidHazardsData && skidModalState.selectedSkidHazardsData.map((hazard) => (
-                  <ListGroupItem
-                    key={hazard.id}
-                    className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
-                    style={{ textAlign: 'center' }}
-                    onClick={() => handleHazardClick(hazard)}
-                  >
-                    <span>
-                      {hazard.id} : {hazard.title}
-                    </span>
-                    <Button
-                      type="button"
-                      className="btn btn-danger btn-sm"
-                      onClick={(event) => removeSkidHazard(event, hazard._id)}
-                    >
-                      Remove
-                    </Button>
-                  </ListGroupItem>
-                ))}
-              </ListGroup>
-            </Form.Group>
-          </Form> */}
+        
         </Modal.Body>
         {/* <Modal.Footer>
           <Button variant="danger" onClick={handleClose}>

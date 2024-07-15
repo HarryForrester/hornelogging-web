@@ -48,7 +48,7 @@ const AddDocModal = ({ docSumbit }) => {
       //setSelectedFiles((prevSelectedFiles) => [...prevSelectedFiles, fileUrl]);
       setSkidModalState((prevState) => ({
         ...prevState,
-        selectedDocuments: [...prevState.selectedDocuments, fileUrl]
+        selectedDocuments: [...prevState.selectedDocuments, fileUrl._id]
       }));
 
       setSkidState((prevState) => ({
@@ -57,7 +57,7 @@ const AddDocModal = ({ docSumbit }) => {
           ...prevState.formik,
           values: {
             ...formik.values,
-            selectedDocuments: [...formik.values.selectedDocuments, fileUrl]
+            selectedDocuments: [...formik.values.selectedDocuments, fileUrl._id]
           }
           // You may need to update touched and errors as well if applicable
         }
