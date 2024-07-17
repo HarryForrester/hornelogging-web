@@ -101,53 +101,59 @@ const AddDocModal = ({ docSumbit }) => {
         />
         <br />
         <div className="modal-hazards">
-        {Object.keys(groupedFiles).map((type) => (
-  <React.Fragment key={type}>
-    <h5>{type}</h5>
-    {groupedFiles[type]  
-      .filter(file => skidState.formik && skidState.formik.values && !skidState.formik.values.selectedDocuments.some(selectedFile => selectedFile === file._id))
-      .map((file) => (
-            <div className="card" style={{ marginBottom: '10px' }} key={file._id}>
-              <div className="search-text-doc" style={{ display: 'none' }}>
-                {file.searchText}
-              </div>
-              <div className="card-header" style={{ backgroundColor: file.color }}>
-                <div style={{ float: 'left' }}>
-                  <b>{file.type}</b>
-                  &nbsp;
-                  <b>
-                    <em
-                      style={{
-                        maxWidth: '300px',
-                        display: 'inline-block',
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                      }}
-                    >
-                      {file.fileName}
-                    </em>
-                  </b>
-                  &nbsp;&nbsp;
-                  <small>({file.uri})</small>
-                </div>
-                <div style={{ float: 'right' }}>
-                  
-                    <Button
-                      type="button"
-                      data-filename={file.fileName}
-                      onClick={() => handleCheckboxChange(file)}
-                      size="sm"
-                    >
-                      Add
-                    </Button>
-                  
-                </div>
-              </div>
+        {Object.keys(groupedFiles).map((type) => {
+  const filteredFiles = groupedFiles[type]
+    .filter(file => skidState.formik && skidState.formik.values && !skidState.formik.values.selectedDocuments.some(selectedFile => selectedFile === file._id));
+
+  if (filteredFiles.length === 0) {
+    return null; // Skip rendering if there are no filtered files
+  }
+
+  return (
+    <React.Fragment key={type}>
+      <h5>{type}</h5>
+      {filteredFiles.map((file) => (
+        <div className="card" style={{ marginBottom: '10px' }} key={file._id}>
+          <div className="search-text-doc" style={{ display: 'none' }}>
+            {file.searchText}
+          </div>
+          <div className="card-header" style={{ backgroundColor: file.color }}>
+            <div style={{ float: 'left' }}>
+              <b>{file.type}</b>
+              &nbsp;
+              <b>
+                <em
+                  style={{
+                    maxWidth: '300px',
+                    display: 'inline-block',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
+                  {file.fileName}
+                </em>
+              </b>
+              &nbsp;&nbsp;
+              <small>({file.uri})</small>
             </div>
-          ))}
-        </React.Fragment>
+            <div style={{ float: 'right' }}>
+              <Button
+                type="button"
+                data-filename={file.fileName}
+                onClick={() => handleCheckboxChange(file)}
+                size="sm"
+              >
+                Add
+              </Button>
+            </div>
+          </div>
+        </div>
       ))}
+    </React.Fragment>
+  );
+})}
+
 
 
 

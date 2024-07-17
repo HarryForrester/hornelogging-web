@@ -70,19 +70,20 @@ const PDFViewer = ({ percentage, _account }) => {
    * @param {*} clickedPoint
    */
   const handleMarkerClick = async (clickedPoint) => {
+    // if the clicked marker is already visible then hide it
     if (skidMarkerState.selectedMarker === clickedPoint) {
       setSkidMarkerState((prevState) => ({
         ...prevState,
         popoverVisible: !prevState.popoverVisible
       }));
     } else {
-      // If it's a different point, close the popover and then open it for the new point
+      // If it's a different point, close the existing popover and then open it for the new popover
       setSkidMarkerState((prevState) => ({
         ...prevState,
         popoverVisible: true
       }));
-
-      if (clickedPoint.info.siteHazards.length > 0) {
+      // if siteHazards in not emtpy
+      /* if (clickedPoint.info.siteHazards.length > 0) {
         try {
           const response = await axios.get('http://localhost:3001/findhazard', {
             params: {
@@ -102,7 +103,7 @@ const PDFViewer = ({ percentage, _account }) => {
           ...prevState,
           popoverVisible: true
         }));
-      }
+      } */
       
     }
 

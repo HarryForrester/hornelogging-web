@@ -264,7 +264,7 @@ const SkidMarkerPopover = () => {
               </div>
               
                 <ul className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
-                  {skidMarkerState.selectedMarker.info.selectedDocuments.map((item, index) => (
+                  {skidMarkerState.selectedMarker.info.selectedDocuments.map(id => mapState.files.find(file => file._id === id)).filter(file => file).map((item, index) => (
                     <li
                       key={index}
                       className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
@@ -299,7 +299,7 @@ const SkidMarkerPopover = () => {
                       onClick={() => openPdfInNewTab(skidMarkerState.selectedMarker.info.cutPlans)}
                       style={{ cursor: 'pointer' }}
                     >
-                      {skidMarkerState.selectedMarker.info.cutPlans.fileName}
+                      {skidMarkerState?.selectedMarker?.info?.cutPlans?.fileName}
                     </li>
                 </ul>
                 </>
