@@ -60,7 +60,7 @@ const SkidMarkerPopover = () => {
     const { formik } = skidState;
 
     const id = new Date().getTime();
-    console.log('dddddddd',skidMarkerState.selectedMarker.info.siteHazards)
+    //console.log('dddddddd',skidMarkerState.selectedMarker.info.siteHazards)
     try {
       /* if(skidMarkerState.selectedMarker.info.siteHazards && skidMarkerState.selectedMarker.info.siteHazards.length > 0) {
         const response = await axios.get('http://localhost:3001/findhazard', {
@@ -222,7 +222,7 @@ const SkidMarkerPopover = () => {
           }}
         >
           <div className="popover-header">
-            Skid: {skidState.formik.values.pointName}
+            Skid: {skidState.formik.values.skidName}
             <RemoveSkidButton onClick={removeSelectedSkid} />
             <EditSkidButton onClick={editSelectedSkid} />
           </div>
