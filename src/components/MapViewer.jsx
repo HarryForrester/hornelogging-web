@@ -66,7 +66,7 @@ const PDFViewer = ({ percentage, _account }) => {
 
   /**
    * Handles the clicked skid point when a user clicks the marker
-   * This function opens and the skid modal where the clicked point is
+   * This function opens and the skid modal where the clicked point ish
    * @param {*} clickedPoint
    */
   const handleMarkerClick = async (clickedPoint) => {
