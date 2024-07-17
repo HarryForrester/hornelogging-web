@@ -43,9 +43,9 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
     setSkidModalState((prevState) => ({ ...prevState, isSkidModalVisible: false }));
   };
 
-  const submitSkidModal = async () => {
+  const submitSkidModal = async (values) => {
     const id = new Date().getTime();
-    const selectedFile = skidModalState.selectedCutPlan;
+    const selectedFile = values.selectedCutPlan;
     console.log('submitted selectedSkidHazards: ', selectedFile);
 
     setShowSpinner(true);
@@ -58,7 +58,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
       await uploadToPresignedUrl(presignedUrl, selectedFile, selectedFile.type);
       cutPlans = {fileName: selectedFile.name, url: filePath, key: key};
     } else {
-      cutPlans =  skidModalState.selectedCutPlan
+      cutPlans =  values.selectedCutPlan
     }
    
 
@@ -66,11 +66,11 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
       _id: skidModalState._id,
       mapName: mapState.currentMapName,
       info: {
-        crews: skidModalState.selectedCrew,
-        cutPlans: cutPlans,
-        pointName: skidModalState.skidName,
-        selectedDocuments: skidModalState.selectedDocuments,
-        siteHazards: skidModalState.selectedSkidHazards //TODO: need to change hazardData to siteHazards
+        crews: values.selectedCrew,
+        cutPlans: values.cutPlans,
+        pointName: values.skidName,
+        selectedDocuments: values.selectedDocuments,
+        siteHazards: values.selectedSkidHazards //TODO: need to change hazardData to siteHazards
       },
       point: {
         originalWidth: mapState.originalWidth,
@@ -437,6 +437,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
             onSubmit={values => {
               console.log(values);
               //console.log("ahha bro", skidModalState)
+              submitSkidModal(values);
             }}
           >
             {formik => (
@@ -521,6 +522,13 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-decoration-none"
+                      style={{
+                        maxWidth: '300px',
+                        display: 'inline-block',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis'
+                      }}
                     >
                       {file.fileName}
                     </Anchor>

@@ -39,18 +39,11 @@ const AddDocModal = ({ docSumbit }) => {
   const handleCheckboxChange = (fileUrl) => {
     const formik = skidState.formik;
     console.log('handle me ok', fileUrl);
-    // Check if the file has a valid _id and is not already in the selectedDocuments array
     if (
       fileUrl._id &&
-      !skidModalState.selectedDocuments.some((selectedFile) => selectedFile._id === fileUrl._id)
+      !formik.values.selectedDocuments.some((selectedFile) => selectedFile._id === fileUrl._id)
     ) {
-      // Update the selectedDocuments state by adding the new file
-      //setSelectedFiles((prevSelectedFiles) => [...prevSelectedFiles, fileUrl]);
-      setSkidModalState((prevState) => ({
-        ...prevState,
-        selectedDocuments: [...prevState.selectedDocuments, fileUrl._id]
-      }));
-
+      
       setSkidState((prevState) => ({
         ...prevState,
         formik: {
@@ -59,7 +52,6 @@ const AddDocModal = ({ docSumbit }) => {
             ...formik.values,
             selectedDocuments: [...formik.values.selectedDocuments, fileUrl._id]
           }
-          // You may need to update touched and errors as well if applicable
         }
       }));
     }
@@ -81,33 +73,41 @@ const AddDocModal = ({ docSumbit }) => {
         />
         <br />
         <div className="modal-hazards">
-          {mapState.files.map((file) => (
+        {mapState.files
+          .filter(file => skidState.formik && skidState.formik.values && !skidState.formik.values.selectedDocuments.includes(file._id))
+          .map((file) => (
             <div className="card" style={{ marginBottom: '10px' }} key={file._id}>
               <div className="search-text-doc" style={{ display: 'none' }}>
                 {file.searchText}
               </div>
               <div className="card-header" style={{ backgroundColor: file.color }}>
                 <div style={{ float: 'left' }}>
-                  <input
-                    type="checkbox"
-                    name="selectedDocs[]"
-                    value={file?.uri}
-                    data-filename={file.fileName}
-                    onChange={() => handleCheckboxChange(file)}
-                  />
+                <b>{file.type}</b>
+
                   &nbsp;
                   <b>
-                    <em>{file.fileName}</em>
+                    <em style={{ maxWidth: '300px', display: 'inline-block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {file.fileName}
+                    </em>
                   </b>
                   &nbsp;&nbsp;
                   <small>({file.uri})</small>
                 </div>
                 <div style={{ float: 'right' }}>
-                  <b>{file.type}</b>
+                <Button
+                    type="button"
+                    data-filename={file.fileName}
+                    onClick={() => handleCheckboxChange(file)}
+                    size='sm'
+                  >
+                    Add
+                  </Button>
                 </div>
               </div>
             </div>
-          ))}
+        ))}
+
+
         </div>
       </Modal.Body>
       <Modal.Footer>

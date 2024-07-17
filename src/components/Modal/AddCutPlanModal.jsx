@@ -31,7 +31,7 @@ const AddCutPlanModal = ({ submitCutPlan }) => {
   };
 
   return (
-    <Modal show={skidState.cutPlanModalVisible} onHide={handleClose}>
+    <Modal show={skidState.cutPlanModalVisible} onHide={handleClose} backdrop='static'>
       <Modal.Header closeButton>
         <Modal.Title>Add Cut Plan</Modal.Title>
       </Modal.Header>

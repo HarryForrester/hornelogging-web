@@ -52,15 +52,7 @@ const SelectHazardsModal = ({ submitSelectedHazards }) => {
     const formik = skidState.formik;
 
     console.log("handleCheckboxChange: ", hazardId);
-    // Toggle the selection of the hazard with hazardId
-    /* setSelectedHazards((prevSelectedHazards) => {
-      if (prevSelectedHazards.includes(hazardId)) {
-        return prevSelectedHazards.filter((id) => id !== hazardId);
-      } else {
-        return [...prevSelectedHazards, hazardId];
-      }
-    }); */
-
+  
     const updatedHazards = skidState.formik.values.selectedSkidHazards.includes(hazardId)
     ? skidState.formik.values.selectedSkidHazards.filter((id) => id !== hazardId)
     : [...skidState.formik.values.selectedSkidHazards, hazardId];
