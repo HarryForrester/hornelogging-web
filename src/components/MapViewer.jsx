@@ -81,7 +81,7 @@ const PDFViewer = ({ percentage, _account }) => {
         popoverVisible: !prevState.popoverVisible
       }));
     } else {
-      // If it's a different point, close the existing popover and then open it for the new popover
+      // If it's a different point, close the existing popover and then open it for the new popovers
       setSkidMarkerState((prevState) => ({
         ...prevState,
         popoverVisible: true
