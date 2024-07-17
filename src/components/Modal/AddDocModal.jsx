@@ -37,25 +37,51 @@ const AddDocModal = ({ docSumbit }) => {
    * @returns {void}
    */
   const handleCheckboxChange = (fileUrl) => {
-    const formik = skidState.formik;
-    console.log('handle me ok', fileUrl);
-    if (
-      fileUrl._id &&
-      !formik.values.selectedDocuments.some((selectedFile) => selectedFile._id === fileUrl._id)
-    ) {
-      
+    if (!skidState.formik || !skidState.formik.values) {
+      console.error('formik or formik.values is null or undefined');
+      return;
+    }
+  
+    const { formik } = skidState;
+    const { selectedDocuments } = formik.values;
+    const fileId = fileUrl._id;
+  
+    if (!selectedDocuments.some((selectedFile) => selectedFile._id === fileId)) {
+      // Add to selectedDocuments
+      const updatedSelectedDocuments = [...selectedDocuments, { _id: fileId }];
       setSkidState((prevState) => ({
         ...prevState,
         formik: {
-          ...prevState.formik,
+          ...formik,
           values: {
             ...formik.values,
-            selectedDocuments: [...formik.values.selectedDocuments, fileUrl._id]
-          }
-        }
+            selectedDocuments: updatedSelectedDocuments,
+          },
+        },
+      }));
+    } else {
+      // Remove from selectedDocuments
+      const updatedSelectedDocuments = selectedDocuments.filter((selectedFile) => selectedFile._id !== fileId);
+      setSkidState((prevState) => ({
+        ...prevState,
+        formik: {
+          ...formik,
+          values: {
+            ...formik.values,
+            selectedDocuments: updatedSelectedDocuments,
+          },
+        },
       }));
     }
   };
+  
+  const groupedFiles = mapState.files.reduce((acc, file) => {
+    if (!acc[file.type]) {
+      acc[file.type] = [];
+    }
+    acc[file.type].push(file);
+    return acc;
+  }, {});
 
   return (
     <Modal show={skidState.docModalVisible} onHide={handleClose}>
@@ -73,20 +99,30 @@ const AddDocModal = ({ docSumbit }) => {
         />
         <br />
         <div className="modal-hazards">
-        {mapState.files
-          .filter(file => skidState.formik && skidState.formik.values && !skidState.formik.values.selectedDocuments.includes(file._id))
-          .map((file) => (
+        {Object.keys(groupedFiles).map((type) => (
+  <React.Fragment key={type}>
+    <h5>{type}</h5>
+    {groupedFiles[type]  
+      .filter(file => skidState.formik && skidState.formik.values && !skidState.formik.values.selectedDocuments.some(selectedFile => selectedFile._id === file._id))
+      .map((file) => (
             <div className="card" style={{ marginBottom: '10px' }} key={file._id}>
               <div className="search-text-doc" style={{ display: 'none' }}>
                 {file.searchText}
               </div>
               <div className="card-header" style={{ backgroundColor: file.color }}>
                 <div style={{ float: 'left' }}>
-                <b>{file.type}</b>
-
+                  <b>{file.type}</b>
                   &nbsp;
                   <b>
-                    <em style={{ maxWidth: '300px', display: 'inline-block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <em
+                      style={{
+                        maxWidth: '300px',
+                        display: 'inline-block',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }}
+                    >
                       {file.fileName}
                     </em>
                   </b>
@@ -94,18 +130,23 @@ const AddDocModal = ({ docSumbit }) => {
                   <small>({file.uri})</small>
                 </div>
                 <div style={{ float: 'right' }}>
-                <Button
-                    type="button"
-                    data-filename={file.fileName}
-                    onClick={() => handleCheckboxChange(file)}
-                    size='sm'
-                  >
-                    Add
-                  </Button>
+                  
+                    <Button
+                      type="button"
+                      data-filename={file.fileName}
+                      onClick={() => handleCheckboxChange(file)}
+                      size="sm"
+                    >
+                      Add
+                    </Button>
+                  
                 </div>
               </div>
             </div>
-        ))}
+          ))}
+        </React.Fragment>
+      ))}
+
 
 
         </div>
