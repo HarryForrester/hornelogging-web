@@ -48,7 +48,9 @@ const AddDocModal = ({ docSumbit }) => {
   
     if (!selectedDocuments.some((selectedFile) => selectedFile._id === fileId)) {
       // Add to selectedDocuments
-      const updatedSelectedDocuments = [...selectedDocuments, { _id: fileId }];
+      const updatedSelectedDocuments = [...selectedDocuments, fileId ];
+      console.log('jajaja', updatedSelectedDocuments)
+
       setSkidState((prevState) => ({
         ...prevState,
         formik: {
@@ -61,7 +63,7 @@ const AddDocModal = ({ docSumbit }) => {
       }));
     } else {
       // Remove from selectedDocuments
-      const updatedSelectedDocuments = selectedDocuments.filter((selectedFile) => selectedFile._id !== fileId);
+      const updatedSelectedDocuments = selectedDocuments.filter((selectedFile) => selectedFile !== fileId);
       setSkidState((prevState) => ({
         ...prevState,
         formik: {
@@ -103,7 +105,7 @@ const AddDocModal = ({ docSumbit }) => {
   <React.Fragment key={type}>
     <h5>{type}</h5>
     {groupedFiles[type]  
-      .filter(file => skidState.formik && skidState.formik.values && !skidState.formik.values.selectedDocuments.some(selectedFile => selectedFile._id === file._id))
+      .filter(file => skidState.formik && skidState.formik.values && !skidState.formik.values.selectedDocuments.some(selectedFile => selectedFile === file._id))
       .map((file) => (
             <div className="card" style={{ marginBottom: '10px' }} key={file._id}>
               <div className="search-text-doc" style={{ display: 'none' }}>
