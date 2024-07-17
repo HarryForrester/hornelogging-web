@@ -7,13 +7,13 @@ import { useAlertMessage } from '../AlertMessage';
 import { useSkidMarker } from '../SkidMarkerContext';
 import axios from 'axios';
 import { deletePresignedUrl } from '../../hooks/useFileDelete';
-
+import { useSkid } from '../../context/SkidContext';
 const SkidMarkerPopover = () => {
   const { skidModalState, setSkidModalState } = useSkidModal();
   const { mapState, setMapState } = useMap();
   const { setAlertMessageState } = useAlertMessage();
   const { skidMarkerState, setSkidMarkerState } = useSkidMarker();
-
+  const { skidState, setSkidState } = useSkid(); // holds information about the skid
   const toggleSkidCrew = (crew) => {
     setSkidMarkerState((prevState) => ({
       ...prevState,
@@ -57,10 +57,12 @@ const SkidMarkerPopover = () => {
   };
 
   const editSelectedSkid = async () => {
+    const { formik } = skidState;
+
     const id = new Date().getTime();
     console.log('dddddddd',skidMarkerState.selectedMarker.info.siteHazards)
     try {
-      if(skidMarkerState.selectedMarker.info.siteHazards && skidMarkerState.selectedMarker.info.siteHazards.length > 0) {
+      /* if(skidMarkerState.selectedMarker.info.siteHazards && skidMarkerState.selectedMarker.info.siteHazards.length > 0) {
         const response = await axios.get('http://localhost:3001/findhazard', {
           params: {
             name: skidMarkerState.selectedMarker.info.siteHazards.join(',') // Convert the array to a comma-separated string
@@ -82,8 +84,9 @@ const SkidMarkerPopover = () => {
             isSkidModalEdit: true
           }));
         }
-      } else {
-        setSkidModalState((prevState) => ({
+      } */ //else {
+        
+        /* setSkidModalState((prevState) => ({
           ...prevState,
           _id: skidMarkerState.selectedMarker._id,
           isSkidModalVisible: true,
@@ -93,8 +96,12 @@ const SkidMarkerPopover = () => {
           selectedSiteHazards: skidMarkerState.selectedMarker.info.siteHazards,
           selectedCutPlan: skidMarkerState.selectedMarker.info.cutPlans,
           isSkidModalEdit: true
-        }));
-      }
+        })); */
+      //}
+      setSkidState((prevState) => ({
+        ...prevState,
+        skidModalVisible: true,
+      }))
       
     } catch (error) {
       setAlertMessageState((prevState) => ({
@@ -201,21 +208,21 @@ const SkidMarkerPopover = () => {
 
   return (
     <>
-      {skidMarkerState.selectedMarker && skidMarkerState.popoverVisible && (
+      {skidMarkerState.popoverVisible && (
         <div
           className="popover"
           data-bs-placement="top"
           style={{
             position: 'absolute',
-            left: `${skidMarkerState.selectedMarker.point.x}px`,
-            top: `${skidMarkerState.selectedMarker.point.y}px`,
+            left: `${skidState.selectedSkidPos.x}px`,
+            top: `${skidState.selectedSkidPos.y}px`,
             width: '250px',
 
             zIndex: 99
           }}
         >
           <div className="popover-header">
-            Skid: {skidMarkerState.selectedMarker.info.pointName}
+            Skid: {skidState.formik.values.pointName}
             <RemoveSkidButton onClick={removeSelectedSkid} />
             <EditSkidButton onClick={editSelectedSkid} />
           </div>
@@ -232,8 +239,7 @@ const SkidMarkerPopover = () => {
 
             <ul className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
               {/* Filters out crews that do not exist anymore */}
-              {skidMarkerState.selectedMarker.info.crews
-
+              {skidState.formik.values.selectedCrew
                 .filter((crew) => mapState.crewTypes.some((mapCrew) => mapCrew === crew))
                 .map((crew) => (
                   <li
@@ -250,7 +256,7 @@ const SkidMarkerPopover = () => {
             
 
             <div>
-              {skidMarkerState.selectedMarker.info.selectedDocuments && skidMarkerState.selectedMarker.info.selectedDocuments.length > 0 && (
+              {skidState.formik.values.selectedDocuments && skidState.formik.values.selectedDocuments.length > 0 && (
                 <>
                 <div
                 style={{
@@ -264,7 +270,7 @@ const SkidMarkerPopover = () => {
               </div>
               
                 <ul className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
-                  {skidMarkerState.selectedMarker.info.selectedDocuments.map(id => mapState.files.find(file => file._id === id)).filter(file => file).map((item, index) => (
+                  {skidState.formik.values.selectedDocuments.map(id => mapState.files.find(file => file._id === id)).filter(file => file).map((item, index) => (
                     <li
                       key={index}
                       className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
@@ -280,7 +286,7 @@ const SkidMarkerPopover = () => {
             
 
             <div>
-              {skidMarkerState.selectedMarker.info.cutPlans !== null && (
+              {skidState.formik.values.selectedCutPlan !== null && (
                 <>
                 <div
                 style={{
@@ -296,10 +302,10 @@ const SkidMarkerPopover = () => {
                 <ul className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
                     <li
                       className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
-                      onClick={() => openPdfInNewTab(skidMarkerState.selectedMarker.info.cutPlans)}
+                      onClick={() => openPdfInNewTab(skidState.formik.values.selectedCutPlan)}
                       style={{ cursor: 'pointer' }}
                     >
-                      {skidMarkerState?.selectedMarker?.info?.cutPlans?.fileName}
+                      {skidState?.formik?.values?.selectedCutPlan?.fileName}
                     </li>
                 </ul>
                 </>

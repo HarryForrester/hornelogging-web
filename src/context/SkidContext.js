@@ -6,6 +6,8 @@ const SkidContext = createContext();
 
 export const SkidProvider = ({ children }) => {
   const [skidState, setSkidState] = useState({
+    selectedSkidId: null,
+    selectedSkidPos: null,
    formik: null,
    skidModalVisible: false,
    docModalVisible: false,

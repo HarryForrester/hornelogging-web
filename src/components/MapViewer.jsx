@@ -70,8 +70,12 @@ const PDFViewer = ({ percentage, _account }) => {
    * @param {*} clickedPoint
    */
   const handleMarkerClick = async (clickedPoint) => {
+    const { formik } = skidState;
+
+    console.log('Marker clicked', clickedPoint)
     // if the clicked marker is already visible then hide it
-    if (skidMarkerState.selectedMarker === clickedPoint) {
+    if (skidState.selectedSkidId === clickedPoint._id) {
+      console.log('ook')
       setSkidMarkerState((prevState) => ({
         ...prevState,
         popoverVisible: !prevState.popoverVisible
@@ -82,6 +86,22 @@ const PDFViewer = ({ percentage, _account }) => {
         ...prevState,
         popoverVisible: true
       }));
+
+      setSkidState((prevState) => ({
+        ...prevState,
+        selectedSkidId: clickedPoint._id,
+        selectedSkidPos: {x: clickedPoint.point.x, y: clickedPoint.point.y},
+        formik: {
+          ...formik,
+          values: {
+            skidName: clickedPoint.info.pointName,
+            selectedCrew: clickedPoint.info.crews,
+            selectedDocuments: clickedPoint.info.selectedDocuments,
+            selectedCutPlan: clickedPoint.info.cutPlans,
+            siteHazards: clickedPoint.info.siteHazards
+          }
+        }
+      }))
       // if siteHazards in not emtpy
       /* if (clickedPoint.info.siteHazards.length > 0) {
         try {
@@ -107,10 +127,10 @@ const PDFViewer = ({ percentage, _account }) => {
       
     }
 
-    setSkidMarkerState((prevState) => ({
+   /*  setSkidMarkerState((prevState) => ({
       ...prevState,
       selectedMarker: clickedPoint
-    }));
+    })); */
   };
 
   /**

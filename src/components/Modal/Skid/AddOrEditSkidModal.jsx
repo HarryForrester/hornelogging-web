@@ -60,14 +60,14 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
     } else {
       cutPlans =  values.selectedCutPlan
     }
-   
+      console.log('cutplans', cutPlans);
 
     const skidObj = {
       _id: skidModalState._id,
       mapName: mapState.currentMapName,
       info: {
         crews: values.selectedCrew,
-        cutPlans: values.cutPlans,
+        cutPlans: cutPlans,
         pointName: values.skidName,
         selectedDocuments: values.selectedDocuments,
         siteHazards: values.selectedSkidHazards //TODO: need to change hazardData to siteHazards
