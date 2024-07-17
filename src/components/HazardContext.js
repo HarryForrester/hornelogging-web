@@ -25,7 +25,7 @@ export const HazardProvider = ({ children }) => {
 
 HazardProvider.propTypes = {
   children: PropTypes.object.isRequired
-}
+};
 
 export const useHazardState = () => {
   return useContext(HazardContext);

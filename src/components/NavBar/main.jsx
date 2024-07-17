@@ -5,9 +5,9 @@ import { Link, Outlet } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { useAuth } from '../../context/AuthContext';
 
-const NavBar = ({ username }) => {
-  const { user, logout, isLoggedIn } = useAuth();
-
+const NavBar = () => {
+  const { session, logout, isLoggedIn } = useAuth();
+  const username = session?.username;
   return (
     <>
       <Navbar expand="lg" fixed="top" bg="light" variant="light">
@@ -43,25 +43,24 @@ const NavBar = ({ username }) => {
               <Nav.Link as={Link} to="/training">
                 Training
               </Nav.Link>
+              <Nav.Link as={Link} to="/tasks">
+                Tasks
+              </Nav.Link>
               <Nav.Link as={Link} to="/profile">
                 Profile
               </Nav.Link>
               {/* Add other navigation links as needed */}
               <Nav.Link as={Link} to="/login" onClick={logout}>
-                Logout ({user})
+                Logout ({username})
               </Nav.Link>
             </Nav>
           </Navbar.Collapse>
         </Container>
       </Navbar>
 
-      <Outlet context={{ user, isLoggedIn }} />
+      <Outlet context={{ username, isLoggedIn }} />
     </>
   );
-};
-
-NavBar.propTypes = {
-  username: PropTypes.string.isRequired
 };
 
 export default NavBar;

@@ -1,4 +1,4 @@
-import React,{ createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 
 const ConfirmationModalContext = createContext();
@@ -20,11 +20,9 @@ export const ConfirmationModalProvider = ({ children }) => {
   );
 };
 
-
-
 ConfirmationModalProvider.propTypes = {
   children: PropTypes.object.isRequired
-}
+};
 
 export const useConfirmationModal = () => {
   return useContext(ConfirmationModalContext);

@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import React, { useState, useEffect } from 'react';
 import SelectRoleType from '../SelectList/SelectRoleType';
 import InputWithLabel from '../Input/InputWithLabel';
@@ -9,8 +10,9 @@ import { useMap } from '../Map/MapContext';
 import { usePersonData } from '../PersonData';
 import { useAlertMessage } from '../AlertMessage';
 import { faL } from '@fortawesome/free-solid-svg-icons';
-
-const EditPersonModal = () => {
+import { getPresignedUrl, uploadToPresignedUrl, getFilePathFromUrl } from '../../hooks/useFileUpload';
+import { deletePresignedUrl } from '../../hooks/useFileDelete';
+const EditPersonModal = (_account) => {
   const { skidModalState, setSkidModalState } = useSkidModal();
   const { personDataState, setPersonDataState } = usePersonData();
   const { mapState, setMapState } = useMap();
@@ -115,31 +117,41 @@ const EditPersonModal = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setShowSpinner(true);
-
     const id = new Date().getTime();
-    const formData = new FormData();
-
-    Object.entries(formState).forEach(([key, value]) => {
-      formData.append(key, value);
-    });
-
-    if (formState.imgFile) {
-      formData.append('fileupload', formState.imgFile, 'fileupload');
-    }
-
+  
     try {
-      const response = await axios.post(
-        process.env.REACT_APP_URL + '/update-person/' + formState.id,
-        formData,
-        {
-          withCredentials: true,
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        }
-      );
-
+      let response;
+      console.log('this sis the form state',formState)
+      if (formState.imgFile) {
+        // Upload new image and update with imgUrl
+        const [presignedUrl, key] = await getPresignedUrl(`${_account._account}/person/${formState.id}`, 'image/png');
+        await uploadToPresignedUrl(presignedUrl, formState.imgFile, 'image/png');
+        const filePath = getFilePathFromUrl(presignedUrl);
+  
+        response = await axios.post(
+          `${process.env.REACT_APP_URL}/update-person/${formState.id}`,
+          {
+            ...formState,
+            imgUrl: { key: key, url: filePath }
+          },
+          { withCredentials: true }
+        );
+      } else {
+        // Update without changing the imgUrl
+        response = await axios.post(
+          `${process.env.REACT_APP_URL}/update-person/${formState.id}`,
+          { ...formState },
+          { withCredentials: true }
+        );
+      }
+  
       if (response.status === 200) {
+        // Delete old profile image if it exists
+        if (person.imgUrl) {
+          await deletePresignedUrl([person.imgUrl.key]);
+        }
+  
+        // Update UI state after successful update
         setAlertMessageState((prevState) => ({
           ...prevState,
           toasts: [
@@ -154,17 +166,16 @@ const EditPersonModal = () => {
             }
           ]
         }));
-
-        updatePerson(formState);
-        resetForm();
+        
+        updatePerson(response.data.updatedPerson); // Update person data in UI
+        resetForm(); // Reset form fields
         setSkidModalState((prevState) => ({
           ...prevState,
           isEditPersonModalVisible: false
         }));
-      } else {
-        alert('An Error has occurred. Please try again.');
       }
     } catch (error) {
+      // Handle errors
       setAlertMessageState((prevState) => ({
         ...prevState,
         toasts: [
@@ -173,7 +184,7 @@ const EditPersonModal = () => {
             id: id,
             heading: 'Update Person',
             show: true,
-            message: `Error! Updating ${formState.name}  from ${formState.crew}`,
+            message: `Error! Updating ${formState.name} from ${formState.crew}`,
             background: 'danger',
             color: 'white'
           }
@@ -182,6 +193,7 @@ const EditPersonModal = () => {
       console.error('Error:', error);
     } finally {
       setShowSpinner(false);
+      // Remove alert after 10 seconds
       setTimeout(() => {
         setAlertMessageState((prevState) => ({
           ...prevState,
@@ -190,11 +202,13 @@ const EditPersonModal = () => {
       }, 10000);
     }
   };
+  
 
   const handleInputChange = (name, value) => {
     setFormState({ ...formState, [name]: value });
   };
 
+  const imgUrl = person?.imgUrl;
   return (
     <Modal
       show={skidModalState.isEditPersonModalVisible}
@@ -212,7 +226,8 @@ const EditPersonModal = () => {
             <Form.Group className="col-md-3">
               <Form.Label htmlFor="imgurl" className="image-container">
                 <Image
-                  src={formState?.imgPreview || process.env.REACT_APP_URL + '/' + person?.imgUrl}
+                  // eslint-disable-next-line no-undef
+                  src={formState?.imgPreview || imgUrl?.url || '/img/default.jpg'}
                   className="figure-img img-fluid z-depth-1 rounded mb-0 border border-dark"
                   alt="..."
                   id="img-preview"
@@ -300,11 +315,11 @@ const EditPersonModal = () => {
               <Form.Select
                 id="crewInput"
                 name="crew"
-                value={formState.crew || 'Unassigned'}
+                value={formState.crew || 'default'}
                 onChange={handleCrewChange}
                 required
               >
-                <option value="Unassigned" disabled>
+                <option value="default" disabled>
                   Select Crew
                 </option>
                 {personDataState &&
@@ -314,6 +329,9 @@ const EditPersonModal = () => {
                       {option}
                     </option>
                   ))}
+                <option value="Unassigned">
+                  Unassigned
+                </option>
               </Form.Select>
             </Form.Group>
             <SelectRoleType

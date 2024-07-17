@@ -25,7 +25,7 @@ const EditSkidButton = ({ onClick }) => {
 };
 
 EditSkidButton.propTypes = {
-  onClick: PropTypes.func.isRequired,
-}
+  onClick: PropTypes.func.isRequired
+};
 
 export default EditSkidButton;

@@ -1,17 +1,18 @@
+/* eslint-disable no-undef */
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Form, Modal, Button, ProgressBar } from 'react-bootstrap';
+import { Form, Modal, Button, Spinner } from 'react-bootstrap';
 import { useAlertMessage } from '../AlertMessage';
 import { usePersonData } from '../PersonData';
 import PropTypes from 'prop-types';
 import DragAndDropUpload from '../DragAndDropUpload';
-
-const UploadLibraryDocumentModal = ({ show, close, docTypes: fileTypes, updateLibraryFiles }) => {
+import { getPresignedUrl, getFilePathFromUrl,uploadToPresignedUrl } from '../../hooks/useFileUpload';
+const UploadLibraryDocumentModal = ({ show, close, docTypes: fileTypes, updateLibraryFiles, _account }) => {
   const [fileName, setFileName] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
   const [fileTypeIsValid, setFileTypeIsValid] = useState(null);
   const [fileIsValid, setFileIsValid] = useState(null);
-  const [showProgressBar, setShowProgressBar] = useState(false); // shows spinner while submitting to server
+  const [showSpinner, setSpinner] = useState(false); // shows spinner while submitting to server
   const [uploadPercentage, setUploadPercentage] = useState(0);
   const [fileTypeValue, setFileTypeValue] = useState(null);
   const [selectedFileType, setSelectedFileType] = useState('defaultFileType'); // default value
@@ -25,7 +26,7 @@ const UploadLibraryDocumentModal = ({ show, close, docTypes: fileTypes, updateLi
     setFileTypeIsValid(null);
     setUploadPercentage(0);
     setSelectedFileType('defaultFileType');
-    setShowProgressBar(false);
+    setSpinner(false);
   };
 
   const removeUploadedFile = () => {
@@ -47,24 +48,33 @@ const UploadLibraryDocumentModal = ({ show, close, docTypes: fileTypes, updateLi
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    setShowProgressBar(true); // show progress bar
     const id = new Date().getTime(); // creates id for alert messages
 
     if (!selectedFile) setFileIsValid(false);
     else if (selectedFileType === 'defaultFileType')
       setFileTypeIsValid(false); //name is not valid
     else {
-      const formData = new FormData();
+      setSpinner(true); // show progress bar
+
+      console.log('ajahjajha', _account)
+      const [presignedUrl, key] = await getPresignedUrl(`${_account}/library`,selectedFile.type)
+      await uploadToPresignedUrl(presignedUrl, selectedFile,selectedFile.type);
+      const filePath = getFilePathFromUrl(presignedUrl)
+
+      const data = {
+        fileName: fileName || selectedFile.name,
+        fileType: fileTypeValue,
+        fileUrl: filePath,
+        key: key
+      }
+      /* const formData = new FormData();
       formData.append('fileupload', selectedFile);
       formData.append('fileName', fileName);
-      formData.append('fileType', fileTypeValue);
+      formData.append('fileType', fileTypeValue); */
 
       try {
-        const response = await axios.post(`${process.env.REACT_APP_URL}/library/upload`, formData, {
+        const response = await axios.post(`${process.env.REACT_APP_URL}/library/upload`, data, {
           withCredentials: true,
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          },
           onUploadProgress: (progressEvent) => {
             const percentage = Math.round((progressEvent.loaded * 100) / progressEvent.total);
             setUploadPercentage(percentage);
@@ -199,16 +209,20 @@ const UploadLibraryDocumentModal = ({ show, close, docTypes: fileTypes, updateLi
           onClick={handleSubmit}
           style={{ height: '38px', width: '100px', padding: 0, fontSize: 14 }}
         >
-          {showProgressBar ? (
-            <ProgressBar
-              animated
-              now={uploadPercentage}
-              label={`${uploadPercentage}%`}
-              style={{ width: '100%', height: '100%', padding: 0 }}
-            />
-          ) : (
-            'Upload File'
-          )}
+          {showSpinner ? (
+                <>
+                  <Spinner
+                    as="span"
+                    animation="border"
+                    size="sm"
+                    role="status"
+                    aria-hidden="true"
+                  />
+                  <span className="visually-hidden">Loading...</span>
+                </>
+              ) : (
+                'Upload'
+              )}
         </Button>
       </Modal.Footer>
     </Modal>
@@ -219,7 +233,8 @@ UploadLibraryDocumentModal.propTypes = {
   show: PropTypes.bool.isRequired,
   close: PropTypes.func.isRequired,
   docTypes: PropTypes.array.isRequired,
-  updateLibraryFiles: PropTypes.func.isRequired
-};
+  updateLibraryFiles: PropTypes.func.isRequired,
+  _account: PropTypes.object.isRequired,
+  };
 
 export default UploadLibraryDocumentModal;

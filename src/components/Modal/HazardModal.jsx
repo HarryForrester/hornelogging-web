@@ -14,14 +14,26 @@ function HazardModal() {
    * @returns {void}
    */
   const handleClose = () => {
-    setSkidModalState((prevState) => ({ ...prevState, hazardModalVisible: false }));
+    if(skidModalState.isSelectHazardsGeneral) {
+      console.log('fk 1')
+      setSkidModalState((prevState) => ({ ...prevState, hazardModalVisible: false, isGeneralHazardsModalVisible: true}));
+
+    } else if (skidModalState.isSkidModalEdit || skidModalState.isSkidModalAdd) {
+      console.log('fk 2')
+      setSkidModalState((prevState) => ({ ...prevState, hazardModalVisible: false, isSkidModalVisible: true}));
+
+    } else {
+
+      console.log('fk 3')
+      setSkidModalState((prevState) => ({ ...prevState, hazardModalVisible: false}));
+
+    }
   };
 
   return (
     <Modal
       show={skidModalState.hazardModalVisible}
       onHide={handleClose}
-      style={{ zindex: 99999 }}
       backdrop="static"
     >
       <Modal.Header style={{ backgroundColor: selectedHazard.color }}>

@@ -2,18 +2,13 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../index.css';
 import axios from 'axios';
-import Cookies from 'js-cookie';
 import { Form, Button, Card, Alert } from 'react-bootstrap';
-import { set } from 'date-fns';
 import PropTypes from 'prop-types';
-import { useAuth } from '../context/AuthContext';
 import NoMenu from '../components/NavBar/nomenu';
 
-const LoginPage = ({ setAccessToken }) => {
-  const { login } = useAuth();
+const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [message, setMessage] = useState('');
 
   // Use the useNavigate hook here
   const navigate = useNavigate();
@@ -21,14 +16,13 @@ const LoginPage = ({ setAccessToken }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (username && password) {
-      //await login(username, password);
-      //await login(username, password);
       const response = await axios.post(
+        // eslint-disable-next-line no-undef
         `${process.env.REACT_APP_URL}/login`,
         { username, password },
         { withCredentials: true }
       );
-      console.log('login respsonse:', response.data);
+
       if (response.status === 200) {
         navigate('/');
       }
@@ -89,7 +83,6 @@ const LoginPage = ({ setAccessToken }) => {
 };
 
 LoginPage.propTypes = {
-  setAccessToken: PropTypes.func.isRequired,
   handleSubmit: PropTypes.func.isRequired
 };
 

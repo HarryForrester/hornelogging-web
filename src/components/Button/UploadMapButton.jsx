@@ -3,7 +3,7 @@ import UploadPdfModal from '../Modal/UploadPdfModal';
 import ErrorConfirmationModal from '../Modal/ErrorConfirmationModal';
 import { SkidModalProvider, useSkidModal } from '../Modal/Skid/SkidModalContext';
 import { Button } from 'react-bootstrap';
-const UploadMapButton = () => {
+const UploadMapButton = (_account) => {
   const { skidModalState, setSkidModalState } = useSkidModal();
 
   const handleClick = () => {
@@ -20,7 +20,7 @@ const UploadMapButton = () => {
         Upload Map
       </Button>
 
-      <UploadPdfModal />
+      <UploadPdfModal _account={_account} />
     </>
   );
 };

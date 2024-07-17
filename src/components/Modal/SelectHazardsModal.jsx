@@ -5,17 +5,22 @@ import { useSkidModal } from './Skid/SkidModalContext';
 import { useMap } from '../Map/MapContext';
 import PropTypes from 'prop-types';
 import { faZ } from '@fortawesome/free-solid-svg-icons';
-
-const SelectHazardsModal = ({ hazards, submitSelectedHazards }) => {
+import { joinPaths } from '@remix-run/router';
+import { useSkid } from '../../context/SkidContext';
+const SelectHazardsModal = ({ submitSelectedHazards }) => {
   const [searchCriteria, setSearchCriteria] = useState('');
   const [selectedHazards, setSelectedHazards] = useState([]);
   const { skidModalState, setSkidModalState } = useSkidModal();
+  const { skidState, setSkidState } = useSkid();
   const { mapState, setMapState } = useMap();
 
   const submitHazards = (selectedHazards) => {
-    submitSelectedHazards(selectedHazards);
-    setSelectedHazards([]);
-    setSearchCriteria('');
+    if (selectedHazards.length > 0) {
+      submitSelectedHazards(selectedHazards);
+      setSelectedHazards([]);
+      setSearchCriteria('');
+  
+    }
   };
 
   /**
@@ -25,16 +30,16 @@ const SelectHazardsModal = ({ hazards, submitSelectedHazards }) => {
    */
   const handleClose = () => {
     if (skidModalState.isSelectHazardsGeneral) {
-      setSkidModalState((prevState) => ({
+      setSkidState((prevState) => ({
         ...prevState,
-        isSelectHazardModalVisible: false,
-        isGeneralHazardsModalVisible: true
+        selectHazardModalVisible: false,
+        generalHazardsModalVisible: true
       }));
     } else {
-      setSkidModalState((prevState) => ({
+      setSkidState((prevState) => ({
         ...prevState,
-        isSelectHazardModalVisible: false,
-        isSkidModalVisible: true
+        selectHazardModalVisible: false,
+        skidModalVisible: true
       }));
     }
   };
@@ -44,16 +49,37 @@ const SelectHazardsModal = ({ hazards, submitSelectedHazards }) => {
   };
 
   const handleCheckboxChange = (hazardId) => {
-    // Toggle the selection of the hazard with hazardId
-    setSelectedHazards((prevSelectedHazards) => {
-      if (prevSelectedHazards.includes(hazardId)) {
-        return prevSelectedHazards.filter((id) => id !== hazardId);
-      } else {
-        return [...prevSelectedHazards, hazardId];
-      }
+    const formik = skidState.formik;
+
+    console.log("handleCheckboxChange: ", hazardId);
+  
+    const updatedHazards = skidState.formik.values.selectedSkidHazards.includes(hazardId)
+    ? skidState.formik.values.selectedSkidHazards.filter((id) => id !== hazardId)
+    : [...skidState.formik.values.selectedSkidHazards, hazardId];
+
+    setSkidModalState((prevState) => ({
+      ...prevState,
+      selectedSkidHazards: updatedHazards
+    }));
+    setSkidState((prevState) => {
+     
+      console.log('hey u cunt', updatedHazards)
+      return {
+        ...prevState,
+        formik: {
+          ...prevState.formik,
+          values: {
+            ...prevState.formik.values,
+            selectedSkidHazards: updatedHazards
+          },
+          // Update touched or errors if needed
+        }
+      };
     });
   };
 
+
+  
   var label;
 
   if (skidModalState.isSelectHazardsGeneral) {
@@ -63,7 +89,7 @@ const SelectHazardsModal = ({ hazards, submitSelectedHazards }) => {
   }
 
   return (
-    <Modal show={skidModalState.isSelectHazardModalVisible} onHide={handleClose}>
+    <Modal show={skidState.selectHazardModalVisible} onHide={handleClose}>
       <Modal.Header closeButton>
         <Modal.Title>Select {label} Hazards</Modal.Title>
       </Modal.Header>
@@ -83,7 +109,7 @@ const SelectHazardsModal = ({ hazards, submitSelectedHazards }) => {
           <br />
           <div className="modal-hazards">
             {mapState.hazards.map((hazard) => (
-              <div className="card" style={{ marginBottom: '10px' }} key={hazard.id}>
+              <div className="card" style={{ marginBottom: '10px' }} key={hazard._id}>
                 <div className="search-text" style={{ display: 'none' }}>
                   {hazard.searchText}
                 </div>
@@ -92,9 +118,9 @@ const SelectHazardsModal = ({ hazards, submitSelectedHazards }) => {
                     <input
                       type="checkbox"
                       name="selectedHazards[]"
-                      value={hazard.id}
-                      onChange={() => handleCheckboxChange(hazard.id)}
-                      checked={selectedHazards.includes(hazard.id)}
+                      value={hazard._id}
+                      onChange={() => handleCheckboxChange(hazard._id)}
+                      checked={skidState.formik?.values?.selectedSkidHazards?.includes(hazard._id)}
                     />
                     <b>
                       {hazard.id}: <em>{hazard.title}</em>
@@ -116,7 +142,7 @@ const SelectHazardsModal = ({ hazards, submitSelectedHazards }) => {
         <Button variant="secondary" onClick={handleClose}>
           Close
         </Button>
-        <Button variant="primary" onClick={() => submitHazards(selectedHazards)}>
+        <Button variant="primary" onClick={handleClose}>
           Save changes
         </Button>
       </Modal.Footer>
@@ -125,8 +151,7 @@ const SelectHazardsModal = ({ hazards, submitSelectedHazards }) => {
 };
 
 SelectHazardsModal.propTypes = {
-  hazards: PropTypes.array.isRequired,
-  submitSelectedHazards: PropTypes.func.isRequired, 
-}
+  submitSelectedHazards: PropTypes.func.isRequired
+};
 
 export default SelectHazardsModal;

@@ -15,6 +15,7 @@ const Person = () => {
   const { id } = useParams();
   const { skidModalState, setSkidModalState } = useSkidModal();
   const { personDataState, setPersonDataState } = usePersonData();
+  const [_account, setAccount] = useState(null);
   const navigate = useNavigate();
 
   const handleEditPerson = () => {
@@ -27,6 +28,7 @@ const Person = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // eslint-disable-next-line no-undef
         const response = await axios.get(`${process.env.REACT_APP_URL}/person/${id}`, {
           withCredentials: true
         });
@@ -42,6 +44,7 @@ const Person = () => {
             forms: data.forms,
             quals: data.quals
           }));
+          setAccount(data._account);
         } else {
           navigate('/login');
         }
@@ -75,18 +78,18 @@ const Person = () => {
         >
           Edit
         </Button>
-        <RemovePersonButton person={personDataState.person} />
+        <RemovePersonButton person={personDataState.person} _account={_account} />
       </div>
 
       <br style={{ clear: 'left' }} />
       <PersonInfoCard person={personDataState.person} />
       <br />
-      <PersonDocumentCard />
+      <PersonDocumentCard _account={_account}/>
       <br />
       <QualificationsCard person={personDataState.person} />
 
       <PersonFormAccessCard />
-      <EditPersonModal />
+      <EditPersonModal _account={_account} />
     </div>
   );
 };

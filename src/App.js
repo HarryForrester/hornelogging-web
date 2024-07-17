@@ -22,16 +22,14 @@ import { useAlertMessage } from './components/AlertMessage.js';
 import DeleteConfirmationModal from './components/Modal/DeleteConfirmationModal.jsx';
 import PrivateRoute from './components/PrivateRoute.jsx';
 import { AuthProvider } from './context/AuthContext.js';
-
+import { useAuth } from './context/AuthContext.js';
 function App() {
   pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
   const { alertMessageState, setAlertMessageState } = useAlertMessage();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [accessToken, setAccessToken] = useState(null);
-
-  useEffect(() => {
-    console.log('accessToken is: ', accessToken);
-  }, [accessToken]);
+  const [username, setUsername] = useState('');
+  const { session } = useAuth();
 
   const handleSubmit = async (username, password) => {
     console.log('handmleSumiu');
@@ -59,6 +57,7 @@ function App() {
 
         //setMessage(response.data.message);
       } */
+      setUsername(response.data.username);
       console.log('resp: ', response.data);
       setAccessToken(response.data.accessToken);
     } catch (error) {
@@ -87,7 +86,7 @@ function App() {
             path="/"
             element={
               <React.Fragment>
-                <NavBar />
+                <NavBar/>
                 <Crews />
               </React.Fragment>
             }
@@ -96,7 +95,7 @@ function App() {
             path="/person/:id"
             element={
               <React.Fragment>
-                <NavBar />
+                <NavBar/>
                 <Person />
               </React.Fragment>
             }
@@ -114,7 +113,7 @@ function App() {
             path="/hazards"
             element={
               <React.Fragment>
-                <NavBar />
+                <NavBar/>
                 <Hazards />
               </React.Fragment>
             }

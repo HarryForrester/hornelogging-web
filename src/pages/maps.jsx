@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import NavBar from '../components/NavBar/main.jsx';
 import ErrorConfirmationModal from '../components/Modal/ErrorConfirmationModal';
 import MapViewer from '../components/MapViewer.jsx';
 import UploadMapButton from '../components/Button/UploadMapButton';
@@ -11,7 +10,9 @@ import { useConfirmationModal } from '../components/ConfirmationModalContext.js'
 import { Button } from 'react-bootstrap';
 import AddSkidButton from '../components/Button/AddSkidButton.jsx';
 import { useAlertMessage } from '../components/AlertMessage.js';
-
+import { deletePresignedUrl } from '../hooks/useFileDelete.js';
+import { useSkidMarker } from '../components/SkidMarkerContext.js';
+import { SkidProvider } from '../context/SkidContext.js';
 const Maps = () => {
   const [isErrorConfirmationModalVisible, setIsErrorConfirmationModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -24,6 +25,8 @@ const Maps = () => {
   const { confirmationModalState, setConfirmationModalState } = useConfirmationModal();
   const { alertMessageState, setAlertMessageState } = useAlertMessage();
   const [showSpinner, setShowSpinner] = useState(false); // shows spinner while submitting to server
+  const [account, setAccount] = useState(null);
+  const { skidMarkerState, setSkidMarkerState } = useSkidMarker();
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -39,7 +42,7 @@ const Maps = () => {
 
         if (response.data.isLoggedIn) {
           const data = response.data;
-
+          setAccount(data._account);
           setMapState((prevState) => ({
             ...prevState,
             files: data.files,
@@ -81,10 +84,9 @@ const Maps = () => {
     const mapId = map._id;
     const mapName = map.name;
     const points = map.points;
-    console.log('Map Clicked: ', mapState);
+    const mapKey = map.map.key
 
-    const parsePoints = JSON.parse(points);
-    console.log('parsePOint: ', parsePoints);
+    const parsePoints = points;
     var pdfButtons = document.querySelectorAll('.pdf-button');
 
     pdfButtons.forEach((button) => {
@@ -99,15 +101,21 @@ const Maps = () => {
     setMapState((prevState) => ({
       ...prevState,
       currentMapId: mapId,
+      currentMapKey: mapKey,
       currentMapName: mapName,
-      currentMapMarkers: parsePoints
+      currentMapMarkers: parsePoints,
+    }));
+
+    setSkidMarkerState((prevState) => ({
+      ...prevState,
+      popoverVisible: false,
+      selectedMarker: null
     }));
 
     loadFromDB(mapName);
   };
 
   const openConfirmRemoveMap = async () => {
-    console.log('remove map');
 
     try {
       //TODO add confirm modal
@@ -119,7 +127,6 @@ const Maps = () => {
         message: `Are you sure you want to delete ${mapState.currentMapName}?`,
         confirmed: false
       }));
-      console.log('con: ', confirmationModalState);
 
       //setSkidModalState((prevState) => ({ ...prevState, isConfirmModalVisible: true }));
     } catch (err) {
@@ -148,6 +155,7 @@ const Maps = () => {
             withCredentials: true
           });
           if (resp.status === 200) {
+            await deletePresignedUrl([mapState.currentMapKey])
             setAlertMessageState((prevState) => ({
               ...prevState,
               toasts: [
@@ -235,8 +243,8 @@ const Maps = () => {
       //          navigate('/login');
       if (res.status === 200) {
         if (map.pdfData.map) {
-          const pdfBlob = new Blob([map.pdfData.map], { type: 'application/pdf' });
-          const pdfUrl = `http://localhost:3001${map.pdfData.map}`;
+          // pdfBlob = new Blob([map.pdfData.map], { type: 'application/pdf' });
+          const pdfUrl = map.pdfData.map;
 
           setMapState((prevState) => ({
             ...prevState,
@@ -258,8 +266,9 @@ const Maps = () => {
 
   // selects first map in list and calls handleMapClick to render the first map
   useEffect(() => {
-    if (mapState.maps.length > 0) {
-      const firstMap = mapState.maps[0];
+    const length = mapState.maps.length
+    if (length > 0) {
+      const firstMap = mapState.maps[length-1];
       handleMapClick(firstMap);
     } else {
       setShowAddPoint(false);
@@ -292,7 +301,7 @@ const Maps = () => {
                 </Button>
               )}
 
-              <UploadMapButton />
+              <UploadMapButton _account={account} />
 
               {isErrorConfirmationModalVisible && (
                 <ErrorConfirmationModal
@@ -324,7 +333,9 @@ const Maps = () => {
           </div>
         </div>
         <div ref={pdfContainerRef} id="pdf-container" className="pdf-container">
-          <MapViewer percentage={percentage} />
+          <SkidProvider>
+          <MapViewer percentage={percentage} _account={account} />
+          </SkidProvider>
         </div>
       </div>
     </>

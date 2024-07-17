@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -8,6 +9,8 @@ import { Button, Container } from 'react-bootstrap';
 import UploadLibraryDocumentModal from '../components/Modal/UploadLibraryDocumentModal';
 import { Card, ListGroup } from 'react-bootstrap';
 import { useAlertMessage } from '../components/AlertMessage';
+import { createHandleDownloadClick } from '../hooks/useFileDownload';
+import { deletePresignedUrl } from '../hooks/useFileDelete';
 const Library = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [files, setFiles] = useState([]);
@@ -15,7 +18,7 @@ const Library = () => {
   const [fileTypes, setFileTypes] = useState([]);
   const [isUploadFileModalVisible, setUploadFileModalVisible] = useState(false);
   const { alertMessageState, setAlertMessageState } = useAlertMessage();
-
+  const [_account, setAccount] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,6 +33,7 @@ const Library = () => {
           setUsername(response.data.username);
           setFileTypes(response.data.doc);
           setFiles(response.data.files);
+          setAccount(response.data._account);
           console.log('little cat hi there: ', response.data.doc);
         } else {
           navigate('/login');
@@ -81,20 +85,21 @@ const Library = () => {
     // Update state or perform any necessary actions after updating the file type
   };
 
-  const handleFileDelete = async (fileName, fileId) => {
+  const handleFileDelete = async (file) => {
     const id = new Date().getTime();
 
-    const userConfirmed = window.confirm('Are you sure you want to remove file: ' + fileName);
+    const userConfirmed = window.confirm('Are you sure you want to remove file: ' + file.fileName);
     if (userConfirmed) {
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_URL}/library/deletefile/${fileId}`,
+          `${process.env.REACT_APP_URL}/library/deletefile/${file._id}`,
           {
             withCredentials: true
           }
         );
 
         if (response.status === 200) {
+          await deletePresignedUrl([file.key])
           setFiles(response.data.files);
 
           setAlertMessageState((prevState) => ({
@@ -105,7 +110,7 @@ const Library = () => {
                 id: id,
                 heading: 'Library Document Removed',
                 show: true,
-                message: `Success! ${fileName} has been removed from library documents `,
+                message: `Success! ${file.fileName} has been removed from library documents `,
                 background: 'success',
                 color: 'white'
               }
@@ -171,6 +176,7 @@ const Library = () => {
               close={() => setUploadFileModalVisible(false)}
               docTypes={fileTypes}
               updateLibraryFiles={updateLibraryFiles}
+              _account={_account}
             />
 
             <Button onClick={() => setUploadFileModalVisible(true)} className="mb-3 w-100">
@@ -193,7 +199,7 @@ const Library = () => {
                         <div className="d-flex">
                           {/* View */}
                           <a
-                            href={process.env.REACT_APP_URL + file.uri}
+                            href={file.fileUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="btn btn-outline-secondary btn-sm text-decoration-none me-2"
@@ -203,10 +209,8 @@ const Library = () => {
                           </a>
                           {/* Download */}
                           <a
-                            href={`${process.env.REACT_APP_URL}${file.uri}?download=true`}
-                            download={file.fileName}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                            href="#"
+                            onClick={createHandleDownloadClick(file)}
                             className="btn btn-outline-secondary btn-sm text-decoration-none me-2"
                           >
                             <FontAwesomeIcon icon={faDownload} className="me-1" />
@@ -218,7 +222,7 @@ const Library = () => {
                       <Button
                         variant="danger"
                         size="sm"
-                        onClick={() => handleFileDelete(file.fileName, file._id)}
+                        onClick={() => handleFileDelete(file)}
                       >
                         <FontAwesomeIcon icon={faTrash} className="me-1" />
                         Delete

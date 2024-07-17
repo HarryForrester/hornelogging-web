@@ -16,16 +16,20 @@ import EditGeneralHazardModal from './Modal/EditGeneralHazardsModal';
 import SkidMarkerPopover from './Popover/SkidMarkerPopover';
 import SkidMarkerCrewPopover from './Popover/SkidMarkerCrewPopover';
 import SkidMarkerPersonPopover from './Popover/SkidMarkerPersonPopover';
-
-const PDFViewer = ({ hazards, percentage }) => {
-  const [pdfData, setPdfData] = useState(null);
+import Spinner from 'react-bootstrap/Spinner';
+import { useSkid } from '../context/SkidContext';
+const PDFViewer = ({ percentage, _account }) => {
+  //const [pdfData, setPdfData] = useState(null);
   const { skidModalState, setSkidModalState } = useSkidModal();
   const { skidMarkerState, setSkidMarkerState } = useSkidMarker();
   const { mapState, setMapState } = useMap();
+  const { skidState, setSkidState } = useSkid();
   const { alertMessageState, setAlertMessageState } = useAlertMessage();
   const [tempHazards, setTempHazards] = useState([]);
   const [pdfSize, setPdfSize] = useState({ width: 0, height: 0 });
   const pdfContainerRef = useRef();
+  const [pdf, setPdf] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   /**
    * Handles the mouse move even when user is adding a point to a pdf
@@ -48,56 +52,85 @@ const PDFViewer = ({ hazards, percentage }) => {
    * This function opens the add skid modal
    */
   const addPointToPDF = () => {
+    setSkidState((prevState) => ({
+      ...prevState,
+      skidModalVisible: true,
+    }))
     setSkidModalState((prevState) => ({
       ...prevState,
-      isSkidModalVisible: true,
-      isSkidModalEdit: false
+      //isSkidModalVisible: true,
+      isSkidModalEdit: false,
+      isSkidModalAdd: true
     }));
   };
 
   /**
    * Handles the clicked skid point when a user clicks the marker
-   * This function opens and the skid modal where the clicked point is
+   * This function opens and the skid modal where the clicked point ish
    * @param {*} clickedPoint
    */
   const handleMarkerClick = async (clickedPoint) => {
-    if (skidMarkerState.selectedMarker === clickedPoint) {
+    const { formik } = skidState;
+
+    console.log('Marker clicked', clickedPoint)
+    // if the clicked marker is already visible then hide it
+    if (skidState.selectedSkidId === clickedPoint._id) {
+      console.log('ook')
       setSkidMarkerState((prevState) => ({
         ...prevState,
         popoverVisible: !prevState.popoverVisible
       }));
     } else {
-      // If it's a different point, close the popover and then open it for the new point
-      setSkidMarkerState((prevState) => ({
-        ...prevState,
-        popoverVisible: false
-      }));
-
-      try {
-        const response = await axios.get('http://localhost:3001/findhazard', {
-          params: {
-            name: clickedPoint.info.siteHazards.join(',') // Convert the array to a comma-separated string
-          },
-          withCredentials: true
-        });
-
-        setSkidMarkerState((prevState) => ({
-          ...prevState,
-          selectedMarkerSiteHazards: response.data
-        }));
-      } catch (error) {
-        console.error('Error fetching hazard data:', error);
-      }
+      // If it's a different point, close the existing popover and then open it for the new popovers
       setSkidMarkerState((prevState) => ({
         ...prevState,
         popoverVisible: true
       }));
+
+      setSkidState((prevState) => ({
+        ...prevState,
+        selectedSkidId: clickedPoint._id,
+        selectedSkidPos: {x: clickedPoint.point.x, y: clickedPoint.point.y},
+        formik: {
+          ...formik,
+          values: {
+            skidName: clickedPoint.info.pointName,
+            selectedCrew: clickedPoint.info.crews,
+            selectedDocuments: clickedPoint.info.selectedDocuments,
+            selectedCutPlan: clickedPoint.info.cutPlans,
+            siteHazards: clickedPoint.info.siteHazards
+          }
+        }
+      }))
+      // if siteHazards in not emtpy
+      /* if (clickedPoint.info.siteHazards.length > 0) {
+        try {
+          const response = await axios.get('http://localhost:3001/findhazard', {
+            params: {
+              name: clickedPoint.info.siteHazards.join(',') // Convert the array to a comma-separated string
+            },
+            withCredentials: true
+          });
+  
+          setSkidMarkerState((prevState) => ({
+            ...prevState,
+            selectedSkidHazardsData: response.data
+          }));
+        } catch (error) {
+          console.error('Error fetching hazard data:', error);
+        }
+        setSkidMarkerState((prevState) => ({
+          ...prevState,
+          popoverVisible: true
+        }));
+      } */
+      
     }
 
-    setSkidMarkerState((prevState) => ({
+   /*  setSkidMarkerState((prevState) => ({
       ...prevState,
       selectedMarker: clickedPoint
-    }));
+    })); */
   };
 
   /**
@@ -122,7 +155,32 @@ const PDFViewer = ({ hazards, percentage }) => {
    * @returns {void}
    */
   const submitCutPlan = (fileName, selectedFile) => {
-    const reader = new FileReader();
+    const formik = skidState.formik;
+
+    const tempFile = new File([selectedFile], fileName, {
+      type: selectedFile.type,
+      lastModified: selectedFile.lastModified
+    });
+
+    setSkidState((prevState) => ({
+      ...prevState,
+      formik: {
+        ...prevState.formik,
+        values: {
+          ...formik.values,
+          selectedCutPlan: tempFile
+        }
+        // You may need to update touched and errors as well if applicable
+      }
+    }));
+
+    setSkidModalState((prevState) => ({
+      ...prevState,
+      isAddDocModalVisible: false,
+      isSkidModalVisible: true,
+      selectedCutPlan: tempFile
+    }));
+    /* const reader = new FileReader();
     reader.onload = () => {
       const base64String = reader.result.substring('data:application/pdf;base64,'.length);
       setSkidModalState((prevState) => ({
@@ -141,7 +199,7 @@ const PDFViewer = ({ hazards, percentage }) => {
       console.warn('File reading aborted');
     };
 
-    reader.readAsDataURL(selectedFile);
+    reader.readAsDataURL(selectedFile); */
   };
 
   const submitSelectedHazards = async (selectedHazards) => {
@@ -178,19 +236,15 @@ const PDFViewer = ({ hazards, percentage }) => {
         } else {
           //setSkidModalState((prevState) => ({ ...prevState, isSelectHazardModalVisible: false, isSkidModalVisible: true, selectedSkidHazards: selectedHazards, selectedSkidHazardsData: response.data }));
           setSkidModalState((prevState) => {
-            const existingIds = prevState.selectedSkidHazardsData.map((hazard) => hazard.id);
+            const existingIds = prevState.selectedSkidHazardsData.map((hazard) => hazard._id);
             const newData = response.data.filter(
-              (newHazard) => !existingIds.includes(newHazard.id)
+              (newHazard) => !existingIds.includes(newHazard._id)
             );
-            console.log('exisinfIds: ', existingIds);
-            console.log('newData:', newData);
-            console.log('selectHazaaa', selectedHazards);
-
             return {
               ...prevState,
               isSelectHazardModalVisible: false,
               isSkidModalVisible: true,
-              selectedSkidHazards: [existingIds, selectedHazards],
+              selectedSkidHazards: [...existingIds, ...selectedHazards],
               selectedSkidHazardsData: [...prevState.selectedSkidHazardsData, ...newData]
             };
           });
@@ -219,10 +273,13 @@ const PDFViewer = ({ hazards, percentage }) => {
     const id = new Date().getTime();
 
     const updatedGeneralHazards = [
-      ...mapState.generalHazards,
-      ...tempHazards.map((hazard) => hazard.id),
-      ...mapState.generalHazardsData.map((hazard) => hazard.id)
+      ...new Set([
+        ...mapState.generalHazards,
+        ...tempHazards.map(hazard => hazard._id),
+        ...mapState.generalHazardsData.map(hazard => hazard._id)
+      ])
     ];
+    
     try {
       const resp = await axios.post(
         'http://localhost:3001/submitGeneralHazards',
@@ -286,22 +343,10 @@ const PDFViewer = ({ hazards, percentage }) => {
   };
 
   useEffect(() => {
-    const fetchPdfData = async () => {
+     const fetchPdfData = async () => {
       try {
         if (mapState.currentMapUrl) {
-          console.log('current MAP URL: ' + mapState.currentMapUrl);
-          const response = await axios.get(mapState.currentMapUrl, {
-            responseType: 'arraybuffer', // Set the responseType to 'arraybuffer' for binary data
-            withCredentials: true // Include credentials (cookies) in the request
-          });
-
-          if (response.status !== 200) {
-            throw new Error(`Error loading PDF: ${response.statusText}`);
-          }
-
-          // Convert the arraybuffer to a Blob
-          const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
-          setPdfData(pdfBlob);
+          setPdf(mapState.currentMapUrl)
         }
       } catch (error) {
         console.error('Error fetching PDF data:', error);
@@ -386,40 +431,74 @@ const PDFViewer = ({ hazards, percentage }) => {
   }, [mapState.maps]);
    */
 
-  // Use useEffect to get the width and height after the component has mounted
+  /* // Use useEffect to get the width and height after the component has mounted
   useEffect(() => {
     if (pdfContainerRef.current) {
-      console.log('pdf: ', pdfContainerRef);
       const width = pdfContainerRef.current.offsetWidth;
       const height = pdfContainerRef.current.offsetHeight;
 
       // Do something with the width and height values, such as logging them
-      console.log('Width:', width, 'Height:', height);
     }
   }, [mapState]);
+ */
+  /* useEffect(() => {
+    const getGeneralHazards = async () => {
+      // eslint-disable-next-line no-undef
+      const response = await axios.get(`${process.env.REACT_APP_URL}/getGeneralHazards`, {withCredentials: true});
+
+      console.log("response for general hazards: ", response.data.hazards);
+
+      const tempGenHaz = mapState.hazards.filter(hazard => 
+        response.data.hazards.hazards.includes(hazard._id)
+      );
+            console.log("temGenHaz", tempGenHaz);
+
+            setMapState((prevState) => ({
+              ...prevState,
+              generalHazardsData: tempGenHaz
+            }));
+    }
+    getGeneralHazards();
+  }, []); */
 
   return (
     <>
-      <AddOrEditSkidModal
-        mousePosition={skidMarkerState.mousePosition}
-        editSkid={skidMarkerState.editSkid}
-      />
+      
       <AddDocModal docSumbit={submitDoc} />
       <AddCutPlanModal submitCutPlan={submitCutPlan} />
-      <SelectHazardsModal hazards={hazards} submitSelectedHazards={submitSelectedHazards} />
+      <SelectHazardsModal submitSelectedHazards={submitSelectedHazards} />
       <HazardModal />
+     
       <EditGeneralHazardModal
         submitGeneralHazardModal={submitGeneralHazardModal}
         handleClose={handleClose}
       />
+ <AddOrEditSkidModal
+        mousePosition={skidMarkerState.mousePosition}
+        editSkid={skidMarkerState.editSkid}
+        _account={_account}
+      />
+      
+                  {loading && <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: '80vh'
+            }}
+          >
+            <h2 style={{ textAlign: 'center', color: '#555', fontSize: '24px' }}>
+              <Spinner animation='border' role='status' />
+            </h2>
+          </div>}
 
-      {percentage >= 100 ? (
-        pdfData && mapState.currentMapName ? (
+      {percentage <= 100 ? (
+        mapState.currentMapName ? (
           <div
             id="pdf-container"
             style={{
-              width: pdfSize.width,
-              height: pdfSize.height,
+              //width: pdfSize.width,
+              //height: pdfSize.height,
               border: '2px solid #000',
               borderRadius: '8px',
               boxShadow: '0px 0px 10px rgba(0,0,0,0.2)',
@@ -430,17 +509,21 @@ const PDFViewer = ({ hazards, percentage }) => {
               transform: 'translate(-50%, 0%)'
             }}
           >
-            <Document file={pdfData} onMouseMove={handleMouseMove}>
+            <Document file={pdf} onMouseMove={handleMouseMove} onLoadSuccess={() => setLoading(false)}>
               <Page
                 pageNumber={1}
                 renderMode="canvas"
                 renderTextLayer={false}
                 renderAnnotationLayer={false}
-                width={mapState.originalWidth}
+                //width={mapState.originalWidth}
+                //height={mapState.originalHeight}
                 onLoadSuccess={(page) => {
                   const { width, height } = page;
-                  //console.log("width: " + width + " height: " + height)
-                  setMapState((prevState) => ({...prevState, originalWidth: width, originalHeight: height}))
+                  setMapState((prevState) => ({
+                    ...prevState,
+                    originalWidth: width,
+                    originalHeight: height
+                  }));
                   setPdfSize({ width, height });
                 }}
               />
@@ -453,8 +536,8 @@ const PDFViewer = ({ hazards, percentage }) => {
                   position: 'absolute',
                   left: `${skidMarkerState.mousePosition.x}px`,
                   top: `${skidMarkerState.mousePosition.y}px`,
-                  width: '10px',
-                  height: '10px',
+                  width: '20px',
+                  height: '20px',
                   backgroundColor: 'red',
                   transform: 'translate(-50%, -50%)' // Center the marker on the mouse position
                 }}
@@ -464,7 +547,7 @@ const PDFViewer = ({ hazards, percentage }) => {
               ></div>
             )}
             {/* Renders map of markers onto map */}
-            {mapState.currentMapMarkers.map((point, index) => (
+            {Array.isArray(mapState.currentMapMarkers) && mapState.currentMapMarkers.map((point, index) => (
               <div
                 key={index}
                 className="red-dot"
@@ -472,10 +555,10 @@ const PDFViewer = ({ hazards, percentage }) => {
                   position: 'absolute',
                   left: `${point.point.x}px`,
                   top: `${point.point.y}px`,
-                  width: '10px',
-                  height: '10px',
+                  width: '20px',
+                  height: '20px',
                   backgroundColor: 'red',
-                  transform: 'translate(-50%, -50%)'
+                  transform: 'translate(-50%, -50%)',
                 }}
                 onClick={() => handleMarkerClick(point)}
                 data-bs-toggle="popover"
@@ -485,9 +568,7 @@ const PDFViewer = ({ hazards, percentage }) => {
               ></div>
             ))}
 
-            <SkidMarkerPopover />
-            <SkidMarkerCrewPopover />
-            <SkidMarkerPersonPopover />
+    
           </div>
         ) : (
           <div
@@ -520,15 +601,20 @@ const PDFViewer = ({ hazards, percentage }) => {
               className="mt-2"
             />
           )}
+          
         </div>
+        
       )}
+              <SkidMarkerPopover />
+            <SkidMarkerCrewPopover />
+            <SkidMarkerPersonPopover />
     </>
   );
 };
 
 PDFViewer.propTypes = {
-  hazards: PropTypes.array.isRequired,
-  percentage: PropTypes.number.isRequired
+  percentage: PropTypes.number.isRequired,
+  _account: PropTypes.any,
 };
 
 export default PDFViewer;

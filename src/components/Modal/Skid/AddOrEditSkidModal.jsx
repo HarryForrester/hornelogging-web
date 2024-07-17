@@ -9,14 +9,24 @@ import { Anchor, ListGroup, ListGroupItem, Spinner } from 'react-bootstrap';
 import { useAlertMessage } from '../../AlertMessage';
 import { useSkidMarker } from '../../SkidMarkerContext';
 import PropTypes from 'prop-types';
-
-const AddOrEditSkidModal = ({ mousePosition, editSkid, resetMarker }) => {
+import { getPresignedUrl, uploadToPresignedUrl } from '../../../hooks/useFileUpload';
+import { Formik,useFormik } from 'formik';
+import * as Yup from 'yup';
+import { useSkid } from '../../../context/SkidContext';
+const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
   const { skidModalState, setSkidModalState } = useSkidModal();
+  const { skidState, setSkidState } = useSkid(); //holds the information for formik when opening and closing modals to add files, hazards, cutplans to skid
   const { mapState, setMapState } = useMap();
   const { alertMessageState, setAlertMessageState } = useAlertMessage();
   const { skidMarkerState, setSkidMarkerState } = useSkidMarker();
   const [showSpinner, setShowSpinner] = useState(false); // shows spinner while submitting to server
+  const [previewUrl, setPreviewUrl] = useState('');
 
+  const [formikState, setFormikState] = useState(null);
+  const getFilePathFromUrl = (url) => {
+    const urlObject = new URL(url);
+    return `${urlObject.origin}${urlObject.pathname}`;
+  };
   const resetAddSkidModal = () => {
     //resetMarker();
     handleClose();
@@ -33,21 +43,34 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, resetMarker }) => {
     setSkidModalState((prevState) => ({ ...prevState, isSkidModalVisible: false }));
   };
 
-  const submitSkidModal = async () => {
+  const submitSkidModal = async (values) => {
     const id = new Date().getTime();
-
-    console.log('submitted selectedSkidHazards: ', skidModalState.selectedSkidHazards);
+    const selectedFile = values.selectedCutPlan;
+    console.log('submitted selectedSkidHazards: ', selectedFile);
 
     setShowSpinner(true);
+    var cutPlans;
+    if(selectedFile && selectedFile.name) {
+      const [presignedUrl, key] = await getPresignedUrl(`${_account}/maps/skids`, selectedFile.type);
+      const filePath = getFilePathFromUrl(presignedUrl);
+      console.log('filepath of the file', filePath);
+      console.log('the key', key);
+      await uploadToPresignedUrl(presignedUrl, selectedFile, selectedFile.type);
+      cutPlans = {fileName: selectedFile.name, url: filePath, key: key};
+    } else {
+      cutPlans =  values.selectedCutPlan
+    }
+      console.log('cutplans', cutPlans);
+
     const skidObj = {
       _id: skidModalState._id,
       mapName: mapState.currentMapName,
       info: {
-        crews: skidModalState.selectedCrew,
-        cutPlans: skidModalState.selectedCutPlan,
-        pointName: skidModalState.skidName,
-        selectedDocuments: skidModalState.selectedDocuments,
-        siteHazards: skidModalState.selectedSkidHazards //TODO: need to change hazardData to siteHazards
+        crews: values.selectedCrew,
+        cutPlans: cutPlans,
+        pointName: values.skidName,
+        selectedDocuments: values.selectedDocuments,
+        siteHazards: values.selectedSkidHazards //TODO: need to change hazardData to siteHazards
       },
       point: {
         originalWidth: mapState.originalWidth,
@@ -59,6 +82,8 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, resetMarker }) => {
       }
     };
 
+    console.log("hello there harry: ", skidObj.info.siteHazards);
+
     try {
       if (editSkid) {
         const resp = await axios.post('http://localhost:3001/update-pdf-point-object', skidObj, {
@@ -66,15 +91,16 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, resetMarker }) => {
         });
 
         if (resp.status === 200) {
+          console.log("hello there u cunt", resp.data);
           setMapState((prevState) => {
             const existingIndex = prevState.currentMapMarkers.findIndex(
-              (marker) => marker._id === skidObj._id
+              (marker) => marker._id === resp.data._id
             );
 
             if (existingIndex !== -1) {
               // If the marker with the same _id exists, update it
               const updatedMarkers = [...prevState.currentMapMarkers];
-              updatedMarkers[existingIndex] = skidObj;
+              updatedMarkers[existingIndex] = resp.data;
 
               return {
                 ...prevState,
@@ -84,7 +110,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, resetMarker }) => {
               // If the marker with the same _id does not exist, add it
               return {
                 ...prevState,
-                currentMapMarkers: [...prevState.currentMapMarkers, skidObj]
+                currentMapMarkers: [...prevState.currentMapMarkers, resp.data]
               };
             }
           });
@@ -105,6 +131,11 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, resetMarker }) => {
           }));
 
           resetAddSkidModal();
+          setSkidModalState((prevState) => ({
+            ...prevState,
+            isSkidModalEdit: false,
+            isSkidModalAdd: false
+          }))
         }
       } else {
         await axios
@@ -125,6 +156,11 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, resetMarker }) => {
               });
 
               resetAddSkidModal();
+              setSkidModalState((prevState) => ({
+                ...prevState,
+                isSkidModalEdit: false,
+                isSkidModalAdd: false
+              }))
 
               setAlertMessageState((prevState) => ({
                 ...prevState,
@@ -143,10 +179,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, resetMarker }) => {
             }
           });
 
-        /*
-         */
-
-        // Set success state to true on successful post
+        
       }
 
       console.log('currentMapMarekrs: ', mapState.currentMapMarkers);
@@ -175,11 +208,17 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, resetMarker }) => {
           toasts: prevState.toasts.filter((toast) => toast.id !== id)
         }));
       }, 10000);
-    }
+    } 
   };
 
   const handleClose = () => {
-    setSkidModalState((prevState) => ({
+    setSkidState((prevState) => ({
+      ...prevState,
+      formik: null,
+      skidModalVisible: false,
+      docModalVisible: false
+    }))
+    /* setSkidModalState((prevState) => ({
       ...prevState,
       _id: null,
       isSkidModalVisible: false,
@@ -188,26 +227,44 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, resetMarker }) => {
       isSelectHazardModalVisible: false,
       hazardModalVisible: false,
       selectedDocuments: [],
-      selectedCutPlan: [],
+      selectedCutPlan: null,
       skidName: '',
       selectedCrew: [],
       selectedSkidHazards: [],
       selectedSkidHazardsData: [],
       selectedHazardData: {}
-    }));
+    })); */
   };
 
+  
   /**
    * Opens the Add Document Modal and hides the Skid Modal by updating the state.
    * @function openDocModal
    * @returns {void}
    */
-  const openDocModal = () => {
-    setSkidModalState((prevState) => ({
+  const openDocModal = (formik) => {
+    console.log('openDocModal called', formik);
+    setSkidState((prevState) => ({
       ...prevState,
-      isAddDocModalVisible: true,
-      isSkidModalVisible: false
-    }));
+      formik: {
+        values: formik.values,
+        touched: formik.touched,
+        errors: formik.errors,
+      },
+      skidModalVisible: false, // hide add/edit skid modal
+      docModalVisible: true, // show doc modal 
+    }))
+    /* setFormikState({
+      values: formik.values,
+      touched: formik.touched,
+      errors: formik.errors,
+    }); */
+
+    /* setSkidModalState((prevState) => ({
+      ...prevState,
+      isSkidModalVisible: false,
+      isAddDocModalVisible: true
+    }));    */
   };
 
   /**
@@ -215,12 +272,22 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, resetMarker }) => {
    * @function openCutPlanModal
    * @returns {void}
    */
-  const openCutPlanModal = () => {
-    setSkidModalState((prevState) => ({
+  const openCutPlanModal = (formik) => {
+    /* setSkidModalState((prevState) => ({
       ...prevState,
       isAddCutPlanModalVisible: true,
       isSkidModalVisible: false
-    }));
+    })); */
+    setSkidState((prevState) => ({
+      ...prevState,
+      formik: {
+        values: formik.values,
+        touched: formik.touched,
+        errors: formik.errors,
+      },
+      skidModalVisible: false, // hide add/edit skid modal
+      cutPlanModalVisible: true, // show doc modal 
+    }))
   };
 
   /**
@@ -228,14 +295,24 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, resetMarker }) => {
    * @function openDocModal
    * @returns {void}
    */
-  const openSelectHazardModal = () => {
+  const openSelectHazardModal = (formik) => {
     setSkidModalState((prevState) => ({
       ...prevState,
       isSkidModalEdit: false,
-      isSelectHazardModalVisible: true,
-      isSkidModalVisible: false,
+      //isSelectHazardModalVisible: true,
+      //isSkidModalVisible: false,
       isSelectHazardsGeneral: false // SelectHazardsModal label will be Add Hazards
     }));
+    setSkidState((prevState) => ({
+      ...prevState,
+      formik: {
+        values: formik.values,
+        touched: formik.touched,
+        errors: formik.errors,
+      },
+      skidModalVisible: false, // hide add/edit skid modal
+      selectHazardModalVisible: true, // show doc modal 
+    }))
   };
 
   /**
@@ -243,17 +320,11 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, resetMarker }) => {
    * @param {File} file - The file that needs to be removed.
    * @returns {void}
    */
-  const removeSkidDoc = (file) => {
-    setSkidModalState((prevState) => {
-      const updatedDocs = prevState.selectedDocuments.filter((doc) => doc._id !== file._id);
-
-      return {
-        ...prevState,
-        selectedDocuments: updatedDocs
-      };
-    });
+  const removeSkidDoc = (file, formik) => {
+    const updatedDocs = formik.values.selectedDocuments.filter((doc) => doc !== file._id);
+    formik.setFieldValue('selectedDocuments', updatedDocs);
   };
-
+  
   /**
    * Handles the removal of a skid hazard from the selected skid hazards list.
    * @param {*} event - event of the button click
@@ -261,22 +332,37 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, resetMarker }) => {
    */
   const removeSkidHazard = (event, hazardToRemove) => {
     event.stopPropagation();
-
+    console.log('hazard tobe removed', skidModalState.selectedSkidHazards)
     setSkidModalState((prevState) => {
-      const updatedHazards = prevState.selectedSkidHazards.filter(
-        (hazard) => hazard.id !== hazardToRemove
+      const updatedHazards = prevState.selectedSkidHazardsData.filter(
+        (hazard) => hazard._id!== hazardToRemove
       );
+      console.log('ytda', updatedHazards);
+
+      const hazardsIds = updatedHazards.map(hazard => hazard._id);
+
       return {
         ...prevState,
-        selectedSkidHazards: updatedHazards
+        selectedSkidHazardsData: updatedHazards,
+        selectedSkidHazards: hazardsIds
       };
     });
   };
 
+  
+
   //Used for viewing pdf in a new tab - Add/Edit Skid Cut Plan Viewer
   const openPdfInNewTab = (item) => {
-    // Remove "data:" URL prefix if present
-    const cleanBase64String = item.base64String.replace(/data:.*;base64,/, '');
+    if (item instanceof File) {
+      console.log('openPDFinnewTab', item);
+      const fileURL = URL.createObjectURL(item);
+      window.open(fileURL, '_blank');
+    } else {
+      window.open(item.url, '_blank');
+
+    }
+    
+    /* const cleanBase64String = item.base64String.replace(/data:.*;base64,/, '');
 
     const byteCharacters = atob(cleanBase64String);
     const byteArrays = [];
@@ -296,13 +382,14 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, resetMarker }) => {
     const blob = new Blob(byteArrays, { type: 'application/pdf' });
     const objectUrl = URL.createObjectURL(blob);
 
-    window.open(objectUrl, '_blank');
+    window.open(objectUrl, '_blank'); */
   };
 
   const handleHazardClick = (hazard) => {
     setSkidModalState((prevState) => ({
       ...prevState,
       hazardModalVisible: true,
+      isSkidModalVisible: false,
       selectedHazardData: hazard
     }));
   };
@@ -314,99 +401,141 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, resetMarker }) => {
   } else {
     name = 'Add';
   }
+  const form = skidState?.formik?.values;
+  const initValues = {
+              skidName: form?.skidName || '',
+              selectedCrew: form?.selectedCrew || [],
+              selectedDocuments: form?.selectedDocuments || [],
+              selectedCutPlan: form?.selectedCutPlan || null,
+              selectedSkidHazards: form?.selectedSkidHazards || [],
+            }
 
   return (
     <>
       <Modal
-        style={{ zIndex: 9999 }}
-        show={skidModalState.isSkidModalVisible}
+        show={skidState.skidModalVisible}
         onHide={handleClose}
         backdrop="static"
+        
       >
         <Modal.Header closeButton>
           <Modal.Title>{name} Skid</Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
-          <Form id="add-skid-form" className="row g-3">
-            <Form.Group className="col-md-12">
-              <Form.Label>Add Skid name:</Form.Label>
-              <Form.Control
-                type="text"
-                className="form-control"
-                placeholder="Enter Skid Name"
-                title="Map Name"
-                id="mapname-input"
-                value={skidModalState.skidName}
-                onChange={(e) =>
-                  setSkidModalState((prevState) => ({ ...prevState, skidName: e.target.value }))
-                }
-              />
-            </Form.Group>
-            <Form.Group className="col-md-12">
-              <Form.Label className="form-label">Select Crew</Form.Label>
-              <Form.Group id="crew-checkboxes" className="d-flex justify-content-center">
-                {mapState.crewTypes.map((crewMember) => (
-                  <Form.Group className="form-check form-check-inline" key={crewMember}>
-                    <Form.Control
-                      className="form-check-input crew-checkbox"
-                      type="checkbox"
-                      id={crewMember}
-                      value={crewMember}
-                      checked={skidModalState.selectedCrew.includes(crewMember)}
-                      onChange={(e) => {
-                        const updatedCrew = e.target.checked
-                          ? [...skidModalState.selectedCrew, crewMember]
-                          : skidModalState.selectedCrew.filter((name) => name !== crewMember);
-                        setSkidModalState((prevState) => ({
-                          ...prevState,
-                          selectedCrew: updatedCrew
-                        }));
-                      }}
-                    />
-                    <Form.Label className="form-check-label" htmlFor={crewMember}>
-                      {crewMember}
-                    </Form.Label>
-                  </Form.Group>
-                ))}
-              </Form.Group>
-            </Form.Group>
-            <Form.Group className="col-md-12">
-              <Form.Label htmlFor="siteDocs" className="form-label">
-                Site Documents
-              </Form.Label>
-              <Form.Group className="input-group">
-                <Button
-                  type="button"
-                  id="siteDocs"
-                  className="btn btn-secondary btn-block"
-                  onClick={openDocModal}
-                >
-                  Add Document
-                </Button>
-              </Form.Group>
-            </Form.Group>
+          <Formik
+          
+          initialValues={formikState ? formikState.values : initValues}
 
-            <Form.Group className="col-md-12">
-              <ListGroup className="doc-list list-group list-group-flush">
-                {skidModalState.selectedDocuments.map((file) => (
+            /* validationSchema={Yup.object({
+              skidName: Yup.string()
+                .max(15, 'Must be 15 characters or less')
+                .required('Required'),
+              selectedCrew: Yup.array().min(1, 'At least one crew member is required'),
+
+            })} */
+            onSubmit={values => {
+              console.log(values);
+              //console.log("ahha bro", skidModalState)
+              submitSkidModal(values);
+            }}
+          >
+            {formik => (
+              <Form id="add-skid-form" className="row g-3">
+              <Form.Group className="col-md-12">
+                <Form.Label>Add Skid name:</Form.Label>
+                <Form.Control
+                  type="text"
+                  id="skidName"
+                  {...formik.getFieldProps('skidName')}
+                  isInvalid={formik.touched.skidName && formik.errors.skidName}
+                  />
+                {
+                  formik.touched.skidName && formik.errors.skidName ? (
+                    <div className="invalid-feedback d-block">{formik.errors.skidName}</div>
+                  ) : null
+                }
+
+              </Form.Group>
+
+              <Form.Group className="col-md-12">
+                <Form.Label className="form-label">Select Crew</Form.Label>
+                <Form.Group id="crew-checkboxes" className="d-flex justify-content-center">
+                  {mapState.crewTypes.map((crewMember) => (
+                    <Form.Group className="form-check form-check-inline" key={crewMember}>
+                      <Form.Check
+                        className="mb-2"
+                        type="checkbox"
+                        id={crewMember}
+                        value={crewMember}
+                        checked={formik.values.selectedCrew.includes(crewMember)}
+                        onChange={(e) => {
+                          const updatedCrew = e.target.checked
+                            ? [...formik.values.selectedCrew, crewMember]
+                            : formik.values.selectedCrew.filter((name) => name !== crewMember);
+                          formik.setFieldValue('selectedCrew', updatedCrew);
+                        }}
+                        isInvalid={formik.touched.selectedCrew && formik.errors.selectedCrew}
+                      />
+                      <Form.Label className="form-check-label" htmlFor={crewMember}>
+                        {crewMember}
+                      </Form.Label>
+                    </Form.Group>
+                  ))}
+                </Form.Group>
+                {
+                  formik.touched.skidName && formik.errors.skidName ? (
+                    <div className="invalid-feedback d-block">{formik.errors.selectedCrew}</div>
+                  ) : null
+                }
+              </Form.Group>
+
+              <Form.Group className="col-md-12">
+                <Form.Label htmlFor="siteDocs" className="form-label">
+                  Site Documents
+                </Form.Label>
+                <Form.Group className="input-group">
+                  <Button
+                    type="button"
+                    id="siteDocs"
+                    className="btn btn-secondary btn-block"
+                    onClick={() => openDocModal(formik)}
+                  >
+                    Add Document
+                  </Button>
+                </Form.Group>
+              </Form.Group>
+
+              <Form.Group>
+              <ListGroup className="doc-list list-group">
+              {formik.values.selectedDocuments
+                .map(id => mapState.files.find(file => file._id === id))
+                .filter(file => file)
+                .map(file => (
                   <ListGroupItem
                     key={file._id}
                     className="list-group-item d-flex justify-content-between align-items-center"
                   >
                     <Anchor
                       key={`${file._id}-link`}
-                      href={process.env.REACT_APP_URL + file.uri}
+                      href={file.fileUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-decoration-none"
+                      style={{
+                        maxWidth: '300px',
+                        display: 'inline-block',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis'
+                      }}
                     >
                       {file.fileName}
                     </Anchor>
                     <Button
                       type="button"
                       className="btn btn-danger btn-sm"
-                      onClick={() => removeSkidDoc(file)}
+                      onClick={() => removeSkidDoc(file, formik)}
                     >
                       Remove
                     </Button>
@@ -424,7 +553,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, resetMarker }) => {
                   type="button"
                   id="siteCutPlan"
                   className="btn btn-secondary btn-block"
-                  onClick={openCutPlanModal}
+                  onClick={() => openCutPlanModal(formik)}
                 >
                   Add Cut Plan
                 </Button>
@@ -432,22 +561,16 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, resetMarker }) => {
             </Form.Group>
 
             <Form.Group className="col-md-12">
-              <ListGroup className="cutplan-list list-group list-group-flush">
-                {skidModalState.selectedCutPlan !== null && (
-                  <ListGroup
-                    className="list-group"
-                    style={{ maxHeight: '100px', overflowY: 'auto' }}
-                  >
-                    {skidModalState.selectedCutPlan.map((item, index) => (
-                      <ListGroupItem
-                        key={index}
-                        className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
-                        onClick={() => openPdfInNewTab(item)}
-                        style={{ cursor: 'pointer' }}
-                      >
-                        {item.fileName}
-                      </ListGroupItem>
-                    ))}
+              <ListGroup className="cutplan-list list-group">
+                {formik.values.selectedCutPlan !== null && (
+                  <ListGroup className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
+                    <ListGroupItem
+                      className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
+                      onClick={() => openPdfInNewTab(formik.values.selectedCutPlan)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      {formik.values.selectedCutPlan.fileName || formik.values.selectedCutPlan.name}
+                    </ListGroupItem>
                   </ListGroup>
                 )}
               </ListGroup>
@@ -462,7 +585,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, resetMarker }) => {
                   type="button"
                   id="siteHazards"
                   className="btn btn-secondary btn-block"
-                  onClick={openSelectHazardModal}
+                  onClick={() => openSelectHazardModal(formik)}
                 >
                   Add Hazard
                 </Button>
@@ -471,7 +594,10 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, resetMarker }) => {
 
             <Form.Group className="col-md-12">
               <ListGroup className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
-                {skidModalState.selectedSkidHazardsData.map((hazard) => (
+              {formik.values.selectedSkidHazards
+                .map(id => mapState.hazards.find(hazard => hazard._id === id))
+                .filter(hazard => hazard)
+                .map(hazard => (
                   <ListGroupItem
                     key={hazard.id}
                     className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
@@ -484,21 +610,20 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, resetMarker }) => {
                     <Button
                       type="button"
                       className="btn btn-danger btn-sm"
-                      onClick={(event) => removeSkidHazard(event, hazard.id)}
+                      onClick={(event) => removeSkidHazard(event, hazard._id)}
                     >
                       Remove
                     </Button>
                   </ListGroupItem>
+                  
                 ))}
+               
               </ListGroup>
             </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="danger" onClick={handleClose}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={submitSkidModal}>
+
+
+
+              <Button variant="primary" onClick={formik.handleSubmit}>
             {showSpinner ? (
               <>
                 <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
@@ -508,7 +633,29 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, resetMarker }) => {
               'Save changes'
             )}
           </Button>
-        </Modal.Footer>
+            </Form>
+
+            )}
+
+            
+            </Formik>
+        
+        </Modal.Body>
+        {/* <Modal.Footer>
+          <Button variant="danger" onClick={handleClose}>
+            Close
+          </Button>
+          <Button variant="primary" onClick={formik.handleSubmit}>
+            {showSpinner ? (
+              <>
+                <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
+                <span className="visually-hidden">Loading...</span>
+              </>
+            ) : (
+              'Save changes'
+            )}
+          </Button>
+        </Modal.Footer> */}
       </Modal>
     </>
   );
@@ -516,8 +663,8 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, resetMarker }) => {
 
 AddOrEditSkidModal.propTypes = {
   editSkid: PropTypes.any.isRequired,
-  resetMarker: PropTypes.func.isRequired,
   mousePosition: PropTypes.object.isRequired,
-}
+  _account: PropTypes.any,
+};
 
 export default AddOrEditSkidModal;

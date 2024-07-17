@@ -4,17 +4,16 @@ import PropTypes from 'prop-types';
 
 const HazardCard = ({ hazard, selectAll, handleHazardChange }) => {
   const { _id, color, id, title, cat, harms, reviewDate, reviewReason } = hazard;
-  const [toggle, setToggle] = useState(selectAll);
+  //const [toggle, setToggle] = useState(selectAll);
 
-  useEffect(() => {
+  /* useEffect(() => {
     setToggle(selectAll);
     console.log('selectalll buttjksdfblsf: ', selectAll);
-  }, [selectAll]);
+  }, [selectAll]); */
 
   return (
     <Card style={{ marginBottom: '10px' }}>
       <div className="search-text" style={{ display: 'none' }}>
-        {/* replace with your search text value */}
       </div>
       <div className="id-text" style={{ display: 'none' }}>
         {_id}
@@ -63,8 +62,8 @@ const HazardCard = ({ hazard, selectAll, handleHazardChange }) => {
 
 HazardCard.propTypes = {
   hazard: PropTypes.object.isRequired,
-  selectAll: PropTypes.object.isRequired,
+  selectAll: PropTypes.bool.isRequired,
   handleHazardChange: PropTypes.func.isRequired
-}
+};
 
 export default HazardCard;

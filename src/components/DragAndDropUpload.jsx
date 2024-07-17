@@ -122,9 +122,9 @@ const DragAndDropUpload = ({
 DragAndDropUpload.propTypes = {
   setSelectedFile: PropTypes.func.isRequired,
   setFileIsValid: PropTypes.func.isRequired,
-  selectedFile: PropTypes.object.isRequired,
+  selectedFile: PropTypes.object,
   removeUploadedFile: PropTypes.func.isRequired,
-  fileTypes: PropTypes.array.isRequired
+  fileTypes: PropTypes.any.isRequired
 };
 
 export default DragAndDropUpload;

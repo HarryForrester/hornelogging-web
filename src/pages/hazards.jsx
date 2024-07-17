@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
@@ -216,13 +217,14 @@ const Hazards = () => {
     if (selectedHazardIds.length === 0) {
       return;
     }
-
+    const hazardNames = hazards.filter((hazard) => selectedHazardIds.includes(hazard._id)).map(hazard => hazard.id).join(',');
+console.log("delelele", hazardNames)
     setConfirmationModalState((prevState) => ({
       ...prevState,
       show: true,
       confirmed: false,
       label: 'Remove Hazard',
-      message: <>Are you sure you want to remove hazard:</>
+      message: <>Are you sure you want to remove hazard: {hazardNames}</>
     }));
   };
 
@@ -293,10 +295,6 @@ const Hazards = () => {
   }, [confirmationModalState.confirmed]);
 
   const updateSelected = () => {
-    console.log('updateSelected called');
-
-    console.log('memes: ', selectedHazardIds);
-
     setHazardState((prevState) => ({
       ...prevState,
       isUpdateReviewModalVisible: true
@@ -304,7 +302,6 @@ const Hazards = () => {
   };
 
   const editHazard = () => {
-    console.log('editHazard called');
     const selectedHazardObj = hazards.find((hazard) => hazard._id === selectedHazardIds[0]);
 
     const harmFields = Object.entries(selectedHazardObj.harms).map(([category, descriptions]) => {
@@ -326,12 +323,9 @@ const Hazards = () => {
       category: selectedHazardObj.cat,
       harmFields: harmFields
     }));
-
-    console.log('selected hazard :$: ', selectedHazardObj);
   };
 
   const addHazard = () => {
-    console.log('add Hazard called');
     setHazardState((prevState) => ({
       ...prevState,
       isCreateHazardModalVisible: true,
@@ -364,7 +358,6 @@ const Hazards = () => {
         if (response.status === 200) {
           if (response.data.isLoggedIn) {
             const data = response.data;
-            console.log('data: ', data.hazards);
             setHazards(data.hazards);
           } else {
             navigate('/login');

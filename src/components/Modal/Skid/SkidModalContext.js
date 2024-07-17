@@ -14,6 +14,7 @@ export const SkidModalProvider = ({ children }) => {
     isGeneralHazardsModalVisible: false,
     isUploadMapModalVisible: false,
     hazardModalVisible: false,
+    isSkidModalAdd: false, // when true, the user is adding a new marker (skid) to the pdf displayed
     isSkidModalEdit: false, // if true it will display Edit Skid Modal, if false will dispay Add Skid Modal for component AddOrEditSkidModal.jsx
     isSelectHazardsGeneral: false, // If true SelectHazardsModal will be a Select (General) Hazards else will be a Select (Skid) Hazards
     isConfirmModalVisible: false,
@@ -21,7 +22,7 @@ export const SkidModalProvider = ({ children }) => {
     isEditPersonModalVisible: false,
     isAddCrewModalVisible: false,
     selectedDocuments: [],
-    selectedCutPlan: [],
+    selectedCutPlan: null,
     skidName: '',
     selectedCrew: [],
     selectedSkidHazards: [],
@@ -37,8 +38,8 @@ export const SkidModalProvider = ({ children }) => {
 };
 
 SkidModalProvider.propTypes = {
-  children: PropTypes.object.isRequired,
-}
+  children: PropTypes.object.isRequired
+};
 
 export const useSkidModal = () => {
   return useContext(SkidModalContext);

@@ -5,10 +5,6 @@ const AlertMessageContext = createContext();
 
 export const AlertMessageProvider = ({ children }) => {
   const [alertMessageState, setAlertMessageState] = useState({
-    //show: false,
-    //time: null,
-    //heading: null,
-    //message: null,
     toasts: [],
     background: 'light',
     color: 'black'
@@ -22,8 +18,8 @@ export const AlertMessageProvider = ({ children }) => {
 };
 
 AlertMessageProvider.propTypes = {
-  children: PropTypes.func.isRequired,
-}
+  children: PropTypes.node.isRequired // Changed from func to node
+};
 
 export const useAlertMessage = () => {
   return useContext(AlertMessageContext);

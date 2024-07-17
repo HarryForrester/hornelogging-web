@@ -27,8 +27,8 @@ export const SkidMarkerProvider = ({ children }) => {
 };
 
 SkidMarkerProvider.propTypes = {
-  children: PropTypes.object.isRequired,
-}
+  children: PropTypes.object.isRequired
+};
 
 export const useSkidMarker = () => {
   return useContext(SkidMarkerContext);

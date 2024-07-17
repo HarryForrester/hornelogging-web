@@ -36,7 +36,7 @@ const AddSkidButton = ({ pdfContainerRef }) => {
 };
 
 AddSkidButton.propTypes = {
-  pdfContainerRef: PropTypes.func.isRequired
-}
+  pdfContainerRef: PropTypes.object.isRequired
+};
 
 export default AddSkidButton;

@@ -27,7 +27,6 @@ const QualificationsCard = ({ person }) => {
 };
 
 QualificationsCard.propTypes = {
-  person: PropTypes.object.isRequired,
-  quals: PropTypes.array.isRequired
+  person: PropTypes.any.isRequired
 };
 export default QualificationsCard;

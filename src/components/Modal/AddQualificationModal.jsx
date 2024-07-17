@@ -109,6 +109,6 @@ const AddQualificationModal = ({ show, hide, person }) => {
 AddQualificationModal.propTypes = {
   show: PropTypes.bool.isRequired,
   hide: PropTypes.func.isRequired,
-  person: PropTypes.object.isRequired
+  person: PropTypes.object
 };
 export default AddQualificationModal;

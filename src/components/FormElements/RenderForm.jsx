@@ -59,12 +59,12 @@ function renderForm(sections) {
 }
 
 FormSection.propTypes = {
-  section: PropTypes.object.isRequired,
-}
+  section: PropTypes.object.isRequired
+};
 
 RenderForm.propTypes = {
   form: PropTypes.object.isRequired
-}
+};
 
 export default function RenderForm({ form }) {
   return <div>{renderForm(JSON.parse(form.sectionsSerialized))}</div>;

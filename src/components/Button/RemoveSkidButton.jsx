@@ -25,7 +25,7 @@ const RemoveSkidButton = ({ onClick }) => {
 };
 
 RemoveSkidButton.propTypes = {
-  onClick: PropTypes.func.isRequired,
-}
+  onClick: PropTypes.func.isRequired
+};
 
 export default RemoveSkidButton;

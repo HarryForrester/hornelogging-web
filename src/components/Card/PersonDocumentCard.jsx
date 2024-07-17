@@ -1,13 +1,15 @@
+/* eslint-disable no-undef */
 import React, { useState } from 'react';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDownload, faEye, faTrash, faUpload } from '@fortawesome/free-solid-svg-icons';
-import { InputGroup, FormControl, ProgressBar, Form } from 'react-bootstrap';
+import { Card, Button, ListGroup } from 'react-bootstrap';
 import { useAlertMessage } from '../AlertMessage';
 import { usePersonData } from '../PersonData';
-import { Card, Button, ListGroup } from 'react-bootstrap';
 import UploadUserDocumentModal from '../Modal/UploadUserDocument';
-const PersonDocumentCard = () => {
+import { deletePresignedUrl } from '../../hooks/useFileDelete';
+import { createHandleDownloadClick } from '../../hooks/useFileDownload';
+const PersonDocumentCard = (_account) => {
   const [uploadPercentage, setUploadPercentage] = useState(0);
   const { alertMessageState, setAlertMessageState } = useAlertMessage();
   const { personDataState, setPersonDataState } = usePersonData();
@@ -140,24 +142,24 @@ const PersonDocumentCard = () => {
     }
   };
 
-  const handleFileDelete = async (fileName, fileId) => {
+  const handleFileDelete = async (file) => {
     const id = new Date().getTime();
+    const userConfirmed = window.confirm('Are you sure you want to remove file: ' + file.fileName);
 
-    const userConfirmed = window.confirm('Are you sure you want to remove file: ' + fileName);
     if (userConfirmed) {
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_URL}/person/deletefile/${personDataState.person._id}/${fileId}`,
+          `${process.env.REACT_APP_URL}/person/deletefile/${file._id}`,
           {
             withCredentials: true
           }
         );
 
         if (response.status === 200) {
-          //window.location.reload();
+          await deletePresignedUrl([file.key]);
           setPersonDataState((prevState) => ({
             ...prevState,
-            files: prevState.files.filter((file) => file._id !== response.data.file._id)
+            files: prevState.files.filter((f) => f._id !== file._id)
           }));
           setAlertMessageState((prevState) => ({
             ...prevState,
@@ -167,7 +169,7 @@ const PersonDocumentCard = () => {
                 id: id,
                 heading: 'Person Document Removed',
                 show: true,
-                message: `Success! ${fileName} has been removed to ${personDataState.person.name} documents `,
+                message: `Success! ${file.fileName} has been removed from ${personDataState.person.name} documents `,
                 background: 'success',
                 color: 'white'
               }
@@ -211,6 +213,10 @@ const PersonDocumentCard = () => {
     filesByType[file.type].push(file);
   });
 
+
+
+  
+
   return (
     <Card>
       <Card.Header>Employee Files</Card.Header>
@@ -219,11 +225,11 @@ const PersonDocumentCard = () => {
         <UploadUserDocumentModal
           show={isUploadFileModalVisible}
           close={() => setUploadFileModalVisible(false)}
+          _account={_account}
         />
 
         {/* Upload button */}
         <Button onClick={() => setUploadFileModalVisible(true)} className="mb-3">
-          {' '}
           <FontAwesomeIcon icon={faUpload} color="white" className="me-1" />
           Upload File
         </Button>
@@ -244,7 +250,7 @@ const PersonDocumentCard = () => {
                     <div className="d-flex">
                       {/* View */}
                       <a
-                        href={process.env.REACT_APP_URL + file.uri}
+                        href={file.fileUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="btn btn-outline-secondary btn-sm text-decoration-none me-2"
@@ -254,10 +260,8 @@ const PersonDocumentCard = () => {
                       </a>
                       {/* Download */}
                       <a
-                        href={`${process.env.REACT_APP_URL}${file.uri}?download=true`}
-                        download={file.fileName}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        href="#"
+                        onClick={createHandleDownloadClick(file)}
                         className="btn btn-outline-secondary btn-sm text-decoration-none me-2"
                       >
                         <FontAwesomeIcon icon={faDownload} className="me-1" />
@@ -269,7 +273,7 @@ const PersonDocumentCard = () => {
                   <Button
                     variant="danger"
                     size="sm"
-                    onClick={() => handleFileDelete(file.fileName, file._id)}
+                    onClick={() => handleFileDelete(file)}
                   >
                     <FontAwesomeIcon icon={faTrash} className="me-1" />
                     Delete

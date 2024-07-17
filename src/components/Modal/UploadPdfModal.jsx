@@ -1,35 +1,37 @@
+/* eslint-disable no-undef */
 import React, { useState } from 'react';
 import InputWithLabel from '../Input/InputWithLabel';
 import FileInputWithLabel from '../Input/FileInputWithLabel';
 import ErrorConfirmationModal from './ErrorConfirmationModal';
 import axios from 'axios';
-import { Form, Modal, Button, ProgressBar } from 'react-bootstrap';
+import { Form, Modal, Button, Spinner } from 'react-bootstrap';
 import { SkidModalProvider, useSkidModal } from './Skid/SkidModalContext';
 import { useAlertMessage } from '../AlertMessage';
 import { useMap } from '../Map/MapContext';
 import Feedback from 'react-bootstrap/esm/Feedback';
 import DragAndDropUpload from '../DragAndDropUpload';
-const UploadPdfModal = () => {
-  const [pdfName, setPdfName] = useState(null);
+import { getPresignedUrl, uploadToPresignedUrl, getFilePathFromUrl } from '../../hooks/useFileUpload';
+const UploadPdfModal = (_account) => {
+  const [pdfName, setPdfName] = useState('');
   //const [selectedPdf, setSelectedPdf] = useState(null);
-  const [showErrorModal, setShowErrorModal] = useState(false);
+  //const [showErrorModal, setShowErrorModal] = useState(false);
   const [pdfNameIsValid, setPdfNameIsValid] = useState(null);
   const [pdfFileIsValid, setPdfFileIsValid] = useState(null);
-  const [showProgressBar, setShowProgressBar] = useState(false); // shows spinner while submitting to server
+  const [showSpinner, setShowSpinner] = useState(false); // shows spinner while submitting to server
   const [uploadPercentage, setUploadPercentage] = useState(0);
 
   const { skidModalState, setSkidModalState } = useSkidModal();
   const { alertMessageState, setAlertMessageState } = useAlertMessage();
   const { mapState, setMapState } = useMap();
 
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(undefined);
   const [fileIsValid, setFileIsValid] = useState(null);
 
   const handlePdfNameChange = (event) => {
     setPdfName(event);
     setPdfNameIsValid(event ? true : null);
   };
-
+  
   const handlePdfInputChange = (event) => {
     const file = event.target.files[0];
     //setSelectedPdf(file);
@@ -38,7 +40,7 @@ const UploadPdfModal = () => {
   };
 
   const handleSubmit = async (event) => {
-    setShowProgressBar(true);
+    setShowSpinner(true);
 
     const id = new Date().getTime();
 
@@ -51,12 +53,20 @@ const UploadPdfModal = () => {
     } else if (!selectedFile) {
       setPdfFileIsValid(false);
     } else {
+      console.log("the _id you bro man: ", _account._account)
+      const [presignedUrl, key] = await getPresignedUrl(_account._account._account+"/maps", selectedFile.type);
+        const filePath = getFilePathFromUrl(presignedUrl);
+        console.log('filepath of the file', filePath);
+        await uploadToPresignedUrl(presignedUrl, selectedFile, selectedFile.type);
       const formData = new FormData();
       formData.append('file', selectedFile);
       formData.append('id', pdfName);
+      formData.append('url',filePath);
+      formData.append('key', key);
 
       try {
-        const response = await axios.post(process.env.REACT_APP_URL + '/loadpdf', formData, {
+        
+          const response = await axios.post(process.env.REACT_APP_URL + '/loadpdf', formData, {
           withCredentials: true,
           onUploadProgress: (progressEvent) => {
             const percentage = Math.round((progressEvent.loaded * 100) / progressEvent.total);
@@ -82,17 +92,18 @@ const UploadPdfModal = () => {
               }
             ]
           }));
-
+          
           setMapState((prevState) => ({
             ...prevState,
-            maps: response.data.maps
+            maps: response.data.maps,
+            currentMapUrl: filePath
           }));
 
           setSkidModalState((prevState) => ({
             ...prevState,
             isUploadMapModalVisible: false
           }));
-        }
+        } 
       } catch (error) {
         setAlertMessageState((prevState) => ({
           ...prevState,
@@ -110,7 +121,7 @@ const UploadPdfModal = () => {
         }));
         console.error('Error submitting form:', error);
       } finally {
-        setShowProgressBar(false);
+        setShowSpinner(false);
         resetForm();
 
         setTimeout(() => {
@@ -222,16 +233,20 @@ const UploadPdfModal = () => {
           onClick={handleSubmit}
           style={{ height: '38px', width: '100px', padding: 0, fontSize: 14 }}
         >
-          {showProgressBar ? (
-            <ProgressBar
-              animated
-              now={uploadPercentage}
-              label={`${uploadPercentage}%`}
-              style={{ width: '100%', height: '100%', padding: 0 }}
-            />
-          ) : (
-            'Upload Map'
-          )}
+          {showSpinner ? (
+                <>
+                  <Spinner
+                    as="span"
+                    animation="border"
+                    size="sm"
+                    role="status"
+                    aria-hidden="true"
+                  />
+                  <span className="visually-hidden">Loading...</span>
+                </>
+              ) : (
+                'Upload'
+              )}
         </Button>
       </Modal.Footer>
       {/*             <ErrorConfirmationModal message={message} onClose={closeErrorModal} show={showErrorModal}/>

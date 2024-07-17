@@ -21,6 +21,6 @@ const CrewCard = ({ crew }) => {
 };
 
 CrewCard.propTypes = {
-  crew: PropTypes.array.isRequired
+  crew: PropTypes.object.isRequired
 };
 export default CrewCard;
