@@ -14,6 +14,12 @@ const SkidMarkerPopover = () => {
   const { setAlertMessageState } = useAlertMessage();
   const { skidMarkerState, setSkidMarkerState } = useSkidMarker();
   const { skidState, setSkidState } = useSkid(); // holds information about the skid
+
+  useEffect(() => {
+    console.log('skidState', skidState)
+
+    console.log('formik', skidState?.formik?.values)
+  }, [skidState]);
   const toggleSkidCrew = (crew) => {
     setSkidMarkerState((prevState) => ({
       ...prevState,
@@ -222,7 +228,7 @@ const SkidMarkerPopover = () => {
           }}
         >
           <div className="popover-header">
-            Skid: {skidState.formik.values.skidName}
+            Skid: {skidState?.formik?.values?.skidName}
             <RemoveSkidButton onClick={removeSelectedSkid} />
             <EditSkidButton onClick={editSelectedSkid} />
           </div>
@@ -239,7 +245,7 @@ const SkidMarkerPopover = () => {
 
             <ul className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
               {/* Filters out crews that do not exist anymore */}
-              {skidState.formik.values.selectedCrew
+              {skidState?.formik?.values?.selectedCrew
                 .filter((crew) => mapState.crewTypes.some((mapCrew) => mapCrew === crew))
                 .map((crew) => (
                   <li
@@ -256,7 +262,7 @@ const SkidMarkerPopover = () => {
             
 
             <div>
-              {skidState.formik.values.selectedDocuments && skidState.formik.values.selectedDocuments.length > 0 && (
+              {skidState?.formik?.values?.selectedDocuments && skidState?.formik?.values?.selectedDocuments.length > 0 && (
                 <>
                 <div
                 style={{
@@ -270,7 +276,7 @@ const SkidMarkerPopover = () => {
               </div>
               
                 <ul className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
-                  {skidState.formik.values.selectedDocuments.map(id => mapState.files.find(file => file._id === id)).filter(file => file).map((item, index) => (
+                  {skidState?.formik?.values?.selectedDocuments.map(id => mapState.files.find(file => file._id === id)).filter(file => file).map((item, index) => (
                     <li
                       key={index}
                       className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
@@ -286,7 +292,7 @@ const SkidMarkerPopover = () => {
             
 
             <div>
-              {skidState.formik.values.selectedCutPlan !== null && (
+              {skidState?.formik?.values?.selectedCutPlan !== null && (
                 <>
                 <div
                 style={{

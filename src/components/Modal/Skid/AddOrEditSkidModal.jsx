@@ -44,9 +44,10 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
   };
 
   const submitSkidModal = async (values) => {
+    const { formik } = skidState;
+
     const id = new Date().getTime();
     const selectedFile = values.selectedCutPlan;
-    console.log('submitted selectedSkidHazards: ', selectedFile);
 
     setShowSpinner(true);
     var cutPlans;
@@ -54,16 +55,14 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
       const [presignedUrl, key] = await getPresignedUrl(`${_account}/maps/skids`, selectedFile.type);
       const filePath = getFilePathFromUrl(presignedUrl);
       console.log('filepath of the file', filePath);
-      console.log('the key', key);
       await uploadToPresignedUrl(presignedUrl, selectedFile, selectedFile.type);
       cutPlans = {fileName: selectedFile.name, url: filePath, key: key};
     } else {
       cutPlans =  values.selectedCutPlan
     }
-      console.log('cutplans', cutPlans);
 
     const skidObj = {
-      _id: skidModalState._id,
+      _id: skidState.selectedSkidId,
       mapName: mapState.currentMapName,
       info: {
         crews: values.selectedCrew,
@@ -82,26 +81,29 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
       }
     };
 
-    console.log("hello there harry: ", skidObj.info.siteHazards);
+    console.log("hello there harry: ", skidObj);
 
     try {
       if (editSkid) {
+        console.log("edit mode", skidState)
         const resp = await axios.post('http://localhost:3001/update-pdf-point-object', skidObj, {
           withCredentials: true
         });
-
+        console.log('cunty cunt', skidState.formik);
         if (resp.status === 200) {
-          console.log("hello there u cunt", resp.data);
+          const val = resp.data;
+          console.log('resp.data', val);
+
           setMapState((prevState) => {
             const existingIndex = prevState.currentMapMarkers.findIndex(
-              (marker) => marker._id === resp.data._id
+              (marker) => marker._id === val._id
             );
 
             if (existingIndex !== -1) {
               // If the marker with the same _id exists, update it
               const updatedMarkers = [...prevState.currentMapMarkers];
-              updatedMarkers[existingIndex] = resp.data;
-
+              updatedMarkers[existingIndex] = val;
+    
               return {
                 ...prevState,
                 currentMapMarkers: updatedMarkers
@@ -110,10 +112,25 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
               // If the marker with the same _id does not exist, add it
               return {
                 ...prevState,
-                currentMapMarkers: [...prevState.currentMapMarkers, resp.data]
+                currentMapMarkers: [...prevState.currentMapMarkers, val]
               };
             }
           });
+
+          setSkidState((prevState) => ({
+            ...prevState,
+            formik: {
+              ...prevState.formik,
+              values: {
+                ...prevState.formik.values,
+                skidName: val.info.pointName,
+                selectedCrew: val.info.crews,
+                selectedDocuments: val.info.selectedDocuments,
+                selectedCutPlan: val.info.cutPlans,
+                siteHazards: val.info.siteHazards,
+              },
+            },
+          })); 
 
           setAlertMessageState((prevState) => ({
             ...prevState,
@@ -130,7 +147,11 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
             ]
           }));
 
-          resetAddSkidModal();
+          //resetAddSkidModal();
+          setSkidState((prevState) => ({
+            ...prevState,
+            skidModalVisible: false,
+          }))
           setSkidModalState((prevState) => ({
             ...prevState,
             isSkidModalEdit: false,
