@@ -143,13 +143,13 @@ const SkidMarkerPopover = () => {
   const removeSelectedSkid = async () => {
     const id = new Date().getTime();
 
-    if (skidMarkerState.selectedMarker.info.cutPlans) {
+    if (skidState.formik.selectedCutPlan) {
       const cutPlanKey = skidMarkerState.selectedMarker.info.cutPlans.key;
 
-      await deletePresignedUrl([cutPlanKey]);
+      await deletePresignedUrl([cutPlanKey]); // removes cutplan file from s3
     }
     
-    const skidObj = {
+  /*   const skidObj = {
       _id: skidModalState._id,
       mapName: mapState.currentMapName,
       info: {
@@ -165,10 +165,10 @@ const SkidMarkerPopover = () => {
         x: skidMarkerState.mousePosition.x,
         y: skidMarkerState.mousePosition.y
       }
-    };
+    }; */
 
     const response = await axios.delete(
-      `http://localhost:3001/pointonmap/${skidMarkerState.selectedMarker._id}/${mapState.currentMapId}`,
+      `http://localhost:3001/pointonmap/${skidState.selectedSkidId}/${mapState.currentMapId}`,
       { withCredentials: true }
     );
 
@@ -176,7 +176,7 @@ const SkidMarkerPopover = () => {
       //call api to delete file 
       setMapState((prevState) => {
         const updatedMarkers = prevState.currentMapMarkers.filter(
-          (marker) => marker._id !== skidMarkerState.selectedMarker._id
+          (marker) => marker._id !== skidState.selectedSkidId
         );
         return {
           ...prevState,

@@ -6,13 +6,14 @@ import { useMap } from '../Map/MapContext';
 import { useAlertMessage } from '../AlertMessage';
 import { useSkidMarker } from '../SkidMarkerContext';
 import axios from 'axios';
+import { useSkid } from '../../context/SkidContext';
 
 const SkidMarkerPersonPopover = () => {
   const { skidModalState, setSkidModalState } = useSkidModal();
   const { mapState, setMapState } = useMap();
   const { alertMessageState, setAlertMessageState } = useAlertMessage();
   const { skidMarkerState, setSkidMarkerState } = useSkidMarker();
-
+  const { skidState, setSkidState } = useSkid();
   const closePersonPopover = () => {
     //setPopoverPersonVisible(false);
     setSkidMarkerState((prevState) => ({
@@ -29,8 +30,8 @@ const SkidMarkerPersonPopover = () => {
           data-bs-placement="top"
           style={{
             position: 'absolute',
-            left: `${skidMarkerState.selectedMarker.point.x + 520}px`,
-            top: `${skidMarkerState.selectedMarker.point.y}px`,
+            left: `${skidState.selectedSkidPos.x + 520}px`,
+            top: `${skidState.selectedSkidPos.y}px`,
             width: '250px'
           }}
         >
