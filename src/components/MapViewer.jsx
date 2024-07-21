@@ -13,6 +13,7 @@ import AddDocModal from './Modal/AddDocModal';
 import AddCutPlanModal from './Modal/AddCutPlanModal';
 import SelectHazardsModal from './Modal/SelectHazardsModal';
 import EditGeneralHazardModal from './Modal/EditGeneralHazardsModal';
+import AddSkidHazardModal from './Modal/AddSkidHazardModal';
 import SkidMarkerPopover from './Popover/SkidMarkerPopover';
 import SkidMarkerCrewPopover from './Popover/SkidMarkerCrewPopover';
 import SkidMarkerPersonPopover from './Popover/SkidMarkerPersonPopover';
@@ -467,6 +468,7 @@ const PDFViewer = ({ percentage, _account }) => {
       <AddDocModal docSumbit={submitDoc} />
       <AddCutPlanModal submitCutPlan={submitCutPlan} />
       <SelectHazardsModal submitSelectedHazards={submitSelectedHazards} />
+      <AddSkidHazardModal />
       <HazardModal />
      
       <EditGeneralHazardModal

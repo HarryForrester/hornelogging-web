@@ -114,23 +114,32 @@ const SelectHazardsModal = ({ submitSelectedHazards }) => {
                   {hazard.searchText}
                 </div>
                 <div className="card-header" style={{ backgroundColor: hazard.color }}>
-                  <div style={{ float: 'left' }}>
-                    <input
+                <div style={{ float: 'left' }}>
+                    <b>{hazard.cat}</b>
+                  </div>
+                  <div style={{ float: 'right' }}>
+                    {/* <input
                       type="checkbox"
                       name="selectedHazards[]"
                       value={hazard._id}
                       onChange={() => handleCheckboxChange(hazard._id)}
                       checked={skidState.formik?.values?.selectedSkidHazards?.includes(hazard._id)}
-                    />
+                    /> */}
+                   
                     <b>
                       {hazard.id}: <em>{hazard.title}</em>
                     </b>
                     &nbsp;&nbsp;
                     <small>({hazard.sev})</small>
+                    <Button
+                      type="button"
+                      onClick={() => handleCheckboxChange(hazard)}
+                      size="sm"
+                    >
+                      Add
+                    </Button>
                   </div>
-                  <div style={{ float: 'right' }}>
-                    <b>{hazard.cat}</b>
-                  </div>
+                  
                 </div>
               </div>
             ))}

@@ -4,12 +4,11 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { useSkidModal } from './Skid/SkidModalContext';
 import { useSkid } from '../../context/SkidContext';
-
-const AddSkidHazardModal = ( hazards, sumbitSkidHazard ) => {
+import { useMap } from '../Map/MapContext';
+const AddSkidHazardModal = (sumbitSkidHazard ) => {
   const { skidModalState, setSkidModalState } = useSkidModal();
   const { skidState, setSkidState } = useSkid();
-
-  console.log('hazards: ', hazards);
+  const { mapState, setMapState } = useMap();
 
   /**
    * Closes the Add Document Modal and opens the Skid Modal by updating the state.
@@ -19,13 +18,13 @@ const AddSkidHazardModal = ( hazards, sumbitSkidHazard ) => {
   const handleClose = () => {
     setSkidModalState((prevState) => ({
       ...prevState,
-      isAddSiteHazardModalVisible: false,
-      isSkidModalVisible: true
+      isSelectHazardModalVisible: false,
+      isGeneralHazardsModalVisible: true
     }));
   };
 
   return (
-    <Modal show={true} centered>
+    <Modal show={skidModalState.isSelectHazardModalVisible} centered>
       <Modal.Header>
         <Modal.Title className="fs-5">Add Hazard</Modal.Title>
         <Button variant="link" onClick={handleClose}>
@@ -42,7 +41,7 @@ const AddSkidHazardModal = ( hazards, sumbitSkidHazard ) => {
 
       <Modal.Body>
         <div className="modal-hazards">
-          {hazards.map((hazard) => (
+          {mapState.hazards.map((hazard) => (
             <div className="card" style={{ marginBottom: 10 }} key={hazard.id}>
               <div className="search-text" style={{ display: 'none' }}>
                 {hazard.searchText}

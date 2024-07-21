@@ -4,18 +4,21 @@ import Button from 'react-bootstrap/Button';
 import { useSkidModal } from './Skid/SkidModalContext';
 import { useMap } from '../Map/MapContext';
 import PropTypes from 'prop-types';
+import Accordion from 'react-bootstrap/Accordion';
+
 import { useSkid } from '../../context/SkidContext';
+
 /**
  * AddDocModal component for handling document selection.
  * @component
- * @param {Function} docSumbit - Function to be executed on submitting selected documents.
+ * @param {Function} docSubmit - Function to be executed on submitting selected documents.
  * @returns  {JSX.Element} - Rendered component.
  */
-const AddDocModal = ({ docSumbit }) => {
+const AddDocModal = ({ docSubmit }) => {
   const { skidModalState, setSkidModalState } = useSkidModal();
-  const { mapState, setMapState } = useMap();
-  const { skidState, setSkidState} = useSkid();
-  const [selectedFiles, setSelectedFiles] = useState([]);
+  const { mapState } = useMap();
+  const { skidState, setSkidState } = useSkid();
+  const [searchQuery, setSearchQuery] = useState('');
 
   /**
    * Closes the Add Document Modal and opens the Skid Modal by updating the state.
@@ -26,7 +29,7 @@ const AddDocModal = ({ docSumbit }) => {
     setSkidState((prevState) => ({
       ...prevState,
       docModalVisible: false,
-      skidModalVisible: true
+      skidModalVisible: true,
     }));
   };
 
@@ -41,15 +44,14 @@ const AddDocModal = ({ docSumbit }) => {
       console.error('formik or formik.values is null or undefined');
       return;
     }
-  
+
     const { formik } = skidState;
     const { selectedDocuments } = formik.values;
     const fileId = fileUrl._id;
-  
+
     if (!selectedDocuments.some((selectedFile) => selectedFile._id === fileId)) {
       // Add to selectedDocuments
-      const updatedSelectedDocuments = [...selectedDocuments, fileId ];
-      console.log('jajaja', updatedSelectedDocuments)
+      const updatedSelectedDocuments = [...selectedDocuments, fileId];
 
       setSkidState((prevState) => ({
         ...prevState,
@@ -63,7 +65,9 @@ const AddDocModal = ({ docSumbit }) => {
       }));
     } else {
       // Remove from selectedDocuments
-      const updatedSelectedDocuments = selectedDocuments.filter((selectedFile) => selectedFile !== fileId);
+      const updatedSelectedDocuments = selectedDocuments.filter(
+        (selectedFile) => selectedFile !== fileId
+      );
       setSkidState((prevState) => ({
         ...prevState,
         formik: {
@@ -76,8 +80,12 @@ const AddDocModal = ({ docSumbit }) => {
       }));
     }
   };
-  
-  const groupedFiles = mapState.files.reduce((acc, file) => {
+
+  const filteredFiles = mapState.files.filter((file) =>
+    file.fileName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const groupedFiles = filteredFiles.reduce((acc, file) => {
     if (!acc[file.type]) {
       acc[file.type] = [];
     }
@@ -98,73 +106,71 @@ const AddDocModal = ({ docSumbit }) => {
           size="30"
           placeholder="Search"
           id="search-criteria-doc"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
         />
         <br />
-        <div className="modal-hazards">
-        {Object.keys(groupedFiles).map((type) => {
-  const filteredFiles = groupedFiles[type]
-    .filter(file => skidState.formik && skidState.formik.values && !skidState.formik.values.selectedDocuments.some(selectedFile => selectedFile === file._id));
+        <Accordion defaultActiveKey="0">
+          {Object.keys(groupedFiles).map((type, index) => {
+            const filesToShow = groupedFiles[type].filter(
+              (file) =>
+                skidState.formik &&
+                skidState.formik.values &&
+                !skidState.formik.values.selectedDocuments.some(
+                  (selectedFile) => selectedFile === file._id
+                )
+            );
 
-  if (filteredFiles.length === 0) {
-    return null; // Skip rendering if there are no filtered files
-  }
-
-  return (
-    <React.Fragment key={type}>
-      <h5>{type}</h5>
-      {filteredFiles.map((file) => (
-        <div className="card" style={{ marginBottom: '10px' }} key={file._id}>
-          <div className="search-text-doc" style={{ display: 'none' }}>
-            {file.searchText}
-          </div>
-          <div className="card-header" style={{ backgroundColor: file.color }}>
-            <div style={{ float: 'left' }}>
-              <b>{file.type}</b>
-              &nbsp;
-              <b>
-                <em
-                  style={{
-                    maxWidth: '300px',
-                    display: 'inline-block',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                  }}
-                >
-                  {file.fileName}
-                </em>
-              </b>
-              &nbsp;&nbsp;
-              <small>({file.uri})</small>
-            </div>
-            <div style={{ float: 'right' }}>
-              <Button
-                type="button"
-                data-filename={file.fileName}
-                onClick={() => handleCheckboxChange(file)}
-                size="sm"
-              >
-                Add
-              </Button>
-            </div>
-          </div>
-        </div>
-      ))}
-    </React.Fragment>
-  );
-})}
-
-
-
-
-        </div>
+            return (
+              <Accordion.Item eventKey={index.toString()} key={type}>
+                <Accordion.Header>{type}</Accordion.Header>
+                <Accordion.Body>
+                  {filesToShow.map((file) => (
+                    <div
+                      className="card"
+                      style={{ marginBottom: '10px', backgroundColor: file.color }}
+                      key={file._id}
+                    >
+                      <div className="search-text-doc" style={{ display: 'none' }}>
+                        {file.searchText}
+                      </div>
+                      <div className="card-header">
+                        <div style={{ float: 'left' }}>
+                          <em
+                            style={{
+                              maxWidth: '300px',
+                              display: 'inline-block',
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                            }}
+                          >
+                            {file.fileName}
+                          </em>
+                          &nbsp;&nbsp;
+                        </div>
+                        <div style={{ float: 'right' }}>
+                          <Button
+                            type="button"
+                            data-filename={file.fileName}
+                            onClick={() => handleCheckboxChange(file)}
+                            size="sm"
+                          >
+                            Add
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </Accordion.Body>
+              </Accordion.Item>
+            );
+          })}
+        </Accordion>
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={handleClose}>
           Close
-        </Button>
-        <Button variant="primary" onClick={handleClose}>
-          Save changes
         </Button>
       </Modal.Footer>
     </Modal>
@@ -172,7 +178,7 @@ const AddDocModal = ({ docSumbit }) => {
 };
 
 AddDocModal.propTypes = {
-  docSumbit: PropTypes.func.isRequired
+  docSubmit: PropTypes.func.isRequired,
 };
 
 export default AddDocModal;
