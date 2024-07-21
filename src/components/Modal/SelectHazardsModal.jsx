@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
+import {Modal, Button, Accordion} from 'react-bootstrap';
 import { useSkidModal } from './Skid/SkidModalContext';
 import { useMap } from '../Map/MapContext';
 import PropTypes from 'prop-types';
@@ -8,7 +7,7 @@ import { faZ } from '@fortawesome/free-solid-svg-icons';
 import { joinPaths } from '@remix-run/router';
 import { useSkid } from '../../context/SkidContext';
 const SelectHazardsModal = ({ submitSelectedHazards }) => {
-  const [searchCriteria, setSearchCriteria] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedHazards, setSelectedHazards] = useState([]);
   const { skidModalState, setSkidModalState } = useSkidModal();
   const { skidState, setSkidState } = useSkid();
@@ -18,7 +17,7 @@ const SelectHazardsModal = ({ submitSelectedHazards }) => {
     if (selectedHazards.length > 0) {
       submitSelectedHazards(selectedHazards);
       setSelectedHazards([]);
-      setSearchCriteria('');
+      setSearchQuery('');
   
     }
   };
@@ -44,12 +43,13 @@ const SelectHazardsModal = ({ submitSelectedHazards }) => {
     }
   };
 
-  const handleSearchChange = (event) => {
+  /* const handleSearchChange = (event) => {
     setSearchCriteria(event.target.value);
-  };
+  }; */
 
-  const handleCheckboxChange = (hazardId) => {
-    const formik = skidState.formik;
+  const handleCheckboxChange = (hazard) => {
+    const hazardId = hazard._id
+    const { formik } = skidState;
 
     console.log("handleCheckboxChange: ", hazardId);
   
@@ -88,6 +88,18 @@ const SelectHazardsModal = ({ submitSelectedHazards }) => {
     label = 'Skid';
   }
 
+  const filteredHazards = mapState.hazards.filter((hazard) => 
+    hazard.searchText.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const groupedHazards = filteredHazards.reduce((acc, hazard) => {
+    if (!acc[hazard.cat]) {
+      acc[hazard.cat] = [];
+    }
+    acc[hazard.cat].push(hazard);
+    return acc;
+  }, {});
+  
   return (
     <Modal show={skidState.selectHazardModalVisible} onHide={handleClose}>
       <Modal.Header closeButton>
@@ -103,12 +115,69 @@ const SelectHazardsModal = ({ submitSelectedHazards }) => {
             size="30"
             placeholder="Search"
             id="search-criteria-hazard"
-            value={searchCriteria}
-            onChange={handleSearchChange}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
           <br />
           <div className="modal-hazards">
-            {mapState.hazards.map((hazard) => (
+            <Accordion>
+              {Object.keys(groupedHazards).map((cat, index) => {
+                const hazardsToShow = groupedHazards[cat].filter(
+                  (hazard) => 
+                      skidState.formik &&
+                    skidState.formik.values &&
+                    !skidState.formik.values.selectedSkidHazards.some(
+                      (selectedHazard) => selectedHazard == hazard._id
+                    )
+                );
+
+                return (
+                  <Accordion.Item eventKey={index.toString()} key={cat}>
+                    <Accordion.Header>{cat}</Accordion.Header>
+                    <Accordion.Body>
+                      {hazardsToShow.map((hazard) => (
+                        <div className="card" style={{ marginBottom: '10px' }} key={hazard._id}>
+                        <div className="search-text" style={{ display: 'none' }}>
+                          {hazard.searchText}
+                        </div>
+                        <div className="card-header" style={{ backgroundColor: hazard.color }}>
+                        <div style={{ float: 'left' }}>
+                            <b>{hazard.cat}</b>
+                          </div>
+                          <div style={{ float: 'right' }}>
+                            {/* <input
+                              type="checkbox"
+                              name="selectedHazards[]"
+                              value={hazard._id}
+                              onChange={() => handleCheckboxChange(hazard._id)}
+                              checked={skidState.formik?.values?.selectedSkidHazards?.includes(hazard._id)}
+                            /> */}
+                           
+                            <b>
+                              {hazard.id}: <em>{hazard.title}</em>
+                            </b>
+                            &nbsp;&nbsp;
+                            <small>({hazard.sev})</small>
+                            <Button
+                              type="button"
+                              onClick={() => handleCheckboxChange(hazard)}
+                              size="sm"
+                            >
+                              Add
+                            </Button>
+                          </div>
+                          
+                        </div>
+                      </div>
+
+                      ))}
+                    </Accordion.Body>
+                  </Accordion.Item>
+                )
+              })}
+
+            </Accordion>
+            {/* {mapState.hazards.map((hazard) => (
               <div className="card" style={{ marginBottom: '10px' }} key={hazard._id}>
                 <div className="search-text" style={{ display: 'none' }}>
                   {hazard.searchText}
@@ -124,7 +193,7 @@ const SelectHazardsModal = ({ submitSelectedHazards }) => {
                       value={hazard._id}
                       onChange={() => handleCheckboxChange(hazard._id)}
                       checked={skidState.formik?.values?.selectedSkidHazards?.includes(hazard._id)}
-                    /> */}
+                    /> 
                    
                     <b>
                       {hazard.id}: <em>{hazard.title}</em>
@@ -142,7 +211,7 @@ const SelectHazardsModal = ({ submitSelectedHazards }) => {
                   
                 </div>
               </div>
-            ))}
+            ))} */}
           </div>
         </>
       </Modal.Body>
