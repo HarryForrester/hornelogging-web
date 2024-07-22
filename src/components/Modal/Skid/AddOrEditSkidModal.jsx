@@ -353,6 +353,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
    */
   const removeSkidHazard = (event, hazardToRemove, formik) => {
     event.stopPropagation();
+    console.log('hazardToRemove', hazardToRemove);
     const updatedHazards = formik.values.selectedSkidHazards.filter((hazard) => hazard !== hazardToRemove._id);
     formik.setFieldValue('selectedSkidHazards', updatedHazards);
     /* setSkidModalState((prevState) => {
@@ -615,13 +616,13 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
             </Form.Group>
 
             <Form.Group className="col-md-12">
-              <ListGroup className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
+              <ListGroup className="list-group" style={{ maxHeight: '200px', overflowY: 'auto' }}>
               {formik.values.selectedSkidHazards
                 .map(id => mapState.hazards.find(hazard => hazard._id === id))
                 .filter(hazard => hazard)
                 .map(hazard => (
                   <ListGroupItem
-                    key={hazard.id}
+                    key={hazard._id}
                     className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
                     style={{ textAlign: 'center', backgroundColor: hazard.color}}
                     onClick={() => handleHazardClick(hazard)}
