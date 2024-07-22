@@ -623,7 +623,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
                   <ListGroupItem
                     key={hazard.id}
                     className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
-                    style={{ textAlign: 'center' }}
+                    style={{ textAlign: 'center', backgroundColor: hazard.color}}
                     onClick={() => handleHazardClick(hazard)}
                   >
                     <span>
