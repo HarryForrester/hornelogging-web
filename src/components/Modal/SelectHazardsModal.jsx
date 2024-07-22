@@ -99,7 +99,7 @@ const SelectHazardsModal = ({ submitSelectedHazards }) => {
     acc[hazard.cat].push(hazard);
     return acc;
   }, {});
-  
+
   return (
     <Modal show={skidState.selectHazardModalVisible} onHide={handleClose}>
       <Modal.Header closeButton>
@@ -120,7 +120,7 @@ const SelectHazardsModal = ({ submitSelectedHazards }) => {
           />
           <br />
           <div className="modal-hazards">
-            <Accordion>
+            <Accordion defaultActiveKey="0">
               {Object.keys(groupedHazards).map((cat, index) => {
                 const hazardsToShow = groupedHazards[cat].filter(
                   (hazard) => 
@@ -130,6 +130,10 @@ const SelectHazardsModal = ({ submitSelectedHazards }) => {
                       (selectedHazard) => selectedHazard == hazard._id
                     )
                 );
+
+                if (hazardsToShow.length === 0) {
+                  return null;
+                }
 
                 return (
                   <Accordion.Item eventKey={index.toString()} key={cat}>
@@ -141,10 +145,10 @@ const SelectHazardsModal = ({ submitSelectedHazards }) => {
                           {hazard.searchText}
                         </div>
                         <div className="card-header" style={{ backgroundColor: hazard.color }}>
-                        <div style={{ float: 'left' }}>
+                        {/* <div style={{ float: 'left' }}>
                             <b>{hazard.cat}</b>
-                          </div>
-                          <div style={{ float: 'right' }}>
+                          </div> */}
+                          <div style={{ float: 'left' }}>
                             {/* <input
                               type="checkbox"
                               name="selectedHazards[]"
@@ -158,7 +162,11 @@ const SelectHazardsModal = ({ submitSelectedHazards }) => {
                             </b>
                             &nbsp;&nbsp;
                             <small>({hazard.sev})</small>
-                            <Button
+                           
+                          </div>
+
+                          <div style={{ float: 'right' }}>
+                          <Button
                               type="button"
                               onClick={() => handleCheckboxChange(hazard)}
                               size="sm"
@@ -220,9 +228,9 @@ const SelectHazardsModal = ({ submitSelectedHazards }) => {
         <Button variant="secondary" onClick={handleClose}>
           Close
         </Button>
-        <Button variant="primary" onClick={handleClose}>
+      {/*   <Button variant="primary" onClick={handleClose}>
           Save changes
-        </Button>
+        </Button> */}
       </Modal.Footer>
     </Modal>
   );

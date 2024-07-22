@@ -351,12 +351,13 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
    * @param {*} event - event of the button click
    * @param {*} hazardToRemove - the hazard object to be removed
    */
-  const removeSkidHazard = (event, hazardToRemove) => {
+  const removeSkidHazard = (event, hazardToRemove, formik) => {
     event.stopPropagation();
-    console.log('hazard tobe removed', skidModalState.selectedSkidHazards)
-    setSkidModalState((prevState) => {
+    const updatedHazards = formik.values.selectedSkidHazards.filter((hazard) => hazard !== hazardToRemove._id);
+    formik.setFieldValue('selectedSkidHazards', updatedHazards);
+    /* setSkidModalState((prevState) => {
       const updatedHazards = prevState.selectedSkidHazardsData.filter(
-        (hazard) => hazard._id!== hazardToRemove
+        (hazard) => hazard._id!== hazardToRemove._id
       );
       console.log('ytda', updatedHazards);
 
@@ -367,7 +368,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
         selectedSkidHazardsData: updatedHazards,
         selectedSkidHazards: hazardsIds
       };
-    });
+    }); */
   };
 
   
@@ -631,7 +632,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
                     <Button
                       type="button"
                       className="btn btn-danger btn-sm"
-                      onClick={(event) => removeSkidHazard(event, hazard._id)}
+                      onClick={(event) => removeSkidHazard(event, hazard, formik)}
                     >
                       Remove
                     </Button>

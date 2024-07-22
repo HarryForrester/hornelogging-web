@@ -121,6 +121,10 @@ const AddDocModal = ({ docSubmit }) => {
                 )
             );
 
+            if (filesToShow.length === 0) {
+              return null;
+            }
+
             return (
               <Accordion.Item eventKey={index.toString()} key={type}>
                 <Accordion.Header>{type}</Accordion.Header>
