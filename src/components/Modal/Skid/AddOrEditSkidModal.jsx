@@ -60,6 +60,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
     } else {
       cutPlans =  values.selectedCutPlan
     }
+    console.log('values bro', values)
 
     const skidObj = {
       _id: skidState.selectedSkidId,
@@ -235,7 +236,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
   const handleClose = () => {
     setSkidState((prevState) => ({
       ...prevState,
-      formik: null,
+      //formik: null,
       skidModalVisible: false,
       docModalVisible: false
     }))

@@ -349,7 +349,7 @@ const SkidMarkerPopover = () => {
             )}
 
             
-            { skidMarkerState.selectedSkidHazardsData && skidMarkerState.selectedSkidHazardsData.length > 0 && (
+            { skidState?.formik?.values?.selectedSkidHazards && skidState?.formik?.values?.selectedSkidHazards.length > 0 && (
               <>
                <div
               style={{
@@ -364,7 +364,10 @@ const SkidMarkerPopover = () => {
 
             <div>
               <ul className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
-                {skidMarkerState.selectedSkidHazardsData.map((hazard) => (
+              {skidState?.formik.values.selectedSkidHazards
+                .map(id => mapState.hazards.find(hazard => hazard._id === id))
+                .filter(hazard => hazard)
+                .map(hazard => (
                   <li
                     key={hazard.id}
                     className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"

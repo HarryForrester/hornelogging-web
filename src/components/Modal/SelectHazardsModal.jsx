@@ -126,7 +126,7 @@ const SelectHazardsModal = ({ submitSelectedHazards }) => {
                   (hazard) => 
                       skidState.formik &&
                     skidState.formik.values &&
-                    !skidState.formik.values.selectedSkidHazards.some(
+                    !skidState.formik?.values?.selectedSkidHazards?.some(
                       (selectedHazard) => selectedHazard == hazard._id
                     )
                 );

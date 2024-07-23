@@ -55,6 +55,7 @@ const PDFViewer = ({ percentage, _account }) => {
   const addPointToPDF = () => {
     setSkidState((prevState) => ({
       ...prevState,
+      formik: null,
       skidModalVisible: true,
     }))
     setSkidModalState((prevState) => ({
@@ -99,7 +100,7 @@ const PDFViewer = ({ percentage, _account }) => {
             selectedCrew: clickedPoint.info.crews,
             selectedDocuments: clickedPoint.info.selectedDocuments,
             selectedCutPlan: clickedPoint.info.cutPlans,
-            siteHazards: clickedPoint.info.siteHazards
+            selectedSkidHazards: clickedPoint.info.siteHazards
           }
         }
       }))
