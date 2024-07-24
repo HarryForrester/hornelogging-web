@@ -15,11 +15,6 @@ const SkidMarkerPopover = () => {
   const { skidMarkerState, setSkidMarkerState } = useSkidMarker();
   const { skidState, setSkidState } = useSkid(); // holds information about the skid
 
-  useEffect(() => {
-    console.log('skidState', skidState)
-
-    console.log('formik', skidState?.formik?.values)
-  }, [skidState]);
   const toggleSkidCrew = (crew) => {
     setSkidMarkerState((prevState) => ({
       ...prevState,
@@ -337,7 +332,7 @@ const SkidMarkerPopover = () => {
                   <li
                     key={hazard._id}
                     className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
-                    style={{ textAlign: 'center' }}
+                    style={{ textAlign: 'center', backgroundColor: hazard.color }}
                     onClick={() => handleHazardClick(hazard)}
                   >
                     {hazard.id} : {hazard.title}
@@ -371,7 +366,7 @@ const SkidMarkerPopover = () => {
                   <li
                     key={hazard.id}
                     className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
-                    style={{ textAlign: 'center' }}
+                    style={{ textAlign: 'center', backgroundColor: hazard.color }}
                     onClick={() => handleHazardClick(hazard)}
                   >
                     {hazard.id} : {hazard.title}

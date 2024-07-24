@@ -14,7 +14,7 @@ import { useSkid } from '../../context/SkidContext';
  * @param {Function} docSubmit - Function to be executed on submitting selected documents.
  * @returns  {JSX.Element} - Rendered component.
  */
-const AddDocModal = ({ docSubmit }) => {
+const AddDocModal = () => {
   const { skidModalState, setSkidModalState } = useSkidModal();
   const { mapState } = useMap();
   const { skidState, setSkidState } = useSkid();
@@ -147,6 +147,7 @@ const AddDocModal = ({ docSubmit }) => {
                               whiteSpace: 'nowrap',
                               overflow: 'hidden',
                               textOverflow: 'ellipsis',
+                              paddingRight: '5px'
                             }}
                           >
                             {file.fileName}
@@ -179,10 +180,6 @@ const AddDocModal = ({ docSubmit }) => {
       </Modal.Footer>
     </Modal>
   );
-};
-
-AddDocModal.propTypes = {
-  docSubmit: PropTypes.func.isRequired,
 };
 
 export default AddDocModal;
