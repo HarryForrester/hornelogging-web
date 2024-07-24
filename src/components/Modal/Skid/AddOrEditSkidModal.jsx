@@ -346,6 +346,11 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
     const updatedDocs = formik.values.selectedDocuments.filter((doc) => doc !== file._id);
     formik.setFieldValue('selectedDocuments', updatedDocs);
   };
+
+  const removeCutPlan = (event, formik) => {
+    event.stopPropagation();
+    formik.setFieldValue('selectedCutPlan', null)
+  }
   
   /**
    * Handles the removal of a skid hazard from the selected skid hazards list.
@@ -551,7 +556,9 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
                         display: 'inline-block',
                         whiteSpace: 'nowrap',
                         overflow: 'hidden',
-                        textOverflow: 'ellipsis'
+                        textOverflow: 'ellipsis',
+                        color: 'black', // Custom link color
+                        
                       }}
                     >
                       {file.fileName}
@@ -594,6 +601,13 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
                       style={{ cursor: 'pointer' }}
                     >
                       {formik.values.selectedCutPlan.fileName || formik.values.selectedCutPlan.name}
+                      <Button
+                      type="button"
+                      className="btn btn-danger btn-sm"
+                      onClick={(event) => removeCutPlan(event, formik)}
+                    >
+                      Remove
+                    </Button>
                     </ListGroupItem>
                   </ListGroup>
                 )}
