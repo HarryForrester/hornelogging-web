@@ -33,72 +33,15 @@ const SkidMarkerPopover = () => {
     }));
   };
 
-  // Used to convert base64String to  blob to view file on new tab
   const openPdfInNewTab = (item) => {
     window.open(item.url, '_blank');
-  /*   const byteCharacters = atob(item.base64String);
-    const byteArrays = [];
-
-    for (let offset = 0; offset < byteCharacters.length; offset += 512) {
-      const slice = byteCharacters.slice(offset, offset + 512);
-      const byteNumbers = new Array(slice.length);
-
-      for (let i = 0; i < slice.length; i++) {
-        byteNumbers[i] = slice.charCodeAt(i);
-      }
-
-      const byteArray = new Uint8Array(byteNumbers);
-      byteArrays.push(byteArray);
-    }
-
-    const blob = new Blob(byteArrays, { type: 'application/pdf' });
-    const objectUrl = URL.createObjectURL(blob);
-
-    window.open(item, '_blank'); */
   };
 
   const editSelectedSkid = async () => {
     const { formik } = skidState;
 
     const id = new Date().getTime();
-    //console.log('dddddddd',skidMarkerState.selectedMarker.info.siteHazards)
     try {
-      /* if(skidMarkerState.selectedMarker.info.siteHazards && skidMarkerState.selectedMarker.info.siteHazards.length > 0) {
-        const response = await axios.get('http://localhost:3001/findhazard', {
-          params: {
-            name: skidMarkerState.selectedMarker.info.siteHazards.join(',') // Convert the array to a comma-separated string
-          },
-          withCredentials: true
-        });
-  
-        if (response.status === 200) {
-          setSkidModalState((prevState) => ({
-            ...prevState,
-            _id: skidMarkerState.selectedMarker._id,
-            isSkidModalVisible: true,
-            skidName: skidMarkerState.selectedMarker.info.pointName,
-            selectedCrew: skidMarkerState.selectedMarker.info.crews,
-            selectedDocuments: skidMarkerState.selectedMarker.info.selectedDocuments,
-            selectedSkidHazards: skidMarkerState.selectedMarker.info.siteHazards,
-            selectedSkidHazardsData: response.data,
-            selectedCutPlan: skidMarkerState.selectedMarker.info.cutPlans,
-            isSkidModalEdit: true
-          }));
-        }
-      } */ //else {
-        
-        /* setSkidModalState((prevState) => ({
-          ...prevState,
-          _id: skidMarkerState.selectedMarker._id,
-          isSkidModalVisible: true,
-          skidName: skidMarkerState.selectedMarker.info.pointName,
-          selectedCrew: skidMarkerState.selectedMarker.info.crews,
-          selectedDocuments: skidMarkerState.selectedMarker.info.selectedDocuments,
-          selectedSiteHazards: skidMarkerState.selectedMarker.info.siteHazards,
-          selectedCutPlan: skidMarkerState.selectedMarker.info.cutPlans,
-          isSkidModalEdit: true
-        })); */
-      //}
       setSkidState((prevState) => ({
         ...prevState,
         skidModalVisible: true,
@@ -128,7 +71,6 @@ const SkidMarkerPopover = () => {
         }));
       }, 10000);
     }
-    //setEditSkid(true);
     setSkidMarkerState((prevState) => ({
       ...prevState,
       editSkid: true
@@ -143,24 +85,6 @@ const SkidMarkerPopover = () => {
 
       await deletePresignedUrl([cutPlanKey]); // removes cutplan file from s3
     }
-    
-  /*   const skidObj = {
-      _id: skidModalState._id,
-      mapName: mapState.currentMapName,
-      info: {
-        crews: skidModalState.selectedCrew,
-        cutPlans: skidModalState.selectedCutPlan,
-        pointName: skidModalState.skidName,
-        selectedDocuments: skidModalState.selectedDocuments,
-        siteHazards: skidModalState.selectedSkidHazards
-      },
-      point: {
-        originalWidth: mapState.originalWidth,
-        originalHeight: mapState.originalHeight,
-        x: skidMarkerState.mousePosition.x,
-        y: skidMarkerState.mousePosition.y
-      }
-    }; */
 
     const response = await axios.delete(
       `http://localhost:3001/pointonmap/${skidState.selectedSkidId}/${mapState.currentMapId}`,
@@ -239,7 +163,6 @@ const SkidMarkerPopover = () => {
             </div>
 
             <ul className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
-              {/* Filters out crews that do not exist anymore */}
               {skidState?.formik?.values?.selectedCrew
                 .filter((crew) => mapState.crewTypes.some((mapCrew) => mapCrew === crew))
                 .map((crew) => (
@@ -254,8 +177,6 @@ const SkidMarkerPopover = () => {
                 ))}
             </ul>
               
-            
-
             <div>
               {skidState?.formik?.values?.selectedDocuments && skidState?.formik?.values?.selectedDocuments.length > 0 && (
                 <>
@@ -282,9 +203,7 @@ const SkidMarkerPopover = () => {
                   ))}
                 </ul></>
               )}
-            </div>
-
-            
+            </div> 
 
             <div>
               {skidState?.formik?.values?.selectedCutPlan !== null && (
