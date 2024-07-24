@@ -538,40 +538,48 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
               <Form.Group>
               <ListGroup className="doc-list list-group">
               {formik.values.selectedDocuments
-                .map(id => mapState.files.find(file => file._id === id))
-                .filter(file => file)
-                .map(file => (
-                  <ListGroupItem
-                    key={file._id}
-                    className="list-group-item d-flex justify-content-between align-items-center"
-                  >
-                    <Anchor
-                      key={`${file._id}-link`}
-                      href={file.fileUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-decoration-none"
-                      style={{
-                        maxWidth: '300px',
-                        display: 'inline-block',
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        color: 'black', // Custom link color
-                        
-                      }}
-                    >
-                      {file.fileName}
-                    </Anchor>
-                    <Button
-                      type="button"
-                      className="btn btn-danger btn-sm"
-                      onClick={() => removeSkidDoc(file, formik)}
-                    >
-                      Remove
-                    </Button>
-                  </ListGroupItem>
-                ))}
+  .map(id => mapState.files.find(file => file._id === id))
+  .filter(file => file)
+  .map(file => (
+    <ListGroupItem
+      key={file._id}
+      className="list-group-item d-flex justify-content-between align-items-center"
+      onClick={() => window.open(file.fileUrl, '_blank')}
+      style={{ cursor: 'pointer' }}
+    >
+      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+        <Anchor
+          key={`${file._id}-link`}
+          href={file.fileUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-decoration-none"
+          style={{
+            maxWidth: '300px',
+            display: 'inline-block',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            color: 'black' // Custom link color
+          }}
+          onClick={(e) => e.stopPropagation()} // Prevents the outer click event
+        >
+          {file.fileName}
+        </Anchor>
+        <Button
+          type="button"
+          className="btn btn-danger btn-sm"
+          onClick={(e) => {
+            e.stopPropagation();
+            removeSkidDoc(file, formik);
+          }}
+        >
+          Remove
+        </Button>
+      </div>
+    </ListGroupItem>
+  ))}
+
               </ListGroup>
             </Form.Group>
 
