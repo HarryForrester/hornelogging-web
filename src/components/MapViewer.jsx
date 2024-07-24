@@ -364,6 +364,19 @@ const PDFViewer = ({ percentage, _account }) => {
       try {
         const response = await axios.get('http://localhost:3001/people', { withCredentials: true });
         const data = response.data;
+        const files = data.files;
+
+            // Create a map of files by person ID
+            const filesByPerson = files.reduce((acc, file) => {
+              if (!acc[file.owner]) {
+                acc[file.owner] = [];
+              }
+              acc[file.owner].push(file);
+              return acc;
+            }, {});
+
+            console.log('ching hong',filesByPerson);
+
 
         setSkidMarkerState((prevState) => {
           const updatedPeopleByCrew =
@@ -375,14 +388,15 @@ const PDFViewer = ({ percentage, _account }) => {
                     const crewName = item.crew;
                     const existingCrew = updatedCrews[crewName] || [];
                     const existingPerson = existingCrew.find((person) => person._id === item._id);
-
+                    console.log('hello there', item)
                     if (!existingPerson) {
                       updatedCrews[crewName] = [
                         ...existingCrew,
                         {
                           _id: item._id,
                           name: item.name,
-                          role: item.role
+                          role: item.role,
+                          filesByPerson: filesByPerson[item._id]
                         }
                       ];
                     }

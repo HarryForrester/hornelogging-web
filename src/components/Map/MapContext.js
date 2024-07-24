@@ -21,6 +21,8 @@ export const MapProvider = ({ children }) => {
     hazards: [],
     generalHazards: [],
     generalHazardsData: [],
+    skidFiles: [],
+    fileTypes: [],
     confirmModalLabel: null,
     confirmModalMessage: null
   });

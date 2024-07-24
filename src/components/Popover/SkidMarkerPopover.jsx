@@ -7,7 +7,7 @@ import { useAlertMessage } from '../AlertMessage';
 import { useSkidMarker } from '../SkidMarkerContext';
 import axios from 'axios';
 import { deletePresignedUrl } from '../../hooks/useFileDelete';
-
+import { useNavigate } from 'react-router-dom';
 import { useSkid } from '../../context/SkidContext';
 const SkidMarkerPopover = () => {
   const { skidModalState, setSkidModalState } = useSkidModal();
@@ -15,6 +15,7 @@ const SkidMarkerPopover = () => {
   const { setAlertMessageState } = useAlertMessage();
   const { skidMarkerState, setSkidMarkerState } = useSkidMarker();
   const { skidState, setSkidState } = useSkid(); // holds information about the skid
+  const navigate = useNavigate();
 
   const toggleSkidCrew = (crew) => {
     setSkidMarkerState((prevState) => ({
@@ -131,7 +132,30 @@ const SkidMarkerPopover = () => {
       enableMarker: false
     }));  
   };
-
+  
+  const handlePersonClick = async (person) => {
+    /* try {
+      // eslint-disable-next-line no-undef
+      const response = await axios.get(`${process.env.REACT_APP_URL}/person-files/${person._id}`, {
+        withCredentials: true
+      });
+      if (response.data.isLoggedIn) {
+        const data = response.data;
+        console.log('dtat', data)
+       
+      } else {
+        navigate('/login');
+      }
+    } catch (error) {
+      console.error('An error has occuring fetching person data', error);
+    } */
+    
+    setSkidMarkerState((prevState) => ({
+      ...prevState,
+      selectedSkidPerson: person,
+      popoverPersonVisible: !prevState.popoverPersonVisible
+    }))
+  }
   return (
     <>
       {skidMarkerState.popoverVisible && (
@@ -316,11 +340,10 @@ const SkidMarkerPopover = () => {
                       key={person._id}
                       className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
                       style={{ textAlign: 'center' }}
-                      onClick={() => setSkidMarkerState((prevState) => ({
-                        ...prevState,
-                        selectedSkidPerson: person,
-                        popoverPersonVisible: !prevState.popoverPersonVisible
-                      }))}
+                      onClick={() => {
+                        console.log("memeoww", person);
+                        handlePersonClick(person);
+                        }}
                     >
                       {person.name}
                     </li>
@@ -341,10 +364,10 @@ const SkidMarkerPopover = () => {
               </div>
               <div className="popover-body">
                 <ul className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
-                  {skidMarkerState.selectedSkidPersonFiles.length === 0 ? (
+                    {Object.keys(skidMarkerState?.selectedSkidPerson?.filesByPerson || {}).length === 0 ? (
                     <p>No files available</p>
                   ) : (
-                    Array.from(new Set(skidMarkerState.selectedSkidPersonFiles.map((item) => item.type))).map((type) => (
+                    Array.from(new Set(skidMarkerState?.selectedSkidPerson?.filesByPerson?.map((item) => item.type))).map((type) => (
                       <div key={type}>
                         <div
                           style={{
@@ -357,7 +380,7 @@ const SkidMarkerPopover = () => {
                           {type}
                         </div>
                         <ul className="list-group">
-                          {skidMarkerState.selectedSkidPersonFiles.filter((item) => item.type === type).map((item) => (
+                          {skidMarkerState?.selectedSkidPerson?.filesByPerson?.filter((item) => item.type === type).map((item) => (
                             <li
                               key={item._id}
                               className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"

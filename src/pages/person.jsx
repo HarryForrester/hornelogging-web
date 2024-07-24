@@ -34,6 +34,7 @@ const Person = () => {
         });
         if (response.data.isLoggedIn) {
           const data = response.data;
+          console.log('dtat', data)
           setPersonDataState((prevState) => ({
             ...prevState,
             person: data.person,
