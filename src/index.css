@@ -695,3 +695,11 @@ button[for='current-maps'] {
 .message-bubble:not(.office) {
   background-color: #ccc;
 }
+
+.skid-hazard-item:hover {
+  transition: background-color 0.3s ease;
+}
+
+.skid-hazard-item:hover {
+  filter: brightness(95%);
+}

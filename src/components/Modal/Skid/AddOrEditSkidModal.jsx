@@ -123,7 +123,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
             formik: {
               ...prevState.formik,
               values: {
-                ...prevState.formik.values,
+                ...prevState?.formik?.values,
                 skidName: val.info.pointName,
                 selectedCrew: val.info.crews,
                 selectedDocuments: val.info.selectedDocuments,
@@ -543,7 +543,8 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
   .map(file => (
     <ListGroupItem
       key={file._id}
-      className="list-group-item d-flex justify-content-between align-items-center"
+
+      className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
       onClick={() => window.open(file.fileUrl, '_blank')}
       style={{ cursor: 'pointer' }}
     >
@@ -646,8 +647,8 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
                 .map(hazard => (
                   <ListGroupItem
                     key={hazard._id}
-                    className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
-                    style={{ textAlign: 'center', backgroundColor: hazard.color}}
+                    className="list-group-item d-flex justify-content-between align-items-center list-group-item-action skid-hazard-item"
+                    style={{ textAlign: 'center', backgroundColor: hazard.color, cursor: 'pointer' }}
                     onClick={() => handleHazardClick(hazard)}
                   >
                     <span>
