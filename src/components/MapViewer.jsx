@@ -80,13 +80,18 @@ const PDFViewer = ({ percentage, _account }) => {
       console.log('ook')
       setSkidMarkerState((prevState) => ({
         ...prevState,
-        popoverVisible: !prevState.popoverVisible
+        popoverVisible: !prevState.popoverVisible,
+        popoverCrewVisible: false,
+        popoverPersonVisible: false
       }));
+      
     } else {
       // If it's a different point, close the existing popover and then open it for the new popovers
       setSkidMarkerState((prevState) => ({
         ...prevState,
-        popoverVisible: true
+        popoverVisible: true,
+        popoverCrewVisible: false,
+        popoverPersonVisible: false
       }));
 
       setSkidState((prevState) => ({
@@ -609,8 +614,8 @@ const PDFViewer = ({ percentage, _account }) => {
         
       )}
               <SkidMarkerPopover />
-            <SkidMarkerCrewPopover />
-            <SkidMarkerPersonPopover />
+          {/*   <SkidMarkerCrewPopover />
+            <SkidMarkerPersonPopover /> */}
     </>
   );
 };

@@ -7,6 +7,7 @@ import { useAlertMessage } from '../AlertMessage';
 import { useSkidMarker } from '../SkidMarkerContext';
 import axios from 'axios';
 import { deletePresignedUrl } from '../../hooks/useFileDelete';
+
 import { useSkid } from '../../context/SkidContext';
 const SkidMarkerPopover = () => {
   const { skidModalState, setSkidModalState } = useSkidModal();
@@ -139,164 +140,240 @@ const SkidMarkerPopover = () => {
           data-bs-placement="top"
           style={{
             position: 'absolute',
-            left: `${skidState.selectedSkidPos.x}px`,
-            top: `${skidState.selectedSkidPos.y}px`,
+            left: `${skidState?.selectedSkidPos?.x}px`,
+            top: `${skidState?.selectedSkidPos?.y}px`,
             width: '250px',
 
             zIndex: 99
           }}
         >
-          <div className="popover-header">
-            Skid: {skidState?.formik?.values?.skidName}
-            <RemoveSkidButton onClick={removeSelectedSkid} />
-            <EditSkidButton onClick={editSelectedSkid} />
-          </div>
-          <div className="popover-body">
-            <div
-              style={{
-                fontWeight: 'bold',
-                fontSize: '100%',
-                textAlign: 'center'
-              }}
-            >
-              Crew:
-            </div>
-
-            <ul className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
-              {skidState?.formik?.values?.selectedCrew
-                .filter((crew) => mapState.crewTypes.some((mapCrew) => mapCrew === crew))
-                .map((crew) => (
-                  <li
-                    key={crew}
-                    className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
-                    onClick={() => toggleSkidCrew(crew)}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    {crew}
-                  </li>
-                ))}
-            </ul>
-              
-            <div>
-              {skidState?.formik?.values?.selectedDocuments && skidState?.formik?.values?.selectedDocuments.length > 0 && (
-                <>
-                <div
-                style={{
-                  fontWeight: 'bold',
-                  fontSize: '100%',
-                  textAlign: 'center',
-                  paddingBottom: '10px'
-                }}
-              >
-                Site Documents:
+          {!skidMarkerState.popoverCrewVisible ? (
+            <>
+              <div className="popover-header">
+                Skid: {skidState?.formik?.values?.skidName}
+                <RemoveSkidButton onClick={removeSelectedSkid} />
+                <EditSkidButton onClick={editSelectedSkid} />
               </div>
-              
+              <div className="popover-body">
+                <div
+                  style={{
+                    fontWeight: 'bold',
+                    fontSize: '100%',
+                    textAlign: 'center'
+                  }}
+                >
+                  Crew:
+                </div>
                 <ul className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
-                  {skidState?.formik?.values?.selectedDocuments.map(id => mapState.files.find(file => file._id === id)).filter(file => file).map((item, index) => (
-                    <li
-                      key={index}
-                      className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
-                      onClick={() => window.open(item.fileUrl, '_blank')}
+                  {skidState?.formik?.values?.selectedCrew
+                    .filter((crew) => mapState.crewTypes.some((mapCrew) => mapCrew === crew))
+                    .map((crew) => (
+                      <li
+                        key={crew}
+                        className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
+                        onClick={() => toggleSkidCrew(crew)}
+                        style={{ cursor: 'pointer' }}
+                      >
+                        {crew}
+                      </li>
+                    ))}
+                </ul>
+                <div>
+                  {skidState?.formik?.values?.selectedDocuments && skidState?.formik?.values?.selectedDocuments.length > 0 && (
+                    <>
+                      <div
+                        style={{
+                          fontWeight: 'bold',
+                          fontSize: '100%',
+                          textAlign: 'center',
+                          paddingBottom: '10px'
+                        }}
+                      >
+                        Site Documents:
+                      </div>
+                      <ul className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
+                        {skidState?.formik?.values?.selectedDocuments.map(id => mapState.files.find(file => file._id === id)).filter(file => file).map((item, index) => (
+                          <li
+                            key={index}
+                            className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
+                            onClick={() => window.open(item.fileUrl, '_blank')}
+                          >
+                            {item.fileName}
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
+                </div>
+                <div>
+                  {skidState?.formik?.values?.selectedCutPlan !== null && (
+                    <>
+                      <div
+                        style={{
+                          fontWeight: 'bold',
+                          fontSize: '100%',
+                          textAlign: 'center',
+                          paddingBottom: '10px'
+                        }}
+                      >
+                        Weekly Cut Plans:
+                      </div>
+                      <ul className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
+                        <li
+                          className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
+                          onClick={() => openPdfInNewTab(skidState.formik.values.selectedCutPlan)}
+                          style={{ cursor: 'pointer' }}
+                        >
+                          {skidState?.formik?.values?.selectedCutPlan?.fileName}
+                        </li>
+                      </ul>
+                    </>
+                  )}
+                </div>
+                {mapState.generalHazardsData && mapState.generalHazardsData.length > 0 && (
+                  <>
+                    <div
+                      style={{
+                        fontWeight: 'bold',
+                        fontSize: '100%',
+                        textAlign: 'center',
+                        paddingBottom: '10px'
+                      }}
                     >
-                      {item.fileName}
+                      General Hazards:
+                    </div>
+                    <div>
+                      <ul className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
+                        {mapState.generalHazardsData.map((hazard) => (
+                          <li
+                            key={hazard._id}
+                            className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
+                            style={{ textAlign: 'center', backgroundColor: hazard.color }}
+                            onClick={() => handleHazardClick(hazard)}
+                          >
+                            {hazard.id} : {hazard.title}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </>
+                )}
+                {skidState?.formik?.values?.selectedSkidHazards && skidState?.formik?.values?.selectedSkidHazards.length > 0 && (
+                  <>
+                    <div
+                      style={{
+                        fontWeight: 'bold',
+                        fontSize: '100%',
+                        textAlign: 'center',
+                        paddingBottom: '10px'
+                      }}
+                    >
+                      Site Hazards:
+                    </div>
+                    <div>
+                      <ul className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
+                      {skidState?.formik.values.selectedSkidHazards
+                      .map(id => mapState.hazards.find(hazard => hazard._id === id))
+                      .filter(hazard => hazard)
+                      .map(hazard => (
+                        <li
+                          key={hazard.id}
+                          className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
+                          style={{ textAlign: 'center', backgroundColor: hazard.color }}
+                          onClick={() => handleHazardClick(hazard)}
+                        >
+                          {hazard.id} : {hazard.title}
+                        </li>
+                      ))}
+                      </ul>
+                    </div>
+                  </>
+                )}
+              </div>
+            </>
+          ) : !skidMarkerState.popoverPersonVisible ? (
+            <>
+              <div className="popover-header">
+                <button type="button" className="btn btn-link" onClick={() => toggleSkidCrew(null)}>
+                  ←
+                </button>
+                Crew: {skidMarkerState.selectedSkidCrew}
+              </div>
+              <div className="popover-body">
+                <ul className="list-group" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                <div
+                      style={{
+                        fontWeight: 'bold',
+                        fontSize: '100%',
+                        textAlign: 'center',
+                        paddingBottom: '10px'
+                      }}
+                    >
+                      People:
+                    </div>
+                  {skidMarkerState.peopleByCrew[skidMarkerState.selectedSkidCrew].map((person) => (
+                    <li
+                      key={person._id}
+                      className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
+                      style={{ textAlign: 'center' }}
+                      onClick={() => setSkidMarkerState((prevState) => ({
+                        ...prevState,
+                        selectedSkidPerson: person,
+                        popoverPersonVisible: !prevState.popoverPersonVisible
+                      }))}
+                    >
+                      {person.name}
                     </li>
                   ))}
-                </ul></>
-              )}
-            </div> 
-
-            <div>
-              {skidState?.formik?.values?.selectedCutPlan !== null && (
-                <>
-                <div
-                style={{
-                  fontWeight: 'bold',
-                  fontSize: '100%',
-                  textAlign: 'center',
-                  paddingBottom: '10px'
-                }}
-              >
-                Weekly Cut Plans:
-              </div>
-              
-                <ul className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
-                    <li
-                      className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
-                      onClick={() => openPdfInNewTab(skidState.formik.values.selectedCutPlan)}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      {skidState?.formik?.values?.selectedCutPlan?.fileName}
-                    </li>
                 </ul>
-                </>
-              )}
-            </div>
-
-            {mapState.generalHazardsData && mapState.generalHazardsData.length > 0 && (
-              <>
-              <div
-              style={{
-                fontWeight: 'bold',
-                fontSize: '100%',
-                textAlign: 'center',
-                paddingBottom: '10px'
-              }}
-            >
-              General Hazards:
-            </div>
-
-            <div>
-              <ul className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
-                {mapState.generalHazardsData.map((hazard) => (
-                  <li
-                    key={hazard._id}
-                    className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
-                    style={{ textAlign: 'center', backgroundColor: hazard.color }}
-                    onClick={() => handleHazardClick(hazard)}
-                  >
-                    {hazard.id} : {hazard.title}
-                  </li>
-                ))}
-              </ul>
-            </div>
+              </div>
             </>
-            )}
-
-            
-            { skidState?.formik?.values?.selectedSkidHazards && skidState?.formik?.values?.selectedSkidHazards.length > 0 && (
-              <>
-               <div
-              style={{
-                fontWeight: 'bold',
-                fontSize: '100%',
-                textAlign: 'center',
-                paddingBottom: '10px'
-              }}
-            >
-              Site Hazards:
-            </div>
-
-            <div>
-              <ul className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
-              {skidState?.formik.values.selectedSkidHazards
-                .map(id => mapState.hazards.find(hazard => hazard._id === id))
-                .filter(hazard => hazard)
-                .map(hazard => (
-                  <li
-                    key={hazard.id}
-                    className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
-                    style={{ textAlign: 'center', backgroundColor: hazard.color }}
-                    onClick={() => handleHazardClick(hazard)}
-                  >
-                    {hazard.id} : {hazard.title}
-                  </li>
-                ))}
-              </ul>
-            </div>
-              </>
-            )}
-           
-          </div>
+          ) : (
+            <>
+              <div className="popover-header">
+                <button type="button" className="btn btn-link" onClick={() => setSkidMarkerState((prevState) => ({
+                  ...prevState,
+                  popoverPersonVisible: !prevState.popoverPersonVisible
+                }))}>
+                  ←
+                </button>
+                {skidMarkerState.selectedSkidPerson.name} <span className="smaller-text">({skidMarkerState.selectedSkidPerson.role})</span>
+              </div>
+              <div className="popover-body">
+                <ul className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
+                  {skidMarkerState.selectedSkidPersonFiles.length === 0 ? (
+                    <p>No files available</p>
+                  ) : (
+                    Array.from(new Set(skidMarkerState.selectedSkidPersonFiles.map((item) => item.type))).map((type) => (
+                      <div key={type}>
+                        <div
+                          style={{
+                            fontWeight: 'bold',
+                            fontSize: '100%',
+                            textAlign: 'center',
+                            paddingBottom: '10px'
+                          }}
+                        >
+                          {type}
+                        </div>
+                        <ul className="list-group">
+                          {skidMarkerState.selectedSkidPersonFiles.filter((item) => item.type === type).map((item) => (
+                            <li
+                              key={item._id}
+                              className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
+                              onClick={() => window.open(item.fileUrl, '_blank')}
+                            >
+                              {item.fileName}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))
+                  )}
+                </ul>
+              </div>
+            </>
+          )}
         </div>
       )}
     </>
