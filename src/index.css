@@ -703,3 +703,7 @@ button[for='current-maps'] {
 .skid-hazard-item:hover {
   filter: brightness(95%);
 }
+
+.hazard-modal-content {
+  padding: 0
+}

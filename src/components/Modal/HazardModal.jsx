@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import { useSkidModal } from './Skid/SkidModalContext';
-
+import tinycolor from 'tinycolor2';
 function HazardModal() {
   const { skidModalState, setSkidModalState } = useSkidModal();
 
@@ -29,15 +29,19 @@ function HazardModal() {
 
     }
   };
+  const lighterBackgroundColor = tinycolor(selectedHazard.color).lighten(30).toString()
 
   return (
     <Modal
       show={skidModalState.hazardModalVisible}
       onHide={handleClose}
       backdrop="static"
+      size='lg'
+      contentClassName='hazard-modal-content'
+      style={{padding: 0, margin: 0}}
     >
-      <Modal.Header style={{ backgroundColor: selectedHazard.color }}>
-        <Modal.Title>
+      <Modal.Header style={{ backgroundColor: selectedHazard.color}} closeButton>
+        <Modal.Title /* style={{fontSize: 18}} */>
           <b>
             {selectedHazard.id}: <em>{selectedHazard.title}</em>
           </b>{' '}
@@ -47,11 +51,11 @@ function HazardModal() {
           <b>{selectedHazard.cat}</b>
         </div>
       </Modal.Header>
-      <Modal.Body>
+      <Modal.Body style={{ backgroundColor: lighterBackgroundColor }}>
         <dl>
           {Object.entries(selectedHarms).map(([key, value]) => (
             <React.Fragment key={key}>
-              <dt style={{ width: '200px' }}>{key}</dt>
+              <dt style={{ width: '150px' }}>{key}</dt>
               <dd>
                 <ul>
                   {value.map((item, index) => (
@@ -64,14 +68,12 @@ function HazardModal() {
         </dl>
       </Modal.Body>
       <Modal.Footer>
-        <div style={{ float: 'right', marginTop: '10px', marginBottom: '10px' }}>
           <em>
             Reviewed: {selectedHazard.reviewDate} ({selectedHazard.reviewReason})
           </em>
-        </div>
-        <Button variant="danger" onClick={handleClose}>
+        {/* <Button variant="danger" onClick={handleClose}>
           Close
-        </Button>
+        </Button> */}
       </Modal.Footer>
     </Modal>
   );
