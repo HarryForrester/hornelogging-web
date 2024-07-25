@@ -5,14 +5,13 @@ import { useSkidModal } from './Skid/SkidModalContext';
 import { useMap } from '../Map/MapContext';
 import PropTypes from 'prop-types';
 import Accordion from 'react-bootstrap/Accordion';
-
 import { useSkid } from '../../context/SkidContext';
 
 /**
  * AddDocModal component for handling document selection.
  * @component
  * @param {Function} docSubmit - Function to be executed on submitting selected documents.
- * @returns  {JSX.Element} - Rendered component.
+ * @returns {JSX.Element} - Rendered component.
  */
 const AddDocModal = () => {
   const { skidModalState, setSkidModalState } = useSkidModal();
@@ -132,8 +131,9 @@ const AddDocModal = () => {
                   {filesToShow.map((file) => (
                     <div
                       className="card"
-                      style={{ marginBottom: '10px', backgroundColor: file.color }}
+                      style={{ marginBottom: '10px', backgroundColor: file.color, cursor: 'pointer' }}
                       key={file._id}
+                      onClick={() => window.open(file.fileUrl, '_blank')}
                     >
                       <div className="search-text-doc" style={{ display: 'none' }}>
                         {file.searchText}
@@ -158,7 +158,10 @@ const AddDocModal = () => {
                           <Button
                             type="button"
                             data-filename={file.fileName}
-                            onClick={() => handleCheckboxChange(file)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleCheckboxChange(file);
+                            }}
                             size="sm"
                           >
                             Add

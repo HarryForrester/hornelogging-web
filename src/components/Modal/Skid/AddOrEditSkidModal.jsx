@@ -537,7 +537,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
               </Form.Group>
 
               <Form.Group>
-              <ListGroup className="doc-list list-group">
+              <ListGroup className="doc-list list-group" style={{ maxHeight: '200px', overflowY: 'auto' }}>
               {formik.values.selectedDocuments
   .map(id => mapState.files.find(file => file._id === id))
   .filter(file => file)
@@ -545,7 +545,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
     <ListGroupItem
       key={file._id}
 
-      className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
+      className="list-group-item d-flex justify-content-between align-items-center list-group-item-action border border-secondary"
       onClick={() => window.open(file.fileUrl, '_blank')}
       style={{ cursor: 'pointer' }}
     >
@@ -648,7 +648,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
                 .map(hazard => (
                   <ListGroupItem
                     key={hazard._id}
-                    className="list-group-item d-flex justify-content-between align-items-center list-group-item-action skid-hazard-item"
+                    className="list-group-item d-flex justify-content-between align-items-center list-group-item-action skid-hazard-item border border-secondary"
                     style={{ textAlign: 'center', backgroundColor: hazard.color, cursor: 'pointer' }}
                     onClick={() => handleHazardClick(hazard)}
                   >

@@ -704,6 +704,11 @@ button[for='current-maps'] {
   filter: brightness(95%);
 }
 
+.hazard-modal-content {
+  padding: 0
+}
+
 .hazard-modal {
-  background-color: rgba(0,0,0,0.2);
+  background-color: rgba(0,0,0,0.2)
+
 }
