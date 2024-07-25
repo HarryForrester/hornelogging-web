@@ -421,6 +421,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
       isSkidModalVisible: false,
       selectedHazardData: hazard
     }));
+
   };
 
   var name;

@@ -35,22 +35,25 @@ function HazardModal() {
     <Modal
       show={skidModalState.hazardModalVisible}
       onHide={handleClose}
-      backdrop="static"
       size='lg'
       contentClassName='hazard-modal-content'
-      style={{padding: 0, margin: 0}}
+      className='hazard-modal'
+      style={{padding: 0, margin: 0 }}
     >
-      <Modal.Header style={{ backgroundColor: selectedHazard.color}} closeButton>
-        <Modal.Title /* style={{fontSize: 18}} */>
-          <b>
-            {selectedHazard.id}: <em>{selectedHazard.title}</em>
-          </b>{' '}
-          <small>({selectedHazard.sev})</small>
-        </Modal.Title>
-        <div style={{ float: 'right' }}>
-          <b>{selectedHazard.cat}</b>
+      <Modal.Header style={{ backgroundColor: selectedHazard.color }} closeButton>
+        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+          <Modal.Title>
+            <b>
+              {selectedHazard.id}: <em>{selectedHazard.title}</em>
+            </b>{' '}
+            <small>({selectedHazard.sev})</small>
+          </Modal.Title>
+          <div>
+            <b>{selectedHazard.cat}</b>
+          </div>
         </div>
       </Modal.Header>
+
       <Modal.Body style={{ backgroundColor: lighterBackgroundColor }}>
         <dl>
           {Object.entries(selectedHarms).map(([key, value]) => (

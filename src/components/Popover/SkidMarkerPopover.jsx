@@ -34,6 +34,7 @@ const SkidMarkerPopover = () => {
       isSkidModalVisible: false,
       selectedHazardData: hazard
     }));
+
   };
 
   const openPdfInNewTab = (item) => {

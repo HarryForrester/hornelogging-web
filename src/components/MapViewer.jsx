@@ -489,17 +489,18 @@ const PDFViewer = ({ percentage, _account }) => {
       <AddCutPlanModal submitCutPlan={submitCutPlan} />
       <SelectHazardsModal submitSelectedHazards={submitSelectedHazards} />
       <AddSkidHazardModal />
+      <AddOrEditSkidModal
+        mousePosition={skidMarkerState.mousePosition}
+        editSkid={skidMarkerState.editSkid}
+        _account={_account}
+      />
       <HazardModal />
      
       <EditGeneralHazardModal
         submitGeneralHazardModal={submitGeneralHazardModal}
         handleClose={handleClose}
       />
- <AddOrEditSkidModal
-        mousePosition={skidMarkerState.mousePosition}
-        editSkid={skidMarkerState.editSkid}
-        _account={_account}
-      />
+ 
       
                   {loading && <div
             style={{

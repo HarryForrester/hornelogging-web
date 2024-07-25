@@ -332,7 +332,7 @@ const Maps = () => {
               ))}
           </div>
         </div>
-        <div ref={pdfContainerRef} id="pdf-container" className="pdf-container">
+        <div ref={pdfContainerRef} id="pdf-container" className="pdf-container" style={{zIndex: 1 }}>
           <SkidProvider>
           <MapViewer percentage={percentage} _account={account} />
           </SkidProvider>
