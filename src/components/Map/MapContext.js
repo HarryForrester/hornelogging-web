@@ -24,7 +24,8 @@ export const MapProvider = ({ children }) => {
     skidFiles: [],
     fileTypes: [],
     confirmModalLabel: null,
-    confirmModalMessage: null
+    confirmModalMessage: null,
+    selectedGeneralHazards: []
   });
 
   return <MapContext.Provider value={{ mapState, setMapState }}>{children}</MapContext.Provider>;

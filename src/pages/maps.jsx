@@ -42,6 +42,7 @@ const Maps = () => {
 
         if (response.data.isLoggedIn) {
           const data = response.data;
+          console.log('kakakaka', data)
           setAccount(data._account);
           setMapState((prevState) => ({
             ...prevState,
@@ -50,7 +51,7 @@ const Maps = () => {
             maps: data.maps,
             username: data.username,
             hazards: data.hazards,
-            generalHazardsData: data.hazardsForGH
+            selectedGeneralHazards: data.generalHazards
           }));
         } else {
           navigate('/login');
@@ -69,6 +70,7 @@ const Maps = () => {
   }, [navigate]);
 
   const openEditGeneralHazards = () => {
+    
     setSkidModalState((prevState) => ({
       ...prevState,
       isGeneralHazardsModalVisible: true, // or false based on your logic

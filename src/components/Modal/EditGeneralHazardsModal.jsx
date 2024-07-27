@@ -2,26 +2,26 @@ import React from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import axios from 'axios';
 import { useSkidModal } from './Skid/SkidModalContext';
 import { useMap } from '../Map/MapContext';
-import { Anchor, ListGroup, ListGroupItem } from 'react-bootstrap';
+import { ListGroup, ListGroupItem } from 'react-bootstrap';
 import PropTypes from 'prop-types';
+import { useSkid } from '../../context/SkidContext';
 
 const EditGeneralHazardModal = ({ submitGeneralHazardModal, handleClose }) => {
   const { skidModalState, setSkidModalState } = useSkidModal();
   const { mapState, setMapState } = useMap();
+  const { skidState, setSkidState } = useSkid();
 
   /**
-   * Opens the SelectHazardsModal.jsx and hides the Edit General Hazards Modal (EditGeneralHazardsModal.jsx) by updating the state.
-   * @function openDocModal
+   * Opens the SelectHazardsModal and hides the Edit General Hazards Modal.
+   * @function openSelectHazardModal
    * @returns {void}
    */
   const openSelectHazardModal = () => {
-    setSkidModalState((prevState) => ({
+    setSkidState((prevState) => ({
       ...prevState,
-      isSelectHazardModalVisible: true,
-      isGeneralHazardsModalVisible: false
+      selectHazardModalVisible: true
     }));
   };
 
@@ -43,17 +43,21 @@ const EditGeneralHazardModal = ({ submitGeneralHazardModal, handleClose }) => {
     event.stopPropagation();
 
     setMapState((prevState) => {
-      const updatedHazards = prevState.generalHazardsData.filter(
-        (hazard) => hazard.id !== hazardToRemove
+      const updatedHazards = prevState.selectedGeneralHazards.filter(
+        (hazard) => hazard !== hazardToRemove._id
       );
       return {
         ...prevState,
-        generalHazardsData: updatedHazards
+        selectedGeneralHazards: updatedHazards
       };
     });
   };
 
-  const test = mapState.generalHazardsData;
+  // Ensure that selectedGeneralHazards is always an array
+  const selectedGeneralHazards = Array.isArray(mapState.selectedGeneralHazards) 
+    ? mapState.selectedGeneralHazards 
+    : [];
+
   return (
     <>
       <Modal
@@ -82,25 +86,28 @@ const EditGeneralHazardModal = ({ submitGeneralHazardModal, handleClose }) => {
 
             <Form.Group className="col-md-12">
               <ListGroup className="list-group" style={{ maxHeight: '400px', overflowY: 'auto' }}>
-                {mapState.generalHazardsData.map((hazard) => (
-                  <ListGroupItem
-                    key={hazard.id}
-                    className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
-                    style={{ textAlign: 'center' }}
-                    onClick={() => handleHazardClick(hazard)}
-                  >
-                    <span>
-                      {hazard.id} : {hazard.title}
-                    </span>
-                    <Button
-                      type="button"
-                      className="btn btn-danger btn-sm"
-                      onClick={(event) => removeSkidHazard(event, hazard.id)}
+                {selectedGeneralHazards
+                  .map(id => mapState.hazards.find(hazard => hazard._id === id))
+                  .filter(hazard => hazard)
+                  .map(hazard => (
+                    <ListGroupItem
+                      key={hazard._id}
+                      className="list-group-item d-flex justify-content-between align-items-center list-group-item-action skid-hazard-item border border-secondary"
+                      style={{ textAlign: 'center', backgroundColor: hazard.color, cursor: 'pointer' }}
+                      onClick={() => handleHazardClick(hazard)}
                     >
-                      Remove
-                    </Button>
-                  </ListGroupItem>
-                ))}
+                      <span>
+                        {hazard.id} : {hazard.title}
+                      </span>
+                      <Button
+                        type="button"
+                        className="btn btn-danger btn-sm"
+                        onClick={(event) => removeSkidHazard(event, hazard)}
+                      >
+                        Remove
+                      </Button>
+                    </ListGroupItem>
+                  ))}
               </ListGroup>
             </Form.Group>
           </Form>
@@ -122,4 +129,5 @@ EditGeneralHazardModal.propTypes = {
   submitGeneralHazardModal: PropTypes.func.isRequired,
   handleClose: PropTypes.func.isRequired
 };
+
 export default EditGeneralHazardModal;

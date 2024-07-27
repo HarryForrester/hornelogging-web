@@ -279,24 +279,24 @@ const PDFViewer = ({ percentage, _account }) => {
   const submitGeneralHazardModal = async () => {
     const id = new Date().getTime();
 
-    const updatedGeneralHazards = [
+/*     const updatedGeneralHazards = [
       ...new Set([
         ...mapState.generalHazards,
         ...tempHazards.map(hazard => hazard._id),
-        ...mapState.generalHazardsData.map(hazard => hazard._id)
+        ...mapState.selectedGeneralHazards.map(hazard => hazard._id)
       ])
-    ];
+    ]; */
     
     try {
       const resp = await axios.post(
         'http://localhost:3001/submitGeneralHazards',
-        updatedGeneralHazards,
+        mapState.selectedGeneralHazards,
         { withCredentials: true }
       );
       if (resp.status === 200) {
         setMapState((prevState) => ({
           ...prevState,
-          generalHazards: updatedGeneralHazards
+          generalHazards: mapState.selectedGeneralHazards
         }));
 
         setSkidModalState((prevState) => ({ ...prevState, isGeneralHazardsModalVisible: false }));
@@ -532,14 +532,14 @@ const PDFViewer = ({ percentage, _account }) => {
               transform: 'translate(-50%, 0%)'
             }}
           >
-            <Document file={pdf} onMouseMove={handleMouseMove} onLoadSuccess={() => setLoading(false)}>
+            <Document file={pdf} onMouseMove={handleMouseMove} onLoadSuccess={() => setLoading(false)} loading={null} noData={null}>
               <Page
                 pageNumber={1}
                 renderMode="canvas"
                 renderTextLayer={false}
                 renderAnnotationLayer={false}
                 //width={mapState.originalWidth}
-                //height={mapState.originalHeight}
+                //height={mapState.originalHeight}'
                 onLoadSuccess={(page) => {
                   const { width, height } = page;
                   setMapState((prevState) => ({
