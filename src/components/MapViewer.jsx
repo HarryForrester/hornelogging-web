@@ -502,7 +502,7 @@ const PDFViewer = ({ percentage, _account }) => {
       />
  
       
-                  {loading && <div
+                 {/*  {loading && <div
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -514,8 +514,8 @@ const PDFViewer = ({ percentage, _account }) => {
               <Spinner animation='border' role='status' />
             </h2>
           </div>}
-
-      {percentage <= 100 ? (
+ */}
+      {/* percentage <= 100 ? ( */
         mapState.currentMapName ? (
           <div
             id="pdf-container"
@@ -529,10 +529,14 @@ const PDFViewer = ({ percentage, _account }) => {
               position: 'absolute',
               top: '50%',
               left: '50%',
-              transform: 'translate(-50%, 0%)'
+              transform: 'translate(-50%, 0%)',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
             }}
           >
-            <Document file={pdf} onMouseMove={handleMouseMove} onLoadSuccess={() => setLoading(false)} loading={null} noData={null}>
+            {pdf && (
+              <Document file={pdf} onMouseMove={handleMouseMove} onLoadSuccess={() => setLoading(false)} loading={<Spinner animation='border' role='status' />}>
               <Page
                 pageNumber={1}
                 renderMode="canvas"
@@ -549,8 +553,11 @@ const PDFViewer = ({ percentage, _account }) => {
                   }));
                   setPdfSize({ width, height });
                 }}
+                style={{}}
               />
             </Document>
+            )}
+            
 
             {mapState.enableMarker === true && (
               <div
@@ -593,7 +600,7 @@ const PDFViewer = ({ percentage, _account }) => {
 
     
           </div>
-        ) : (
+        ) /* : (
           <div
             style={{
               display: 'flex',
@@ -607,7 +614,7 @@ const PDFViewer = ({ percentage, _account }) => {
             </h2>
           </div>
         )
-      ) : (
+      ) */ : (
         <div
           style={{
             display: 'flex',
