@@ -7,13 +7,10 @@ import NewPersonButton from '../components/Button/NewPersonButton';
 import NewCrewButton from '../components/Button/NewCrewButton';
 import PeopleAndCrewSearch from '../components/Input/PeopleAndCrewSearch';
 import CrewCard from '../components/Card/CrewCard';
-import NavBar from '../components/NavBar/main.jsx';
 import { useMap } from '../components/Map/MapContext.js';
 import { Card, Button } from 'react-bootstrap';
 import PersonCard from '../components/Card/PersonCard.jsx';
-
 const Crews = () => {
-  const [username, setUsername] = useState('');
   const navigate = useNavigate();
   const { mapState, setMapState } = useMap();
   const [showArchived, setShowArchived] = useState(false);
@@ -27,13 +24,13 @@ const Crews = () => {
       try {
         const response = await axios.get('http://localhost:3001/', { withCredentials: true }); // Replace with your API endpoint
         if (response.data.isLoggedIn) {
+          console.log('repsp', response.data)
           setMapState((prevState) => ({
             ...prevState,
             crews: response.data.crews,
             archivedPeople: response.data.archivedPeople
           }));
 
-          setUsername(response.data.username);
         } else {
           navigate('/login');
         }

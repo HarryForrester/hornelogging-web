@@ -9,7 +9,7 @@ import { faUserPlus } from '@fortawesome/free-solid-svg-icons';
  * @returns
  */
 const NewPersonButton = () => {
-  const { skidModalState, setSkidModalState } = useSkidModal();
+  const { setSkidModalState } = useSkidModal();
 
   const handleClick = () => {
     setSkidModalState((prevState) => ({
@@ -20,7 +20,7 @@ const NewPersonButton = () => {
 
   return (
     <Button variant="outline-dark" onClick={handleClick} style={{ marginRight: '10px' }}>
-      <FontAwesomeIcon icon={faUserPlus} />
+      <FontAwesomeIcon icon={faUserPlus} data-testid="fontawesome-icon"/>
       &nbsp; New Person
     </Button>
   );

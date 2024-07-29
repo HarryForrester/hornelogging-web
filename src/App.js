@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import NavBar from './components/NavBar/main.jsx';
 import NoMenu from './components/NavBar/nomenu.jsx';
 import SignIn from './pages/signin.jsx';
@@ -14,15 +14,11 @@ import Tasks from './components/Tasks.jsx';
 import NotFound from './components/NotFound.jsx';
 import { pdfjs } from 'react-pdf';
 import axios from 'axios';
-
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import SuccessAlert from './components/Alert/SuccessAlert.jsx';
-import { useAlertMessage } from './components/AlertMessage.js';
 import DeleteConfirmationModal from './components/Modal/DeleteConfirmationModal.jsx';
-import PrivateRoute from './components/PrivateRoute.jsx';
 import { AuthProvider } from './context/AuthContext.js';
-import { useAuth } from './context/AuthContext.js';
+
 function App() {
   pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 
@@ -35,25 +31,8 @@ function App() {
         password
       });
 
-      // Handle the response from the server
-      //console.log('Server response:', response.data);
-      //console.log('The response data success:', response);
-      //console.log("session", response.data.session);
-
-      /*       if (response.data.isLoggedIn) {
-        // Redirect to '/' on successful login
-        //localStorage.setItem('token', response.data.token);
-
-        navigate('/');
-        console.log('Login successful!', response);
-      } else {
-        navigate('/login');
-
-        //setMessage(response.data.message);
-      } */
-      //setUsername(response.data.username);
+     
       console.log('resp: ', response.data);
-      //setAccessToken(response.data.accessToken);
     } catch (error) {
       console.error('Error submitting form:', error);
       // Handle errors or display an error message to the user

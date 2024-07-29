@@ -9,7 +9,7 @@ import { useSkidModal } from '../Modal/Skid/SkidModalContext';
  * @returns
  */
 const NewCrewButton = () => {
-  const { skidModalState, setSkidModalState } = useSkidModal();
+  const { setSkidModalState } = useSkidModal();
 
   const handleClick = () => {
     setSkidModalState((prevState) => ({
@@ -19,7 +19,7 @@ const NewCrewButton = () => {
   };
   return (
     <Button variant="outline-dark" onClick={handleClick}>
-      <FontAwesomeIcon icon={faUserPlus} />
+      <FontAwesomeIcon icon={faUserPlus} data-testid="fontawesome-icon" />
       &nbsp; New Crew
     </Button>
   );

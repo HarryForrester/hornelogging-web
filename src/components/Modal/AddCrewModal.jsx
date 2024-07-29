@@ -8,7 +8,7 @@ import { useAlertMessage } from '../AlertMessage';
 const AddCrewModal = () => {
   const { skidModalState, setSkidModalState } = useSkidModal();
   const { mapState, setMapState } = useMap();
-  const { alertMessageState, setAlertMessageState } = useAlertMessage();
+  const { setAlertMessageState } = useAlertMessage();
   const [showSpinner, setShowSpinner] = useState(false);
   const [crew, setCrew] = useState('');
 
@@ -63,17 +63,7 @@ const AddCrewModal = () => {
             crews: response.data.crews,
             archivedPeople: response.data.archivedPeople
           }));
-          /* setMapState((prevState) => ({
-            ...prevState,
-            crews: [
-              ...prevState.crews,
-              {
-                ...response.data.crew,
-                people: []
-              }
-            ]
-          })); */
-
+          
           setAlertMessageState((prevState) => ({
             ...prevState,
             toasts: [
@@ -82,7 +72,7 @@ const AddCrewModal = () => {
                 id: id,
                 heading: 'Add Person',
                 show: true,
-                message: `Success! ${crew}  has been added`,
+                message: `Success! ${crew} has been added`,
                 background: 'success',
                 color: 'white'
               }
@@ -98,9 +88,9 @@ const AddCrewModal = () => {
           ...prevState.toasts,
           {
             id: id,
-            heading: 'Add Person',
+            heading: 'Add Crew',
             show: true,
-            message: `Error! An Error has occurred addding crew`,
+            message: `Error! An Error has occurred adding crew`,
             background: 'danger',
             color: 'white'
           }
@@ -150,7 +140,7 @@ const AddCrewModal = () => {
               <span className="visually-hidden">Loading...</span>
             </>
           ) : (
-            'Add Crew'
+            'Add'
           )}
         </Button>
       </Modal.Footer>

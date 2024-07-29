@@ -7,7 +7,7 @@ import { useMap } from '../Map/MapContext';
 
 const AddPersonModal = () => {
   const { skidModalState, setSkidModalState } = useSkidModal();
-  const { alertMessageState, setAlertMessageState } = useAlertMessage();
+  const { setAlertMessageState } = useAlertMessage();
   const { mapState, setMapState } = useMap();
   const [showSpinner, setShowSpinner] = useState(false); // shows spinner while submitting to server
 
@@ -157,7 +157,7 @@ const AddPersonModal = () => {
       <Modal.Body>
         <Form autoComplete="off">
           <Form.Group className="mb-3">
-            <Form.Label>
+            <Form.Label htmlFor="firstName">
               <b>First Name</b>
             </Form.Label>
             <Form.Control
@@ -170,7 +170,7 @@ const AddPersonModal = () => {
             />
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label>
+            <Form.Label htmlFor='lastName'>
               <b>Last Name</b>
             </Form.Label>
             <Form.Control
@@ -183,7 +183,7 @@ const AddPersonModal = () => {
             />
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label>
+            <Form.Label htmlFor='crewName'>
               <b>Crew</b>
             </Form.Label>
             <Form.Select
