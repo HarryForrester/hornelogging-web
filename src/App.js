@@ -25,15 +25,9 @@ import { AuthProvider } from './context/AuthContext.js';
 import { useAuth } from './context/AuthContext.js';
 function App() {
   pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
-  const { alertMessageState, setAlertMessageState } = useAlertMessage();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [accessToken, setAccessToken] = useState(null);
-  const [username, setUsername] = useState('');
-  const { session } = useAuth();
 
   const handleSubmit = async (username, password) => {
     console.log('handmleSumiu');
-    // e.preventDefault();
     try {
       // Make a POST request to the server
       const response = await axios.post('http://localhost:3001/login', {
@@ -57,9 +51,9 @@ function App() {
 
         //setMessage(response.data.message);
       } */
-      setUsername(response.data.username);
+      //setUsername(response.data.username);
       console.log('resp: ', response.data);
-      setAccessToken(response.data.accessToken);
+      //setAccessToken(response.data.accessToken);
     } catch (error) {
       console.error('Error submitting form:', error);
       // Handle errors or display an error message to the user
@@ -77,7 +71,7 @@ function App() {
             element={
               <React.Fragment>
                 <NoMenu />
-                <SignIn setAccessToken={setAccessToken} handleSubmit={handleSubmit} />
+                <SignIn handleSubmit={handleSubmit} />
               </React.Fragment>
             }
           />

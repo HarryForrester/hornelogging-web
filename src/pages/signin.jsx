@@ -82,8 +82,4 @@ const LoginPage = () => {
   );
 };
 
-LoginPage.propTypes = {
-  handleSubmit: PropTypes.func.isRequired
-};
-
 export default LoginPage;
