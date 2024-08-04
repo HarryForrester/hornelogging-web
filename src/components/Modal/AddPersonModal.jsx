@@ -147,7 +147,7 @@ const AddPersonModal = () => {
   return (
     <Modal
       centered
-      show={skidModalState.isAddPersonModalVisible}
+      show={skidModalState?.isAddPersonModalVisible}
       onHide={handleClose}
       backdrop="static"
     >
