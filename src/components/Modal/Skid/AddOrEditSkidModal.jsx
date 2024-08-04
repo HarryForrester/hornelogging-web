@@ -54,13 +54,11 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
     if(selectedFile && selectedFile.name) {
       const [presignedUrl, key] = await getPresignedUrl(`${_account}/maps/skids`, selectedFile.type);
       const filePath = getFilePathFromUrl(presignedUrl);
-      console.log('filepath of the file', filePath);
       await uploadToPresignedUrl(presignedUrl, selectedFile, selectedFile.type);
       cutPlans = {fileName: selectedFile.name, url: filePath, key: key};
     } else {
       cutPlans =  values.selectedCutPlan
     }
-    console.log('values bro', values)
 
     const skidObj = {
       _id: skidState.selectedSkidId,
@@ -82,18 +80,14 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
       }
     };
 
-    console.log("hello there harry: ", skidObj);
 
     try {
       if (editSkid) {
-        console.log("edit mode", skidState)
         const resp = await axios.post('http://localhost:3001/update-pdf-point-object', skidObj, {
           withCredentials: true
         });
-        console.log('cunty cunt', skidState.formik);
         if (resp.status === 200) {
           const val = resp.data;
-          console.log('resp.data', val);
 
           setMapState((prevState) => {
             const existingIndex = prevState.currentMapMarkers.findIndex(
@@ -163,13 +157,11 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
         await axios
           .post('http://localhost:3001/add-pdf-point-object', skidObj, { withCredentials: true })
           .then((response) => {
-            console.log('resp: ', response.data);
 
             if (response.status === 200) {
               setMapState((prevState) => {
                 // Filter out the marker with the same _id as selectedMarker
                 const updatedMarkers = response.data;
-                console.log('updatedMarkers: ', updatedMarkers);
 
                 return {
                   ...prevState,
@@ -204,7 +196,6 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
         
       }
 
-      console.log('currentMapMarekrs: ', mapState.currentMapMarkers);
     } catch (err) {
       setAlertMessageState((prevState) => ({
         ...prevState,
@@ -265,7 +256,6 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
    * @returns {void}
    */
   const openDocModal = (formik) => {
-    console.log('openDocModal called', formik);
     setSkidState((prevState) => ({
       ...prevState,
       formik: {
@@ -359,15 +349,13 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
    */
   const removeSkidHazard = (event, hazardToRemove, formik) => {
     event.stopPropagation();
-    console.log('hazardToRemove', hazardToRemove);
     const updatedHazards = formik.values.selectedSkidHazards.filter((hazard) => hazard !== hazardToRemove._id);
     formik.setFieldValue('selectedSkidHazards', updatedHazards);
     /* setSkidModalState((prevState) => {
       const updatedHazards = prevState.selectedSkidHazardsData.filter(
         (hazard) => hazard._id!== hazardToRemove._id
       );
-      console.log('ytda', updatedHazards);
-
+\
       const hazardsIds = updatedHazards.map(hazard => hazard._id);
 
       return {
@@ -383,7 +371,6 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
   //Used for viewing pdf in a new tab - Add/Edit Skid Cut Plan Viewer
   const openPdfInNewTab = (item) => {
     if (item instanceof File) {
-      console.log('openPDFinnewTab', item);
       const fileURL = URL.createObjectURL(item);
       window.open(fileURL, '_blank');
     } else {
@@ -465,8 +452,6 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
 
             })} */
             onSubmit={values => {
-              console.log(values);
-              //console.log("ahha bro", skidModalState)
               submitSkidModal(values);
             }}
           >

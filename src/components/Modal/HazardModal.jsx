@@ -15,18 +15,11 @@ function HazardModal() {
    */
   const handleClose = () => {
     if(skidModalState.isSelectHazardsGeneral) {
-      console.log('fk 1')
       setSkidModalState((prevState) => ({ ...prevState, hazardModalVisible: false, isGeneralHazardsModalVisible: true}));
-
     } else if (skidModalState.isSkidModalEdit || skidModalState.isSkidModalAdd) {
-      console.log('fk 2')
       setSkidModalState((prevState) => ({ ...prevState, hazardModalVisible: false, isSkidModalVisible: true}));
-
     } else {
-
-      console.log('fk 3')
       setSkidModalState((prevState) => ({ ...prevState, hazardModalVisible: false}));
-
     }
   };
   const lighterBackgroundColor = tinycolor(selectedHazard.color).lighten(30).toString()
@@ -40,7 +33,7 @@ function HazardModal() {
       className='hazard-modal'
       style={{padding: 0, margin: 0 }}
     >
-      <Modal.Header style={{ backgroundColor: selectedHazard.color }} closeButton>
+      <Modal.Header style={{ backgroundColor: selectedHazard.color }} data-testid='hazard-header' closeButton>
         <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
           <Modal.Title>
             <b>
