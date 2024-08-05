@@ -10,25 +10,23 @@ import { useAlertMessage } from '../../AlertMessage';
 import { useSkidMarker } from '../../SkidMarkerContext';
 import PropTypes from 'prop-types';
 import { getPresignedUrl, uploadToPresignedUrl } from '../../../hooks/useFileUpload';
-import { Formik,useFormik } from 'formik';
-import * as Yup from 'yup';
+import { Formik } from 'formik';
 import { useSkid } from '../../../context/SkidContext';
+import * as Yup from 'yup';
 const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
   const { skidModalState, setSkidModalState } = useSkidModal();
   const { skidState, setSkidState } = useSkid(); //holds the information for formik when opening and closing modals to add files, hazards, cutplans to skid
   const { mapState, setMapState } = useMap();
-  const { alertMessageState, setAlertMessageState } = useAlertMessage();
-  const { skidMarkerState, setSkidMarkerState } = useSkidMarker();
+  const { setAlertMessageState } = useAlertMessage();
+  const {setSkidMarkerState } = useSkidMarker();
   const [showSpinner, setShowSpinner] = useState(false); // shows spinner while submitting to server
-  const [previewUrl, setPreviewUrl] = useState('');
 
-  const [formikState, setFormikState] = useState(null);
+  const [formikState] = useState(null);
   const getFilePathFromUrl = (url) => {
     const urlObject = new URL(url);
     return `${urlObject.origin}${urlObject.pathname}`;
   };
   const resetAddSkidModal = () => {
-    //resetMarker();
     handleClose();
 
     setSkidMarkerState((prevState) => ({
@@ -44,8 +42,6 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
   };
 
   const submitSkidModal = async (values) => {
-    const { formik } = skidState;
-
     const id = new Date().getTime();
     const selectedFile = values.selectedCutPlan;
 
@@ -68,7 +64,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
         cutPlans: cutPlans,
         pointName: values.skidName,
         selectedDocuments: values.selectedDocuments,
-        siteHazards: values.selectedSkidHazards //TODO: need to change hazardData to siteHazards
+        siteHazards: values.selectedSkidHazards
       },
       point: {
         originalWidth: mapState.originalWidth,
@@ -142,7 +138,6 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
             ]
           }));
 
-          //resetAddSkidModal();
           setSkidState((prevState) => ({
             ...prevState,
             skidModalVisible: false,
@@ -227,26 +222,9 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
   const handleClose = () => {
     setSkidState((prevState) => ({
       ...prevState,
-      //formik: null,
       skidModalVisible: false,
       docModalVisible: false
     }))
-    /* setSkidModalState((prevState) => ({
-      ...prevState,
-      _id: null,
-      isSkidModalVisible: false,
-      isAddDocModalVisible: false,
-      isAddCutPlanModalVisible: false,
-      isSelectHazardModalVisible: false,
-      hazardModalVisible: false,
-      selectedDocuments: [],
-      selectedCutPlan: null,
-      skidName: '',
-      selectedCrew: [],
-      selectedSkidHazards: [],
-      selectedSkidHazardsData: [],
-      selectedHazardData: {}
-    })); */
   };
 
   
@@ -266,17 +244,6 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
       skidModalVisible: false, // hide add/edit skid modal
       docModalVisible: true, // show doc modal 
     }))
-    /* setFormikState({
-      values: formik.values,
-      touched: formik.touched,
-      errors: formik.errors,
-    }); */
-
-    /* setSkidModalState((prevState) => ({
-      ...prevState,
-      isSkidModalVisible: false,
-      isAddDocModalVisible: true
-    }));    */
   };
 
   /**
@@ -285,11 +252,6 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
    * @returns {void}
    */
   const openCutPlanModal = (formik) => {
-    /* setSkidModalState((prevState) => ({
-      ...prevState,
-      isAddCutPlanModalVisible: true,
-      isSkidModalVisible: false
-    })); */
     setSkidState((prevState) => ({
       ...prevState,
       formik: {
@@ -311,8 +273,6 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
     setSkidModalState((prevState) => ({
       ...prevState,
       isSkidModalEdit: false,
-      //isSelectHazardModalVisible: true,
-      //isSkidModalVisible: false,
       isSelectHazardsGeneral: false // SelectHazardsModal label will be Add Hazards
     }));
     setSkidState((prevState) => ({
@@ -351,19 +311,6 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
     event.stopPropagation();
     const updatedHazards = formik.values.selectedSkidHazards.filter((hazard) => hazard !== hazardToRemove._id);
     formik.setFieldValue('selectedSkidHazards', updatedHazards);
-    /* setSkidModalState((prevState) => {
-      const updatedHazards = prevState.selectedSkidHazardsData.filter(
-        (hazard) => hazard._id!== hazardToRemove._id
-      );
-\
-      const hazardsIds = updatedHazards.map(hazard => hazard._id);
-
-      return {
-        ...prevState,
-        selectedSkidHazardsData: updatedHazards,
-        selectedSkidHazards: hazardsIds
-      };
-    }); */
   };
 
   
@@ -377,28 +324,6 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
       window.open(item.url, '_blank');
 
     }
-    
-    /* const cleanBase64String = item.base64String.replace(/data:.*;base64,/, '');
-
-    const byteCharacters = atob(cleanBase64String);
-    const byteArrays = [];
-
-    for (let offset = 0; offset < byteCharacters.length; offset += 512) {
-      const slice = byteCharacters.slice(offset, offset + 512);
-      const byteNumbers = new Array(slice.length);
-
-      for (let i = 0; i < slice.length; i++) {
-        byteNumbers[i] = slice.charCodeAt(i);
-      }
-
-      const byteArray = new Uint8Array(byteNumbers);
-      byteArrays.push(byteArray);
-    }
-
-    const blob = new Blob(byteArrays, { type: 'application/pdf' });
-    const objectUrl = URL.createObjectURL(blob);
-
-    window.open(objectUrl, '_blank'); */
   };
 
   const handleHazardClick = (hazard) => {
@@ -444,13 +369,13 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
           
           initialValues={formikState ? formikState.values : initValues}
 
-            /* validationSchema={Yup.object({
+             validationSchema={Yup.object({
               skidName: Yup.string()
                 .max(15, 'Must be 15 characters or less')
                 .required('Required'),
               selectedCrew: Yup.array().min(1, 'At least one crew member is required'),
 
-            })} */
+            })} 
             onSubmit={values => {
               submitSkidModal(values);
             }}
@@ -674,21 +599,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
             </Formik>
         
         </Modal.Body>
-        {/* <Modal.Footer>
-          <Button variant="danger" onClick={handleClose}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={formik.handleSubmit}>
-            {showSpinner ? (
-              <>
-                <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
-                <span className="visually-hidden">Loading...</span>
-              </>
-            ) : (
-              'Save changes'
-            )}
-          </Button>
-        </Modal.Footer> */}
+
       </Modal>
     </>
   );
