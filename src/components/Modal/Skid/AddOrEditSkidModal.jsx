@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
@@ -22,6 +22,8 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
   const [showSpinner, setShowSpinner] = useState(false); // shows spinner while submitting to server
 
   const [formikState] = useState(null);
+
+  
   const getFilePathFromUrl = (url) => {
     const urlObject = new URL(url);
     return `${urlObject.origin}${urlObject.pathname}`;
@@ -42,6 +44,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
   };
 
   const submitSkidModal = async (values) => {
+    console.log('values', values);
     const id = new Date().getTime();
     const selectedFile = values.selectedCutPlan;
 
@@ -353,14 +356,15 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
             }
 
   return (
-    <>
+    
       <Modal
         show={skidState.skidModalVisible}
         onHide={handleClose}
+        contentClassName='addOrEditSkidModal-content'
+        className='addOrEditSkid-modal'
         backdrop="static"
-        
       >
-        <Modal.Header closeButton>
+        <Modal.Header closeButton data-testid="addOrEditSkid-modal-header">
           <Modal.Title>{name} Skid</Modal.Title>
         </Modal.Header>
 
@@ -372,7 +376,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
              validationSchema={Yup.object({
               skidName: Yup.string()
                 .max(15, 'Must be 15 characters or less')
-                .required('Required'),
+                .required('Skid name is required'),
               selectedCrew: Yup.array().min(1, 'At least one crew member is required'),
 
             })} 
@@ -383,7 +387,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
             {formik => (
               <Form id="add-skid-form" className="row g-3">
               <Form.Group className="col-md-12">
-                <Form.Label>Add Skid name:</Form.Label>
+                <Form.Label htmlFor="skidName">Add Skid name:</Form.Label>
                 <Form.Control
                   type="text"
                   id="skidName"
@@ -399,14 +403,16 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
               </Form.Group>
 
               <Form.Group className="col-md-12">
-                <Form.Label className="form-label">Select Crew</Form.Label>
-                <Form.Group id="crew-checkboxes" className="d-flex justify-content-center">
+                <Form.Label className="form-label" id="crew-label">
+                  Select Crew
+                </Form.Label>
+                <Form.Group id="crew-checkboxes" className="d-flex justify-content-center" aria-labelledby="crew-label">
                   {mapState.crewTypes.map((crewMember) => (
                     <Form.Group className="form-check form-check-inline" key={crewMember}>
                       <Form.Check
                         className="mb-2"
                         type="checkbox"
-                        id={crewMember}
+                        id={`crew-member-${crewMember}`} // Unique ID for each checkbox
                         value={crewMember}
                         checked={formik.values.selectedCrew.includes(crewMember)}
                         onChange={(e) => {
@@ -417,18 +423,20 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
                         }}
                         isInvalid={formik.touched.selectedCrew && formik.errors.selectedCrew}
                       />
-                      <Form.Label className="form-check-label" htmlFor={crewMember}>
+                      <Form.Label className="form-check-label" htmlFor={`crew-member-${crewMember}`}>
                         {crewMember}
                       </Form.Label>
                     </Form.Group>
                   ))}
                 </Form.Group>
                 {
-                  formik.touched.skidName && formik.errors.skidName ? (
+                  formik.touched.selectedCrew && formik.errors.selectedCrew ? (
                     <div className="invalid-feedback d-block">{formik.errors.selectedCrew}</div>
                   ) : null
                 }
               </Form.Group>
+
+
 
               <Form.Group className="col-md-12">
                 <Form.Label htmlFor="siteDocs" className="form-label">
@@ -503,6 +511,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
                 <Button
                   type="button"
                   id="siteCutPlan"
+                  data-testid="openCutPlanModal"
                   className="btn btn-secondary btn-block"
                   onClick={() => openCutPlanModal(formik)}
                 >
@@ -542,6 +551,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
                 <Button
                   type="button"
                   id="siteHazards"
+                  data-testid="openHazardModal"
                   className="btn btn-secondary btn-block"
                   onClick={() => openSelectHazardModal(formik)}
                 >
@@ -581,7 +591,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
 
 
 
-              <Button variant="primary" onClick={formik.handleSubmit}>
+              <Button type='submit' variant="primary" onClick={formik.handleSubmit}>
             {showSpinner ? (
               <>
                 <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />
@@ -601,7 +611,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
         </Modal.Body>
 
       </Modal>
-    </>
+    
   );
 };
 
