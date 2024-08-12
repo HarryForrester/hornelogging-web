@@ -8,17 +8,10 @@ import * as Yup from 'yup';
 import DragAndDropUpload from '../DragAndDropUpload';
 import { useSkid } from '../../context/SkidContext';
 const AddCutPlanModal = ({ submitCutPlan }) => {
-  const { skidModalState, setSkidModalState } = useSkidModal();
   const [selectedFile, setSelectedFile] = useState(null);
-  const [fileIsValid, setFileIsValid] = useState(null);
   const { skidState, setSkidState } = useSkid();
 
   const handleClose = () => {
-   /*  setSkidModalState((prevState) => ({
-      ...prevState,
-      isAddCutPlanModalVisible: false,
-      isSkidModalVisible: true,
-    })); */
     setSkidState((prevState) => ({
       ...prevState,
       cutPlanModalVisible: false,
@@ -49,13 +42,12 @@ const AddCutPlanModal = ({ submitCutPlan }) => {
             handleClose();
           }}
         >
-          {({ isSubmitting, setFieldValue }) => (
+          {() => (
             <Form id="file-upload-form">
               <div className="form-group">
                 <label htmlFor="file-upload">Upload PDF:</label>
                 <DragAndDropUpload
                   setSelectedFile={setSelectedFile}
-                  setFileIsValid={setFileIsValid}
                   selectedFile={selectedFile}
                   removeUploadedFile={removeUploadedFile}
                   fileTypes={{ 'application/pdf': [] }}
