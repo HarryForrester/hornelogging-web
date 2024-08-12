@@ -30,6 +30,7 @@ const SelectHazardsModal = ({ submitSelectedHazards }) => {
   const handleCheckboxChange = (hazard) => {
     const hazardId = hazard._id;
 
+    //If in selecting General Hazards mode
     if (skidModalState.isSelectHazardsGeneral) {
       const selectedGeneralHazards = Array.isArray(mapState.selectedGeneralHazards)
         ? mapState.selectedGeneralHazards
@@ -44,6 +45,7 @@ const SelectHazardsModal = ({ submitSelectedHazards }) => {
         selectedGeneralHazards: updatedHazards,
       }));
     } else {
+      //selecting skid (site) hazards
       const selectedSkidHazards = skidState.formik?.values?.selectedSkidHazards || [];
       const updatedHazards = selectedSkidHazards.includes(hazardId)
         ? selectedSkidHazards.filter((id) => id !== hazardId)
@@ -82,7 +84,7 @@ const SelectHazardsModal = ({ submitSelectedHazards }) => {
 
   return (
     <Modal show={skidState.selectHazardModalVisible} onHide={handleClose}>
-      <Modal.Header closeButton>
+      <Modal.Header closeButton closeLabel="Close">
         <Modal.Title>Select {label} Hazards</Modal.Title>
       </Modal.Header>
 
@@ -97,6 +99,7 @@ const SelectHazardsModal = ({ submitSelectedHazards }) => {
             id="search-criteria-hazard"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            data-testid="search-input"
           />
           <br />
           <div className="modal-hazards">
@@ -114,9 +117,9 @@ const SelectHazardsModal = ({ submitSelectedHazards }) => {
                 }
 
                 return (
-                  <Accordion.Item eventKey={index.toString()} key={cat}>
-                    <Accordion.Header>{cat}</Accordion.Header>
-                    <Accordion.Body>
+                  <Accordion.Item eventKey={index.toString()} key={cat} data-testid={`accordion-item-${index}`}>
+                    <Accordion.Header data-testid={`accordion-header-${index}`}>{cat}</Accordion.Header>
+                    <Accordion.Body data-testid={`accordion-body-${index}`}>
                       {hazardsToShow.map((hazard) => (
                         <div className="card" style={{ marginBottom: '10px' }} key={hazard._id}>
                           <div className="search-text" style={{ display: 'none' }}>
@@ -135,6 +138,7 @@ const SelectHazardsModal = ({ submitSelectedHazards }) => {
                                 type="button"
                                 onClick={() => handleCheckboxChange(hazard)}
                                 size="sm"
+                                data-testid={`addHazard-${hazard._id}`}
                               >
                                 Add
                               </Button>
@@ -151,11 +155,11 @@ const SelectHazardsModal = ({ submitSelectedHazards }) => {
         </>
       </Modal.Body>
 
-      <Modal.Footer>
+      {/* <Modal.Footer>
         <Button variant="secondary" onClick={handleClose}>
           Close
         </Button>
-      </Modal.Footer>
+      </Modal.Footer> */}
     </Modal>
   );
 };
