@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import { useDropzone } from 'react-dropzone';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashAlt, faFileAlt } from '@fortawesome/free-solid-svg-icons';
-import { Button } from 'react-bootstrap';
+import { Button, Form } from 'react-bootstrap';
+
 const bytesToKB = (bytes) => {
   return (bytes / 1024).toFixed(2); // Convert bytes to KB and round to 2 decimal places
 };
@@ -39,16 +40,15 @@ const rejectStyle = {
 const DragAndDropUpload = ({
   selectedFile,
   setSelectedFile,
-  setFileIsValid,
   removeUploadedFile,
-  fileTypes
+  fileTypes,
+  id,
+  error
 }) => {
   const { getRootProps, getInputProps, isFocused, isDragAccept, isDragReject } = useDropzone({
     accept: fileTypes,
     onDrop: (acceptedFiles) => {
-      console.log('accepted files: ', acceptedFiles);
       setSelectedFile(acceptedFiles[0]);
-      setFileIsValid(true);
     },
     maxFiles: 1
   });
@@ -66,54 +66,57 @@ const DragAndDropUpload = ({
   return (
     <>
       <div {...getRootProps({ style })}>
-        <input {...getInputProps()} />
-
+        <input {...getInputProps()} id={id} data-testid="dragAndDropUpload" />
         <p>Drag and drop file here, or click to select file</p>
       </div>
 
       {selectedFile && (
-        <>
-          <div className="my-2" style={{ width: '100%' }}>
-            <div
-              style={{
-                borderStyle: 'dashed',
-                borderColor: 'green',
-                backgroundColor: 'rgba(144, 238, 144, 0.3)',
-                padding: '10px',
-                display: 'flex',
-                alignItems: 'center',
-                position: 'relative',
-                borderRadius: '5px'
-              }}
-            >
-              <FontAwesomeIcon icon={faFileAlt} size="lg" style={{ marginRight: '10px' }} />
-              <div>
-                <div style={{ position: 'absolute', top: '5px', left: '50px' }}>
-                  {selectedFile?.name}
-                </div>
-                <div
-                  style={{
-                    position: 'absolute',
-                    bottom: '10px',
-                    left: '50px',
-                    color: '#888',
-                    fontSize: '10px'
-                  }}
-                >
-                  ({bytesToKB(selectedFile?.size)} KB)
-                </div>
+        <div className="my-2" style={{ width: '100%' }}>
+          <div
+            style={{
+              borderStyle: 'dashed',
+              borderColor: 'green',
+              backgroundColor: 'rgba(144, 238, 144, 0.3)',
+              padding: '10px',
+              display: 'flex',
+              alignItems: 'center',
+              position: 'relative',
+              borderRadius: '5px'
+            }}
+          >
+            <FontAwesomeIcon icon={faFileAlt} size="lg" style={{ marginRight: '10px' }} />
+            <div>
+              <div style={{ position: 'absolute', top: '5px', left: '50px' }}>
+                {selectedFile?.name}
               </div>
-              <Button
-                variant="danger"
-                onClick={removeUploadedFile}
-                size="sm"
-                style={{ marginLeft: 'auto' }}
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: '10px',
+                  left: '50px',
+                  color: '#888',
+                  fontSize: '10px'
+                }}
               >
-                <FontAwesomeIcon icon={faTrashAlt} size="sm" />
-              </Button>
+                ({bytesToKB(selectedFile?.size)} KB)
+              </div>
             </div>
+            <Button
+              variant="danger"
+              onClick={removeUploadedFile}
+              size="sm"
+              style={{ marginLeft: 'auto' }}
+            >
+              <FontAwesomeIcon icon={faTrashAlt} size="sm" />
+            </Button>
           </div>
-        </>
+        </div>
+      )}
+
+      {error && (
+        <Form.Control.Feedback type="invalid" style={{ display: 'block', marginTop: '10px', fontSize: 16 }}>
+          {error}
+        </Form.Control.Feedback>
       )}
     </>
   );
@@ -121,10 +124,11 @@ const DragAndDropUpload = ({
 
 DragAndDropUpload.propTypes = {
   setSelectedFile: PropTypes.func.isRequired,
-  setFileIsValid: PropTypes.func.isRequired,
   selectedFile: PropTypes.object,
   removeUploadedFile: PropTypes.func.isRequired,
-  fileTypes: PropTypes.any.isRequired
+  fileTypes: PropTypes.any.isRequired,
+  id: PropTypes.any.isRequired,
+  error: PropTypes.string // New prop for error message
 };
 
 export default DragAndDropUpload;
