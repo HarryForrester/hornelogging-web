@@ -43,7 +43,7 @@ const Maps = () => {
         if (response.data.isLoggedIn) {
           const data = response.data;
 
-          console.log('hazards', data.hazards)
+          console.log('files', data.files)
           setAccount(data._account);
           setMapState((prevState) => ({
             ...prevState,

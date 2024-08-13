@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
-import { useSkidModal } from './Skid/SkidModalContext';
 import { useMap } from '../Map/MapContext';
-import PropTypes from 'prop-types';
 import Accordion from 'react-bootstrap/Accordion';
 import { useSkid } from '../../context/SkidContext';
 
@@ -14,7 +12,6 @@ import { useSkid } from '../../context/SkidContext';
  * @returns {JSX.Element} - Rendered component.
  */
 const AddDocModal = () => {
-  const { skidModalState, setSkidModalState } = useSkidModal();
   const { mapState } = useMap();
   const { skidState, setSkidState } = useSkid();
   const [searchQuery, setSearchQuery] = useState('');
@@ -125,15 +122,16 @@ const AddDocModal = () => {
             }
 
             return (
-              <Accordion.Item eventKey={index.toString()} key={type}>
-                <Accordion.Header>{type}</Accordion.Header>
-                <Accordion.Body>
-                  {filesToShow.map((file) => (
+              <Accordion.Item eventKey={index.toString()} key={type} data-testid={`accordion-item-${index}`}> 
+                <Accordion.Header data-testid={`accordion-header-${index}`}>{type}</Accordion.Header>
+                <Accordion.Body data-testid={`accordion-body-${index}`}>
+                  {filesToShow.map((file, fileIndex) => (
                     <div
                       className="card"
                       style={{ marginBottom: '10px', backgroundColor: file.color, cursor: 'pointer' }}
                       key={file._id}
                       onClick={() => window.open(file.fileUrl, '_blank')}
+                      data-testid={`file-card-${index}-${fileIndex}`}
                     >
                       <div className="search-text-doc" style={{ display: 'none' }}>
                         {file.searchText}
@@ -163,6 +161,7 @@ const AddDocModal = () => {
                               handleCheckboxChange(file);
                             }}
                             size="sm"
+                            data-testid={`addDocument-${file._id}`}
                           >
                             Add
                           </Button>
@@ -176,11 +175,11 @@ const AddDocModal = () => {
           })}
         </Accordion>
       </Modal.Body>
-      <Modal.Footer>
+      {/* <Modal.Footer>
         <Button variant="secondary" onClick={handleClose}>
           Close
         </Button>
-      </Modal.Footer>
+      </Modal.Footer> */}
     </Modal>
   );
 };
