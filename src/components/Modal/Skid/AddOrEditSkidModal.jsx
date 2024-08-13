@@ -13,6 +13,7 @@ import { getPresignedUrl, uploadToPresignedUrl } from '../../../hooks/useFileUpl
 import { Formik } from 'formik';
 import { useSkid } from '../../../context/SkidContext';
 import * as Yup from 'yup';
+
 const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
   const { skidModalState, setSkidModalState } = useSkidModal();
   const { skidState, setSkidState } = useSkid(); //holds the information for formik when opening and closing modals to add files, hazards, cutplans to skid
@@ -20,14 +21,13 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
   const { setAlertMessageState } = useAlertMessage();
   const {setSkidMarkerState } = useSkidMarker();
   const [showSpinner, setShowSpinner] = useState(false); // shows spinner while submitting to server
-
   const [formikState] = useState(null);
-
   
   const getFilePathFromUrl = (url) => {
     const urlObject = new URL(url);
     return `${urlObject.origin}${urlObject.pathname}`;
   };
+
   const resetAddSkidModal = () => {
     handleClose();
 
@@ -44,12 +44,12 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
   };
 
   const submitSkidModal = async (values) => {
-    console.log('values', values);
     const id = new Date().getTime();
     const selectedFile = values.selectedCutPlan;
 
     setShowSpinner(true);
     var cutPlans;
+
     if(selectedFile && selectedFile.name) {
       const [presignedUrl, key] = await getPresignedUrl(`${_account}/maps/skids`, selectedFile.type);
       const filePath = getFilePathFromUrl(presignedUrl);
@@ -78,7 +78,6 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
         y: mousePosition.y
       }
     };
-
 
     try {
       if (editSkid) {
@@ -229,7 +228,6 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
       docModalVisible: false
     }))
   };
-
   
   /**
    * Opens the Add Document Modal and hides the Skid Modal by updating the state.
@@ -316,8 +314,6 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
     formik.setFieldValue('selectedSkidHazards', updatedHazards);
   };
 
-  
-
   //Used for viewing pdf in a new tab - Add/Edit Skid Cut Plan Viewer
   const openPdfInNewTab = (item) => {
     if (item instanceof File) {
@@ -348,15 +344,14 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
   }
   const form = skidState?.formik?.values;
   const initValues = {
-              skidName: form?.skidName || '',
-              selectedCrew: form?.selectedCrew || [],
-              selectedDocuments: form?.selectedDocuments || [],
-              selectedCutPlan: form?.selectedCutPlan || null,
-              selectedSkidHazards: form?.selectedSkidHazards || [],
-            }
+    skidName: form?.skidName || '',
+    selectedCrew: form?.selectedCrew || [],
+    selectedDocuments: form?.selectedDocuments || [],
+    selectedCutPlan: form?.selectedCutPlan || null,
+    selectedSkidHazards: form?.selectedSkidHazards || [],
+  }
 
   return (
-    
       <Modal
         show={skidState.skidModalVisible}
         onHide={handleClose}
@@ -370,15 +365,12 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
 
         <Modal.Body>
           <Formik
-          
-          initialValues={formikState ? formikState.values : initValues}
-
+            initialValues={formikState ? formikState.values : initValues}
              validationSchema={Yup.object({
               skidName: Yup.string()
                 .max(15, 'Must be 15 characters or less')
                 .required('Skid name is required'),
               selectedCrew: Yup.array().min(1, 'At least one crew member is required'),
-
             })} 
             onSubmit={values => {
               submitSkidModal(values);
@@ -412,7 +404,7 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
                       <Form.Check
                         className="mb-2"
                         type="checkbox"
-                        id={`crew-member-${crewMember}`} // Unique ID for each checkbox
+                        id={`crew-member-${crewMember}`}
                         value={crewMember}
                         checked={formik.values.selectedCrew.includes(crewMember)}
                         onChange={(e) => {
@@ -435,8 +427,6 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
                   ) : null
                 }
               </Form.Group>
-
-
 
               <Form.Group className="col-md-12">
                 <Form.Label htmlFor="siteDocs" className="form-label">
@@ -462,7 +452,6 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
               .map(file => (
                 <ListGroupItem
                   key={file._id}
-
                   className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
                   onClick={() => window.open(file.fileUrl, '_blank')}
                   style={{ cursor: 'pointer' }}
@@ -480,9 +469,9 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
                         whiteSpace: 'nowrap',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
-                        color: 'black' // Custom link color
+                        color: 'black'
                       }}
-                      onClick={(e) => e.stopPropagation()} // Prevents the outer click event
+                      onClick={(e) => e.stopPropagation()}
                     >
                       {file.fileName}
                     </Anchor>
@@ -588,9 +577,6 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
                
               </ListGroup>
             </Form.Group>
-
-
-
               <Button type='submit' variant="primary" onClick={formik.handleSubmit}>
             {showSpinner ? (
               <>
@@ -604,12 +590,8 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
             </Form>
 
             )}
-
-            
-            </Formik>
-        
+            </Formik>        
         </Modal.Body>
-
       </Modal>
     
   );
