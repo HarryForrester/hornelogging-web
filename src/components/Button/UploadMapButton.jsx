@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import UploadPdfModal from '../Modal/UploadPdfModal';
-import ErrorConfirmationModal from '../Modal/ErrorConfirmationModal';
-import { SkidModalProvider, useSkidModal } from '../Modal/Skid/SkidModalContext';
+import { useSkidModal } from '../Modal/Skid/SkidModalContext';
 import { Button } from 'react-bootstrap';
 const UploadMapButton = (_account) => {
-  const { skidModalState, setSkidModalState } = useSkidModal();
+  const { setSkidModalState } = useSkidModal();
 
   const handleClick = () => {
     setSkidModalState((prevState) => ({

@@ -1,4 +1,4 @@
-import React from 'react';
+/* import React from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import { useConfirmationModal } from '../ConfirmationModalContext';
 import PropTypes from 'prop-types';
@@ -50,3 +50,4 @@ ErrorConfirmationModal.propTypes = {
 };
 
 export default ErrorConfirmationModal;
+ */

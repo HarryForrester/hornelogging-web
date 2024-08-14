@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import ErrorConfirmationModal from '../components/Modal/ErrorConfirmationModal';
+//import ErrorConfirmationModal from '../components/Modal/ErrorConfirmationModal';
 import MapViewer from '../components/MapViewer.jsx';
 import UploadMapButton from '../components/Button/UploadMapButton';
 import { useMap } from '../components/Map/MapContext.js';
@@ -14,19 +14,19 @@ import { deletePresignedUrl } from '../hooks/useFileDelete.js';
 import { useSkidMarker } from '../components/SkidMarkerContext.js';
 import { SkidProvider } from '../context/SkidContext.js';
 const Maps = () => {
-  const [isErrorConfirmationModalVisible, setIsErrorConfirmationModalVisible] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  //const [isErrorConfirmationModalVisible, setIsErrorConfirmationModalVisible] = useState(false);
+  //const [errorMessage, setErrorMessage] = useState('');
   const [showAddPoint, setShowAddPoint] = useState(false); // used to show/hide Add Point Button for map
   const [showRemoveMap, setShowRemoveMap] = useState(false); // used to show/hide Remove Map Button for map
   const [percentage, setPercentage] = useState(0);
   const pdfContainerRef = useRef(null);
   const { mapState, setMapState } = useMap();
-  const { skidModalState, setSkidModalState } = useSkidModal();
+  const { setSkidModalState } = useSkidModal();
   const { confirmationModalState, setConfirmationModalState } = useConfirmationModal();
-  const { alertMessageState, setAlertMessageState } = useAlertMessage();
-  const [showSpinner, setShowSpinner] = useState(false); // shows spinner while submitting to server
+  const { setAlertMessageState } = useAlertMessage();
+  //const [showSpinner, setShowSpinner] = useState(false); // shows spinner while submitting to server
   const [account, setAccount] = useState(null);
-  const { skidMarkerState, setSkidMarkerState } = useSkidMarker();
+  const { setSkidMarkerState } = useSkidMarker();
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -79,9 +79,9 @@ const Maps = () => {
     }));
   };
 
-  const hideErrorConfirmationModal = () => {
+  /* const hideErrorConfirmationModal = () => {
     setIsErrorConfirmationModalVisible(false);
-  };
+  }; */
 
   const handleMapClick = (map) => {
     const mapId = map._id;
@@ -142,8 +142,6 @@ const Maps = () => {
       if (confirmationModalState.confirmed) {
         const id = new Date().getTime();
 
-        setShowSpinner(true);
-
         setMapState((prevState) => {
           const newData = mapState.maps.filter((map) => map._id !== mapState.currentMapId);
           return {
@@ -193,7 +191,6 @@ const Maps = () => {
           }));
           console.error('An error occurred while removing map: ', error);
         } finally {
-          setShowSpinner(false);
 
           setTimeout(() => {
             setAlertMessageState((prevState) => ({
@@ -306,12 +303,12 @@ const Maps = () => {
 
               <UploadMapButton _account={account} />
 
-              {isErrorConfirmationModalVisible && (
+              {/* {isErrorConfirmationModalVisible && (
                 <ErrorConfirmationModal
                   message={errorMessage}
                   onClose={hideErrorConfirmationModal}
                 />
-              )}
+              )} */}
             </div>
           </div>
 
