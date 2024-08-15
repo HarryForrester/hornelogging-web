@@ -86,6 +86,14 @@ const UploadPdfModal = (_account) => {
         ]
       }));
       console.error('Error submitting form:', error);
+    } finally {
+      setSelectedFile(null);
+      setTimeout(() => {
+        setAlertMessageState((prevState) => ({
+          ...prevState,
+          toasts: prevState.toasts.filter((toast) => toast.id !== id)
+        }));
+      }, 10000);
     }
   };
 

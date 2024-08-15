@@ -86,7 +86,7 @@ const DragAndDropUpload = ({
           >
             <FontAwesomeIcon icon={faFileAlt} size="lg" style={{ marginRight: '10px' }} />
             <div>
-              <div style={{ position: 'absolute', top: '5px', left: '50px' }}>
+              <div style={{ position: 'absolute', top: '5px', left: '50px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '300px' }}>
                 {selectedFile?.name}
               </div>
               <div
