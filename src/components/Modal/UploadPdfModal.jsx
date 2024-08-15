@@ -113,11 +113,11 @@ const UploadPdfModal = (_account) => {
         <Formik
           initialValues={{ pdfName: '' }}
           validationSchema={Yup.object({
-            pdfName: Yup.string().max(10, 'Too Long!').required('Map name is required'),
+            pdfName: Yup.string().max(20, 'Too Long!').required('Please provide a valid Map Name.'),
           })}
           onSubmit={(values, { setSubmitting }) => {
             if (!selectedFile) {
-              setUploadError('Map file is required');
+              setUploadError('Please upload a PDF file.');
               setSubmitting(false);
               return;
             }
