@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-//import ErrorConfirmationModal from '../components/Modal/ErrorConfirmationModal';
 import MapViewer from '../components/MapViewer.jsx';
 import UploadMapButton from '../components/Button/UploadMapButton';
 import { useMap } from '../components/Map/MapContext.js';
@@ -14,8 +13,6 @@ import { deletePresignedUrl } from '../hooks/useFileDelete.js';
 import { useSkidMarker } from '../components/SkidMarkerContext.js';
 import { SkidProvider } from '../context/SkidContext.js';
 const Maps = () => {
-  //const [isErrorConfirmationModalVisible, setIsErrorConfirmationModalVisible] = useState(false);
-  //const [errorMessage, setErrorMessage] = useState('');
   const [showAddPoint, setShowAddPoint] = useState(false); // used to show/hide Add Point Button for map
   const [showRemoveMap, setShowRemoveMap] = useState(false); // used to show/hide Remove Map Button for map
   const [percentage, setPercentage] = useState(0);
@@ -24,7 +21,6 @@ const Maps = () => {
   const { setSkidModalState } = useSkidModal();
   const { confirmationModalState, setConfirmationModalState } = useConfirmationModal();
   const { setAlertMessageState } = useAlertMessage();
-  //const [showSpinner, setShowSpinner] = useState(false); // shows spinner while submitting to server
   const [account, setAccount] = useState(null);
   const { setSkidMarkerState } = useSkidMarker();
 
@@ -42,8 +38,6 @@ const Maps = () => {
 
         if (response.data.isLoggedIn) {
           const data = response.data;
-
-          console.log('files', data.files)
           setAccount(data._account);
           setMapState((prevState) => ({
             ...prevState,
@@ -78,10 +72,6 @@ const Maps = () => {
       isSelectHazardsGeneral: true // will display Edit General Hazards as modal label for selecting general hazards
     }));
   };
-
-  /* const hideErrorConfirmationModal = () => {
-    setIsErrorConfirmationModalVisible(false);
-  }; */
 
   const handleMapClick = (map) => {
     const mapId = map._id;
@@ -121,8 +111,6 @@ const Maps = () => {
   const openConfirmRemoveMap = async () => {
 
     try {
-      //TODO add confirm modal
-
       setConfirmationModalState((prevState) => ({
         ...prevState,
         show: true,
@@ -131,7 +119,6 @@ const Maps = () => {
         confirmed: false
       }));
 
-      //setSkidModalState((prevState) => ({ ...prevState, isConfirmModalVisible: true }));
     } catch (err) {
       console.error('An error has occurred while removing map', err);
     }
@@ -149,7 +136,6 @@ const Maps = () => {
             maps: newData
           };
         });
-        //TODO: reenable - a
 
         try {
           const resp = await axios.delete(`http://localhost:3001/map/${mapState.currentMapId}`, {
@@ -219,10 +205,6 @@ const Maps = () => {
       pageContainer.classList.add('page-container');
       container.appendChild(pageContainer);
 
-      // If you're using jQuery for specific functionality, you can use it here
-      // $(pageContainer).doSomething();
-
-      // Clean up code, if needed
       return () => {
         // Clean up code, if needed
       };
@@ -233,19 +215,12 @@ const Maps = () => {
     try {
       const res = await axios.get(`http://localhost:3001/loadfromdb/${mapName}`, {
         withCredentials: true
-      }); // Replace with your API endpoint
-
-      /* if (!res.ok) {
-       throw new Error(`Error loading map from server: ${res.statusText}`);
-     } */
+      });
 
       const map = res.data;
-      //          navigate('/login');
       if (res.status === 200) {
         if (map.pdfData.map) {
-          // pdfBlob = new Blob([map.pdfData.map], { type: 'application/pdf' });
           const pdfUrl = map.pdfData.map;
-
           setMapState((prevState) => ({
             ...prevState,
             currentMapUrl: pdfUrl
@@ -303,12 +278,6 @@ const Maps = () => {
 
               <UploadMapButton _account={account} />
 
-              {/* {isErrorConfirmationModalVisible && (
-                <ErrorConfirmationModal
-                  message={errorMessage}
-                  onClose={hideErrorConfirmationModal}
-                />
-              )} */}
             </div>
           </div>
 
