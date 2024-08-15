@@ -1,9 +1,8 @@
 import React from 'react';
 import { Button } from 'react-bootstrap';
 import { useMap } from '../Map/MapContext';
-import PropTypes from 'prop-types';
 
-const AddSkidButton = ({ pdfContainerRef }) => {
+const AddSkidButton = () => {
   const { mapState, setMapState } = useMap();
 
   const addPoint = () => {
@@ -15,28 +14,18 @@ const AddSkidButton = ({ pdfContainerRef }) => {
       }));
     } else {
       // If enableMarker is false, perform the addPoint operation
-      const { height, width } = pdfContainerRef.current.getBoundingClientRect();
-
       setMapState((prevState) => ({
         ...prevState,
-        // originalHeight: height,
-        //originalWidth: width,
         enableMarker: true
       }));
     }
   };
 
   return (
-    <>
       <Button variant="outline-secondary" onClick={addPoint}>
         {mapState.enableMarker ? 'Cancel' : 'Add Point'}
       </Button>
-    </>
   );
-};
-
-AddSkidButton.propTypes = {
-  pdfContainerRef: PropTypes.object.isRequired
 };
 
 export default AddSkidButton;
