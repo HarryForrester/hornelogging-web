@@ -38,6 +38,7 @@ const Maps = () => {
 
         if (response.data.isLoggedIn) {
           const data = response.data;
+          console.log('dara', data)
           setAccount(data._account);
           setMapState((prevState) => ({
             ...prevState,
@@ -80,6 +81,7 @@ const Maps = () => {
     const mapKey = map.map.key
 
     const parsePoints = points;
+    console.log('pints ', parsePoints);
     var pdfButtons = document.querySelectorAll('.pdf-button');
 
     pdfButtons.forEach((button) => {

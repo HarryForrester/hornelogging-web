@@ -112,6 +112,7 @@ const AddDocModal = () => {
               (file) =>
                 skidState.formik &&
                 skidState.formik.values &&
+                Array.isArray(skidState.formik.values.selectedDocuments) &&
                 !skidState.formik.values.selectedDocuments.some(
                   (selectedFile) => selectedFile === file._id
                 )

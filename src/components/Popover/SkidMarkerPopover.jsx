@@ -298,7 +298,7 @@ const SkidMarkerPopover = () => {
                     </div>
                     <div>
                       <ul className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
-                      {skidState?.formik.values.selectedSkidHazards
+                      {Array.isArray(skidState?.formik.values.selectedSkidHazards) && skidState?.formik.values.selectedSkidHazards
                       .map(id => mapState.hazards.find(hazard => hazard._id === id))
                       .filter(hazard => hazard)
                       .map(hazard => (

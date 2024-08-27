@@ -14,7 +14,7 @@ const UploadMapButton = (_account) => {
 
   return (
     <>
-      <Button variant="outline-secondary" onClick={handleClick}>
+      <Button variant="outline-secondary" onClick={handleClick} data-testid="upload_map_button">
         <img src="/img/document.png" width="20" alt="Upload Document" />
         Upload Map
       </Button>

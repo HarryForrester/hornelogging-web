@@ -17,7 +17,7 @@ import AddSkidHazardModal from './Modal/AddSkidHazardModal';
 import SkidMarkerPopover from './Popover/SkidMarkerPopover';
 import Spinner from 'react-bootstrap/Spinner';
 import { useSkid } from '../context/SkidContext';
-const PDFViewer = ({ percentage, _account }) => {
+const PDFViewer = ({ _account }) => {
 
   const { skidModalState, setSkidModalState } = useSkidModal();
   const { skidMarkerState, setSkidMarkerState } = useSkidMarker();
@@ -387,8 +387,8 @@ const PDFViewer = ({ percentage, _account }) => {
         handleClose={handleClose}
       />
  
-      {mapState.currentMapName ? (
-          <div
+{/*       {mapState.currentMapName ? (
+ */}          <div
             id="pdf-container"
             style={{
               border: '2px solid #000',
@@ -427,6 +427,7 @@ const PDFViewer = ({ percentage, _account }) => {
             {mapState.enableMarker === true && (
               <div
                 className="red-dot"
+                data-testid="cursor-red-dot"
                 style={{
                   position: 'absolute',
                   left: `${skidMarkerState.mousePosition.x}px`,
@@ -443,29 +444,42 @@ const PDFViewer = ({ percentage, _account }) => {
             )}
             {/* Renders map of markers onto map */}
             {Array.isArray(mapState.currentMapMarkers) && mapState.currentMapMarkers.map((point, index) => (
-              <div
-                key={index}
-                className="red-dot"
-                style={{
-                  position: 'absolute',
-                  left: `${point.point.x}px`,
-                  top: `${point.point.y}px`,
-                  width: '20px',
-                  height: '20px',
-                  backgroundColor: 'red',
-                  transform: 'translate(-50%, -50%)',
-                }}
-                onClick={() => handleMarkerClick(point)}
-                data-bs-toggle="popover"
-                data-bs-placement="top"
-                data-bs-content={point}
-                data-bs-trigger="click"
-              ></div>
-            ))}
-
+            <button
+              key={index}
+              data-testid={`red-dot-${index}`}
+              className="red-dot"
+              style={{
+                position: 'absolute',
+                left: `${point.point.x}px`,
+                top: `${point.point.y}px`,
+                width: '20px',
+                height: '20px',
+                backgroundColor: 'red',
+                transform: 'translate(-50%, -50%)',
+                border: 'none',
+                padding: '0',
+                cursor: 'pointer',
+              }}
+              onClick={() => handleMarkerClick(point)}
+              data-bs-toggle="popover"
+              data-bs-placement="top"
+              data-bs-content={point}
+              data-bs-trigger="click"
+            >
+              <span className="visually-hidden">Map Marker</span>
+            </button>
+))}
+{/* {percentage > 0 && percentage < 100 && (
+            <ProgressBar
+              variant="info"
+              now={percentage}
+              label={`Uploading: ${percentage}%`}
+              className="mt-2"
+            />
+          )} */}
     
           </div>
-        ) : (
+        {/* ) : (
         <div
           style={{
             display: 'flex',
@@ -474,18 +488,11 @@ const PDFViewer = ({ percentage, _account }) => {
             height: '100vh'
           }}
         >
-          {percentage > 0 && percentage < 100 && (
-            <ProgressBar
-              variant="info"
-              now={percentage}
-              label={`Uploading: ${skidMarkerState.personFiles}%`}
-              className="mt-2"
-            />
-          )}
+          
           
         </div>
         
-      )}
+      )} */}
       
       <SkidMarkerPopover />
     </>
@@ -493,7 +500,6 @@ const PDFViewer = ({ percentage, _account }) => {
 };
 
 PDFViewer.propTypes = {
-  percentage: PropTypes.number.isRequired,
   _account: PropTypes.any,
 };
 
