@@ -107,74 +107,80 @@ const AddDocModal = () => {
         />
         <br />
         <Accordion defaultActiveKey="0">
-          {Object.keys(groupedFiles).map((type, index) => {
-            const filesToShow = groupedFiles[type].filter(
-              (file) =>
-                skidState.formik &&
-                skidState.formik.values &&
-                Array.isArray(skidState.formik.values.selectedDocuments) &&
-                !skidState.formik.values.selectedDocuments.some(
-                  (selectedFile) => selectedFile === file._id
-                )
-            );
+  {Object.keys(groupedFiles).map((type, index) => {
+    // Find the matching file type by _id
+    const matchingFileType = mapState.fileTypes.find((fileType) => fileType._id === type);
 
-            if (filesToShow.length === 0) {
-              return null;
-            }
+    const filesToShow = groupedFiles[type].filter(
+      (file) =>
+        skidState.formik &&
+        skidState.formik.values &&
+        Array.isArray(skidState.formik.values.selectedDocuments) &&
+        !skidState.formik.values.selectedDocuments.some(
+          (selectedFile) => selectedFile === file._id
+        )
+    );
 
-            return (
-              <Accordion.Item eventKey={index.toString()} key={type} data-testid={`accordion-item-${index}`}> 
-                <Accordion.Header data-testid={`accordion-header-${index}`}>{type}</Accordion.Header>
-                <Accordion.Body data-testid={`accordion-body-${index}`}>
-                  {filesToShow.map((file, fileIndex) => (
-                    <div
-                      className="card"
-                      style={{ marginBottom: '10px', backgroundColor: file.color, cursor: 'pointer' }}
-                      key={file._id}
-                      onClick={() => window.open(file.fileUrl, '_blank')}
-                      data-testid={`file-card-${index}-${fileIndex}`}
-                    >
-                      <div className="search-text-doc" style={{ display: 'none' }}>
-                        {file.searchText}
-                      </div>
-                      <div className="card-header">
-                        <div style={{ float: 'left' }}>
-                          <em
-                            style={{
-                              maxWidth: '300px',
-                              display: 'inline-block',
-                              whiteSpace: 'nowrap',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              paddingRight: '5px'
-                            }}
-                          >
-                            {file.fileName}
-                          </em>
-                          &nbsp;&nbsp;
-                        </div>
-                        <div style={{ float: 'right' }}>
-                          <Button
-                            type="button"
-                            data-filename={file.fileName}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleCheckboxChange(file);
-                            }}
-                            size="sm"
-                            data-testid={`addDocument-${file._id}`}
-                          >
-                            Add
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </Accordion.Body>
-              </Accordion.Item>
-            );
-          })}
-        </Accordion>
+    if (filesToShow.length === 0) {
+      return null;
+    }
+
+    return (
+      <Accordion.Item eventKey={index.toString()} key={type} data-testid={`accordion-item-${index}`}>
+        {/* Display the name from the matching file type */}
+        <Accordion.Header data-testid={`accordion-header-${index}`}>
+          {matchingFileType ? matchingFileType.name : 'Unknown Type'}
+        </Accordion.Header>
+        <Accordion.Body data-testid={`accordion-body-${index}`}>
+          {filesToShow.map((file, fileIndex) => (
+            <div
+              className="card"
+              style={{ marginBottom: '10px', backgroundColor: file.color, cursor: 'pointer' }}
+              key={file._id}
+              onClick={() => window.open(file.fileUrl, '_blank')}
+              data-testid={`file-card-${index}-${fileIndex}`}
+            >
+              <div className="search-text-doc" style={{ display: 'none' }}>
+                {file.searchText}
+              </div>
+              <div className="card-header">
+                <div style={{ float: 'left' }}>
+                  <em
+                    style={{
+                      maxWidth: '300px',
+                      display: 'inline-block',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      paddingRight: '5px'
+                    }}
+                  >
+                    {file.fileName}
+                  </em>
+                  &nbsp;&nbsp;
+                </div>
+                <div style={{ float: 'right' }}>
+                  <Button
+                    type="button"
+                    data-filename={file.fileName}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleCheckboxChange(file);
+                    }}
+                    size="sm"
+                    data-testid={`addDocument-${file._id}`}
+                  >
+                    Add
+                  </Button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </Accordion.Body>
+      </Accordion.Item>
+    );
+  })}
+</Accordion>
       </Modal.Body>
       {/* <Modal.Footer>
         <Button variant="secondary" onClick={handleClose}>
