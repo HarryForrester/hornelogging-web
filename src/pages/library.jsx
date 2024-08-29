@@ -184,54 +184,60 @@ const Library = () => {
               Upload File
             </Button>
 
-            {Object.entries(filesByType).map(([fileType, files]) => (
-              <div key={fileType} className="mb-4">
-                <h5>{fileType}</h5>
-                <ListGroup>
-                  {files.map((file) => (
-                    <ListGroup.Item
-                      key={file._id}
-                      className="d-flex justify-content-between align-items-center border-0"
-                      style={{ backgroundColor: '#f8f9fa', borderRadius: '8px' }}
-                    >
-                      <div className="d-flex flex-column">
-                        <span className="fs-6">{file.fileName}</span>
-                        <div className="d-flex">
-                          {/* View */}
-                          <a
-                            href={file.fileUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="btn btn-outline-secondary btn-sm text-decoration-none me-2"
-                          >
-                            <FontAwesomeIcon icon={faEye} className="me-1" />
-                            View
-                          </a>
-                          {/* Download */}
-                          <a
-                            href="#"
-                            onClick={createHandleDownloadClick(file)}
-                            className="btn btn-outline-secondary btn-sm text-decoration-none me-2"
-                          >
-                            <FontAwesomeIcon icon={faDownload} className="me-1" />
-                            Download
-                          </a>
-                        </div>
-                      </div>
-                      {/* Delete */}
-                      <Button
-                        variant="danger"
-                        size="sm"
-                        onClick={() => handleFileDelete(file)}
+            {Object.entries(filesByType).map(([fileType, files]) => {
+              // Find the matching file type object by _id
+              const matchingFileType = fileTypes.find((type) => type._id === fileType);
+
+              return (
+                <div key={fileType} className="mb-4">
+                  {/* Display the name of the file type */}
+                  <h5>{matchingFileType ? matchingFileType.name : 'Unknown File Type'}</h5>
+                  <ListGroup>
+                    {files.map((file) => (
+                      <ListGroup.Item
+                        key={file._id}
+                        className="d-flex justify-content-between align-items-center border-0"
+                        style={{ backgroundColor: '#f8f9fa', borderRadius: '8px' }}
                       >
-                        <FontAwesomeIcon icon={faTrash} className="me-1" />
-                        Delete
-                      </Button>
-                    </ListGroup.Item>
-                  ))}
-                </ListGroup>
-              </div>
-            ))}
+                        <div className="d-flex flex-column">
+                          <span className="fs-6">{file.fileName}</span>
+                          <div className="d-flex">
+                            {/* View */}
+                            <a
+                              href={file.fileUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="btn btn-outline-secondary btn-sm text-decoration-none me-2"
+                            >
+                              <FontAwesomeIcon icon={faEye} className="me-1" />
+                              View
+                            </a>
+                            {/* Download */}
+                            <a
+                              href="#"
+                              onClick={createHandleDownloadClick(file)}
+                              className="btn btn-outline-secondary btn-sm text-decoration-none me-2"
+                            >
+                              <FontAwesomeIcon icon={faDownload} className="me-1" />
+                              Download
+                            </a>
+                          </div>
+                        </div>
+                        {/* Delete */}
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          onClick={() => handleFileDelete(file)}
+                        >
+                          <FontAwesomeIcon icon={faTrash} className="me-1" />
+                          Delete
+                        </Button>
+                      </ListGroup.Item>
+                    ))}
+                  </ListGroup>
+                </div>
+              );
+            })}
           </Card.Body>
         </Card>
       </div>

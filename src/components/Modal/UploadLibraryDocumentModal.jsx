@@ -190,7 +190,7 @@ const UploadLibraryDocumentModal = ({ show, close, docTypes: fileTypes, updateLi
                     Select a file type
                   </option>
                   {fileTypes.map((fileType) => (
-                    <option key={fileType._id} value={fileType.name}>
+                    <option key={fileType._id} value={fileType._id}>
                       {fileType.name}
                     </option>
                   ))}

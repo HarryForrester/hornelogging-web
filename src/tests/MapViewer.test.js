@@ -81,8 +81,8 @@ describe('PDF Map Viewer', () => {
 
                 ],
                 files: [
-                    { _id: 'file_id_1', owner: 'person1', fileName: 'file1_name' },
-                    { _id: 'file_id_2', owner: 'person2', fileName: 'file2_name' }
+                    { _id: 'file_id_1', owner: 'person_id_1', fileName: 'file1_name', type: 'file_type_1' },
+                    { _id: 'file_id_2', owner: 'person_id_1', fileName: 'file2_name', type: 'file_type_2' },
                 ]
             }
         });
@@ -272,6 +272,45 @@ describe('PDF Map Viewer', () => {
             expect(screen.getByText('Jane Doe')).toBeInTheDocument();
 
         });
+    }); 
+
+    test('renders employee infomation clicked in a selected skid marker (Popover)', async () => {
+        
+        useMap.mockReturnValue({
+            mapState: {
+                ...mockMapState,
+                currentMapMarkers: updatedMapState,
+                crews: [{
+                    _id: 'crew_id_1',
+                    _account: 2,
+                    name: 'Crew One',
+                }, {
+                    _id: 'crew_id_2',
+                    _account: 2,
+                    name: 'Crew Two',
+                }]
+            },
+            setMapState: mockSetMapState
+        });
+    
+        const { user } = setup(renderComponent());
+    
+        // First click on the marker
+        await user.click(screen.getByTestId('red-dot-0'));
+    
+        // Second click on the crew list item
+        await user.click(screen.getByTestId('crew_list_crew_id_1'));
+        // Then click on the first person list item
+        await user.click(screen.getByTestId('popover_person_id_1'));
+
+        await waitFor(() => {
+            expect(screen.getByRole('button', {
+                name: /←/i
+              })).toBeInTheDocument();
+            expect(screen.getByText(/john doe/i)).toBeInTheDocument();
+            expect(screen.getByText(/\(role 1\)/i)).toBeInTheDocument();
+            expect(screen.getByText(/record of learning/i)).toBeInTheDocument();
+        })
     }); 
     
 });
