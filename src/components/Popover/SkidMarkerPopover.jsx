@@ -353,7 +353,7 @@ const SkidMarkerPopover = () => {
                   {skidMarkerState.peopleByCrew[skidMarkerState.selectedSkidCrew._id] && skidMarkerState.peopleByCrew[skidMarkerState.selectedSkidCrew._id].map((person) => (
                     <li
                       key={person._id}
-                      data-testid={`popover-person-${person._id}`}
+                      data-testid={`popover_${person._id}`}
                       className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
                       style={{ textAlign: 'center' }}
                       onClick={() => {

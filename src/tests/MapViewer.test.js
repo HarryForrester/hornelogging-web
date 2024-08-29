@@ -14,6 +14,29 @@ import { setup } from "../utils/testSetup";
 jest.mock('axios');
 jest.mock('../components/Map/MapContext');
 
+const updatedMapState = [
+    {
+        _id: "point_1",
+        info: {
+            crews: ["crew_id_1"],
+            cutPlans: {
+                fileName: "cutplan1",
+                key: 'cutplan_key_1'
+            },
+            pointName: 'pointName_1',
+            selectedDocuments: ['file_id_1'],
+            siteHazards: ['hazard_id_1',]
+        },
+        point: {
+            _id: "points_point_id_1",
+            originalHeight: 800,
+            originalWidth: 1200,
+            x: 500,
+            y: 300
+        }
+    }
+];
+
 describe('PDF Map Viewer', () => {
     const mockSetMapState = jest.fn();
 
@@ -52,12 +75,14 @@ describe('PDF Map Viewer', () => {
         axios.get.mockResolvedValue({
             data: {
                 people: [
-                    { _id: 'person1', name: 'John Doe', crew: 'Crew 1', role: 'Role 1', archive: 'off' },
-                    { _id: 'person2', name: 'Jane Doe', crew: 'Crew 2', role: 'Role 2', archive: 'off' }
+                    { _id: 'person_id_1', name: 'John Doe', crew: 'crew_id_1', role: 'Role 1', archive: 'off' },
+                    { _id: 'person_id_2', name: 'Jane Doe', crew: 'crew_id_1', role: 'Role 2', archive: 'off' },
+                    { _id: 'person_id_3', name: 'Kane Doe', crew: 'crew_id_2', role: 'Role 3', archive: 'off' }
+
                 ],
                 files: [
-                    { _id: 'file1', owner: 'person1', fileName: 'file1_name' },
-                    { _id: 'file2', owner: 'person2', fileName: 'file2_name' }
+                    { _id: 'file_id_1', owner: 'person1', fileName: 'file1_name' },
+                    { _id: 'file_id_2', owner: 'person2', fileName: 'file2_name' }
                 ]
             }
         });
@@ -152,28 +177,7 @@ describe('PDF Map Viewer', () => {
     });
 
      test('displays marker(SkidMarkerPopover) correctly with data when clicked', async() => {
-        const updatedMapState = [
-            {
-                _id: "point_1",
-                info: {
-                    crews: ["crew_id_1"],
-                    cutPlans: {
-                        fileName: "cutplan1",
-                        key: 'cutplan_key_1'
-                    },
-                    pointName: 'pointName_1',
-                    selectedDocuments: ['file_id_1'],
-                    siteHazards: ['hazard_id_1',]
-                },
-                point: {
-                    _id: "points_point_id_1",
-                    originalHeight: 800,
-                    originalWidth: 1200,
-                    x: 500,
-                    y: 300
-                }
-            }
-        ];
+        
         useMap.mockReturnValue({
             mapState: {
                 ...mockMapState,
@@ -224,35 +228,21 @@ describe('PDF Map Viewer', () => {
         });
     }); 
 
-    /* test('renders crew contact list when a crew is clicked', async () => {
-        const updatedMapState = [
-            {
-                _id: "point_1",
-                info: {
-                    crews: ["crew-1"],
-                    cutPlans: {
-                        fileName: "cutplan1",
-                        key: 'cutplan_key_1'
-                    },
-                    pointName: 'pointName_1',
-                    selectedDocuments: ['file_id_1'],
-                    siteHazards: ['hazard_id_1']
-                },
-                point: {
-                    _id: "points_point_id_1",
-                    originalHeight: 800,
-                    originalWidth: 1200,
-                    x: 500,
-                    y: 300
-                }
-            }
-        ];
-    
+     test('renders crew contact list when a crew is clicked', async () => {
+        
         useMap.mockReturnValue({
             mapState: {
                 ...mockMapState,
                 currentMapMarkers: updatedMapState,
-                crewTypes: ['Crew 1', 'Crew 2']
+                crews: [{
+                    _id: 'crew_id_1',
+                    _account: 2,
+                    name: 'Crew One',
+                }, {
+                    _id: 'crew_id_2',
+                    _account: 2,
+                    name: 'Crew Two',
+                }]
             },
             setMapState: mockSetMapState
         });
@@ -268,18 +258,20 @@ describe('PDF Map Viewer', () => {
         });
     
         // Then click on the crew list item
-        await user.click(screen.getByTestId('crew-list-crew-1'));
+        await user.click(screen.getByTestId('crew_list_crew_id_1'));
     
         // Wait for the crew contact list to appear and validate its content
         await waitFor(() => {
             // Check if the popover header is correct
-            expect(screen.getByText(/crew: crew-1/i)).toBeInTheDocument();
+            expect(screen.getByText(/crew: Crew One/i)).toBeInTheDocument();
             expect(screen.getByText(/people:/i)).toBeInTheDocument();
     
             // Check if the correct crew members are displayed
-            expect(screen.getByTestId('popover-person-person1')).toBeInTheDocument();
-            //expect(screen.getByText('John Doe')).toBeInTheDocument();
+            expect(screen.getByTestId('popover_person_id_1')).toBeInTheDocument();
+            expect(screen.getByText('John Doe')).toBeInTheDocument();
+            expect(screen.getByText('Jane Doe')).toBeInTheDocument();
+
         });
-    }); */
+    }); 
     
 });
