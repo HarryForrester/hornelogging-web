@@ -200,7 +200,7 @@ const AddPersonModal = () => {
               {mapState.crews
                 .filter((crew) => crew.name !== 'Unassigned')
                 .map((crew) => (
-                  <option key={crew.name} value={crew.name}>
+                  <option key={crew._id} value={crew._id}>
                     {crew.name}
                   </option>
                 ))}

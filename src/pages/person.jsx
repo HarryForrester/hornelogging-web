@@ -40,7 +40,7 @@ const Person = () => {
             person: data.person,
             files: data.files,
             fileTypes: data.fileTypes,
-            crewTypes: data.crewTypes,
+            crews: data.crews,
             timesheetAccess: data.timesheetAccess,
             forms: data.forms,
             quals: data.quals

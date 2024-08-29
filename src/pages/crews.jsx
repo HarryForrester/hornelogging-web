@@ -60,9 +60,11 @@ const Crews = () => {
           <PeopleAndCrewSearch />
         </div>
 
-        {mapState.crews.map((crew) => (
-          <CrewCard key={crew.name} crew={crew} />
-        ))}
+        {mapState.crews.map((crew) => {
+          console.log('creww',crew)
+          return (
+          <CrewCard key={crew.name} crew={crew} />)
+})}
 
         <Button onClick={toggleArchivedStaff} className="mb-3">
           {showArchived ? 'Hide Archived Staff' : 'Show Archived Staff'}

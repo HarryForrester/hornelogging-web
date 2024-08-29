@@ -323,10 +323,10 @@ const EditPersonModal = (_account) => {
                   Select Crew
                 </option>
                 {personDataState &&
-                  personDataState.crewTypes &&
-                  personDataState.crewTypes.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
+                  personDataState.crews &&
+                  personDataState.crews.map((option) => (
+                    <option key={option._id} value={option._id}>
+                      {option.name}
                     </option>
                   ))}
                 <option value="Unassigned">

@@ -399,24 +399,24 @@ const AddOrEditSkidModal = ({ mousePosition, editSkid, _account }) => {
                   Select Crew
                 </Form.Label>
                 <Form.Group id="crew-checkboxes" className="d-flex justify-content-center" aria-labelledby="crew-label">
-                  {mapState.crewTypes.map((crewMember) => (
-                    <Form.Group className="form-check form-check-inline" key={crewMember}>
+                  {mapState.crews.map((crewMember) => (
+                    <Form.Group className="form-check form-check-inline" key={crewMember._id}>
                       <Form.Check
                         className="mb-2"
                         type="checkbox"
-                        id={`crew-member-${crewMember}`}
-                        value={crewMember}
-                        checked={formik.values.selectedCrew.includes(crewMember)}
+                        id={`crew-member-${crewMember._id}`}
+                        value={crewMember.name}
+                        checked={formik.values.selectedCrew.includes(crewMember._id)}
                         onChange={(e) => {
                           const updatedCrew = e.target.checked
-                            ? [...formik.values.selectedCrew, crewMember]
-                            : formik.values.selectedCrew.filter((name) => name !== crewMember);
+                            ? [...formik.values.selectedCrew, crewMember._id]
+                            : formik.values.selectedCrew.filter((name) => name !== crewMember._id);
                           formik.setFieldValue('selectedCrew', updatedCrew);
                         }}
                         isInvalid={formik.touched.selectedCrew && formik.errors.selectedCrew}
                       />
-                      <Form.Label className="form-check-label" htmlFor={`crew-member-${crewMember}`}>
-                        {crewMember}
+                      <Form.Label className="form-check-label" htmlFor={`crew-member-${crewMember._id}`}>
+                        {crewMember.name}
                       </Form.Label>
                     </Form.Group>
                   ))}

@@ -7,7 +7,7 @@ export const PersonDataProvider = ({ children }) => {
     person: [],
     files: [],
     fileTypes: [],
-    crewTypes: [],
+    crews: [],
     timesheetAccess: [],
     forms: [],
     quals: []

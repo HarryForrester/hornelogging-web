@@ -43,7 +43,8 @@ const Maps = () => {
           setMapState((prevState) => ({
             ...prevState,
             files: data.files,
-            crewTypes: data.crew,
+            //crewTypes: data.crew,
+            crews: data.crew,
             maps: data.maps,
             username: data.username,
             hazards: data.hazards,

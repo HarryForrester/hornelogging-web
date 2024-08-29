@@ -52,6 +52,7 @@ const SkidMarkerCrewPopover = () => {
       {skidMarkerState.popoverCrewVisible && (
         <div
           className="popover nested-popover"
+          data-testid={`popover-crew'`}
           data-bs-placement="top"
           style={{
             position: 'absolute',

@@ -18,6 +18,7 @@ const SkidMarkerPopover = () => {
   const navigate = useNavigate();
 
   const toggleSkidCrew = (crew) => {
+    console.log('toggleSkidCrew clicked', crew);
     setSkidMarkerState((prevState) => ({
       ...prevState,
       selectedSkidCrew: crew,
@@ -163,6 +164,7 @@ const SkidMarkerPopover = () => {
       {skidMarkerState.popoverVisible && (
         <div
           className="popover"
+          data-testid="popover"
           data-bs-placement="top"
           style={{
             position: 'absolute',
@@ -190,19 +192,26 @@ const SkidMarkerPopover = () => {
                 >
                   Crew:
                 </div>
-                <ul className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
-                  {skidState?.formik?.values?.selectedCrew
-                    .filter((crew) => mapState.crewTypes.some((mapCrew) => mapCrew === crew))
-                    .map((crew) => (
+                <ul className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }} data-testid="crew-list">
+                {skidState?.formik?.values?.selectedCrew
+                  .map((crewId) => {
+                    // Find the corresponding crew object in mapState.crewTypes
+                    const crew = mapState.crews.find((mapCrew) => mapCrew._id === crewId);
+                    return crew ? (
                       <li
-                        key={crew}
+                        key={crewId}
+                        data-testid={`crew_list_${crewId}`}
                         className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
                         onClick={() => toggleSkidCrew(crew)}
                         style={{ cursor: 'pointer' }}
                       >
-                        {crew}
+                        {crew.name}
                       </li>
-                    ))}
+                    ) : null;
+                  })
+                  .filter(Boolean) // Remove nulls in case crew was not found
+                }
+
                 </ul>
                 <div>
                   {skidState?.formik?.values?.selectedDocuments && skidState?.formik?.values?.selectedDocuments.length > 0 && (
@@ -215,11 +224,12 @@ const SkidMarkerPopover = () => {
                           paddingBottom: '10px'
                         }}
                       >
-                        Site Documents:
+                        Skid Documents:
                       </div>
                       <ul className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
                         {skidState?.formik?.values?.selectedDocuments.map(id => mapState.files.find(file => file._id === id)).filter(file => file).map((item, index) => (
                           <li
+                            data-testid={`skid-doc-${index}`}
                             key={index}
                             className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
                             onClick={() => window.open(item.fileUrl, '_blank')}
@@ -246,6 +256,7 @@ const SkidMarkerPopover = () => {
                       </div>
                       <ul className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
                         <li
+                          data-testid={`skid-cut-plan`}
                           className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
                           onClick={() => openPdfInNewTab(skidState.formik.values.selectedCutPlan)}
                           style={{ cursor: 'pointer' }}
@@ -256,7 +267,7 @@ const SkidMarkerPopover = () => {
                     </>
                   )}
                 </div>
-                {mapState.generalHazardsData && mapState.generalHazardsData.length > 0 && (
+                {/* {mapState.generalHazardsData && mapState.generalHazardsData.length > 0 && (
                   <>
                     <div
                       style={{
@@ -272,6 +283,7 @@ const SkidMarkerPopover = () => {
                       <ul className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
                         {mapState.generalHazardsData.map((hazard) => (
                           <li
+                            data-testid={``}
                             key={hazard._id}
                             className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
                             style={{ textAlign: 'center', backgroundColor: hazard.color }}
@@ -283,7 +295,7 @@ const SkidMarkerPopover = () => {
                       </ul>
                     </div>
                   </>
-                )}
+                )} */}
                 {skidState?.formik?.values?.selectedSkidHazards && skidState?.formik?.values?.selectedSkidHazards.length > 0 && (
                   <>
                     <div
@@ -294,16 +306,17 @@ const SkidMarkerPopover = () => {
                         paddingBottom: '10px'
                       }}
                     >
-                      Site Hazards:
+                      Skid Hazards:
                     </div>
                     <div>
                       <ul className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
                       {Array.isArray(skidState?.formik.values.selectedSkidHazards) && skidState?.formik.values.selectedSkidHazards
                       .map(id => mapState.hazards.find(hazard => hazard._id === id))
                       .filter(hazard => hazard)
-                      .map(hazard => (
+                      .map((hazard, index) => (
                         <li
-                          key={hazard._id}
+                          data-testid={`skid-hazard-${index}`}
+                          key={index}
                           className="list-group-item d-flex justify-content-between align-items-center list-group-item-action skid-hazard-item"
                           style={{ textAlign: 'center', backgroundColor: hazard.color }}
                           onClick={() => handleHazardClick(hazard)}
@@ -323,7 +336,7 @@ const SkidMarkerPopover = () => {
                 <button type="button" className="btn btn-link" onClick={() => toggleSkidCrew(null)}>
                   ←
                 </button>
-                Crew: {skidMarkerState.selectedSkidCrew}
+                Crew: {skidMarkerState.selectedSkidCrew.name}
               </div>
               <div className="popover-body">
                 <ul className="list-group" style={{ maxHeight: '200px', overflowY: 'auto' }}>
@@ -337,9 +350,10 @@ const SkidMarkerPopover = () => {
                     >
                       People:
                     </div>
-                  {skidMarkerState.peopleByCrew[skidMarkerState.selectedSkidCrew].map((person) => (
+                  {skidMarkerState.peopleByCrew[skidMarkerState.selectedSkidCrew._id] && skidMarkerState.peopleByCrew[skidMarkerState.selectedSkidCrew._id].map((person) => (
                     <li
                       key={person._id}
+                      data-testid={`popover-person-${person._id}`}
                       className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
                       style={{ textAlign: 'center' }}
                       onClick={() => {

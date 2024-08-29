@@ -65,6 +65,7 @@ const PDFViewer = ({ _account }) => {
    * @param {*} clickedPoint
    */
   const handleMarkerClick = async (clickedPoint) => {
+    console.log('handleMarkerClick', clickedPoint);
     const { formik } = skidState;
 
     // if the clicked marker is already visible then hide it
@@ -285,88 +286,103 @@ const PDFViewer = ({ _account }) => {
   };
 
   useEffect(() => {
-     const fetchPdfData = async () => {
+    const fetchPdfData = async () => {
       try {
         if (mapState.currentMapUrl) {
-          setPdf(mapState.currentMapUrl)
+          setPdf(mapState.currentMapUrl);
         }
       } catch (error) {
         console.error('Error fetching PDF data:', error);
       }
     };
-
+  
     const fetchCrewData = async () => {
       try {
         const response = await axios.get('http://localhost:3001/people', { withCredentials: true });
         const data = response.data;
+        console.log('Fetched people data:', data);
+  
+        if (!data.people || !data.files) {
+          console.error('People or files data is missing');
+          return;
+        }
+  
         const files = data.files;
-
-            // Create a map of files by person ID
-            const filesByPerson = files.reduce((acc, file) => {
-              if (!acc[file.owner]) {
-                acc[file.owner] = [];
-              }
-              acc[file.owner].push(file);
-              return acc;
-            }, {});
-
+  
+        // Create a map of files by person ID
+        const filesByPerson = files.reduce((acc, file) => {
+          if (!acc[file.owner]) {
+            acc[file.owner] = [];
+          }
+          acc[file.owner].push(file);
+          return acc;
+        }, {});
+  
+        console.log('Files mapped by person:', filesByPerson);
+  
         setSkidMarkerState((prevState) => {
-          const updatedPeopleByCrew =
-            data.people !== undefined
-              ? data.people.reduce(
-                  (updatedCrews, item) => {
-                    if (item.archive === 'on') return updatedCrews;
-
-                    const crewName = item.crew;
-                    const existingCrew = updatedCrews[crewName] || [];
-                    const existingPerson = existingCrew.find((person) => person._id === item._id);
-                    if (!existingPerson) {
-                      updatedCrews[crewName] = [
-                        ...existingCrew,
-                        {
-                          _id: item._id,
-                          name: item.name,
-                          role: item.role,
-                          filesByPerson: filesByPerson[item._id]
-                        }
-                      ];
-                    }
-
-                    return updatedCrews;
-                  },
-                  { ...prevState.peopleByCrew }
-                )
-              : { ...prevState.peopleByCrew };
-
+          if (!data.people) {
+            return prevState;
+          }
+  
+          const updatedPeopleByCrew = data.people.reduce((updatedCrews, item) => {
+            if (item.archive === 'on') return updatedCrews;
+            console.log('item bro', item.crew)
+            const crewId = item.crew;
+  
+            if (!updatedCrews[crewId]) {
+              updatedCrews[crewId] = [];
+            }
+  
+            const existingPerson = updatedCrews[crewId].find(
+              (person) => person._id === item._id
+            );
+  
+            if (!existingPerson) {
+              updatedCrews[crewId].push({
+                _id: item._id,
+                name: item.name,
+                role: item.role,
+                filesByPerson: filesByPerson[item._id] || []
+              });
+            }
+  
+            return updatedCrews;
+          }, { ...prevState.peopleByCrew });
+  
+          console.log('Updated people by crew:', updatedPeopleByCrew);
+  
           return {
             ...prevState,
             peopleByCrew: updatedPeopleByCrew
           };
         });
       } catch (error) {
-        console.error('Error fetching hazard data:', error);
+        console.error('Error fetching crew data:', error);
       }
     };
-
+  
     const fetchFiles = async () => {
       try {
         const response = await axios.get('http://localhost:3001/files-for-map', {
           withCredentials: true
         });
         const data = response.data;
+        console.log('Fetched files for map:', data);
         setSkidMarkerState((prevState) => ({
           ...prevState,
           personFiles: data.file
         }));
       } catch (error) {
-        console.error('Error fetching hazard data:', error);
+        console.error('Error fetching files data:', error);
       }
     };
-
+  
     fetchFiles();
     fetchPdfData();
     fetchCrewData();
   }, [mapState.currentMapUrl]);
+  
 
   return (
     <>
