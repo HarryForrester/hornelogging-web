@@ -2,19 +2,16 @@ import React from 'react';
 import axios from 'axios';
 import ToggleWithLabel from '../Toggle/ToggleWithLabel';
 import { useAlertMessage } from '../AlertMessage';
-import { usePersonData } from '../PersonData';
 import { Card } from 'react-bootstrap';
-
-const PersonFormAccessCard = () => {
-  const { alertMessageState, setAlertMessageState } = useAlertMessage();
-  const { personDataState, setPersonDataState } = usePersonData();
+import PropTypes from 'prop-types';
+const PersonFormAccessCard = ({ currentUser, timeSheetAccess, forms, updateForms }) => {
+  const { addToast } = useAlertMessage();
 
   const toggleTimeSheet = async (event) => {
-    const id = new Date().getTime();
     const isChecked = event.target.checked;
 
     const data = {
-      person: personDataState.person._id,
+      person: currentUser._id,
       checked: isChecked
     };
 
@@ -23,59 +20,23 @@ const PersonFormAccessCard = () => {
         withCredentials: true
       }); // Replace with your API endpoint
       if (response.status === 200) {
-        setAlertMessageState((prevState) => ({
-          ...prevState,
-          toasts: [
-            ...prevState.toasts,
-            {
-              id: id,
-              heading: `Time Sheet ${isChecked ? 'Enabled' : 'Disabled'}`,
-              show: true,
-              message: `Success! Time Sheet has been ${isChecked ? 'Enabled' : 'Disabled'} for ${personDataState.person.name}`,
-              background: 'success',
-              color: 'white'
-            }
-          ]
-        }));
+        addToast(`Time Sheet ${isChecked ? 'Enabled' : 'Disabled'}`, `Success! Time Sheet has been ${isChecked ? 'Enabled' : 'Disabled'} for ${currentUser.name}`, 'success', 'white');
       }
     } catch (err) {
-      setAlertMessageState((prevState) => ({
-        ...prevState,
-        toasts: [
-          ...prevState.toasts,
-          {
-            id: id,
-            heading: 'Time Sheet',
-            show: true,
-            message: `Error has occurred while changing form state`,
-            background: 'danger',
-            color: 'white'
-          }
-        ]
-      }));
+      addToast('Time Sheet!', 'Error has occurred while changing form state', 'danger', 'white');
       console.error('Network error:', err);
-    } finally {
-      setTimeout(() => {
-        setAlertMessageState((prevState) => ({
-          ...prevState,
-          toasts: prevState.toasts.filter((toast) => toast.id !== id)
-        }));
-      }, 10000);
     }
   };
 
   const toggleForm = async (event, form) => {
-    const id = new Date().getTime();
     const formId = form._id;
     const formTitle = form.title;
-    const personId = personDataState.person._id;
+    const personId = currentUser._id;
 
     try {
-      setPersonDataState((prevState) => {
-        const updatedForms =
-          prevState &&
-          prevState.forms &&
-          prevState.forms.map((form) => {
+      updateForms((forms) => {
+        const updatedForms = forms &&
+          forms.map((form) => {
             if (form._id === formId) {
               const updatedAvailbaleOnDevice = { ...JSON.parse(form.availableOnDeviceSerialized) };
               updatedAvailbaleOnDevice[personId] = isChecked;
@@ -87,59 +48,24 @@ const PersonFormAccessCard = () => {
             }
             return form;
           });
-        return {
-          ...prevState,
-          forms: updatedForms
-        };
+        return updatedForms
       });
       const isChecked = event.target.checked;
       const data = {
         id: formId,
-        person: personDataState.person._id,
+        person: currentUser._id,
         checked: isChecked
       };
+      // eslint-disable-next-line no-undef
       const response = await axios.post(process.env.REACT_APP_URL + '/toggleForm', data, {
         withCredentials: true
       });
       if (response.status === 200) {
-        setAlertMessageState((prevState) => ({
-          ...prevState,
-          toasts: [
-            ...prevState.toasts,
-            {
-              id: id,
-              heading: `${formTitle} ${isChecked ? 'Enabled' : 'Disabled'}`,
-              show: true,
-              message: `Success! ${formTitle} has been ${isChecked ? 'Enabled' : 'Disabled'} for ${personDataState.person.name}`,
-              background: 'success',
-              color: 'white'
-            }
-          ]
-        }));
+        addToast(`${formTitle} ${isChecked ? 'Enabled' : 'Disabled'}`, `Success! ${formTitle} has been ${isChecked ? 'Enabled' : 'Disabled'} for ${currentUser.name}`, 'success', 'white');
       }
     } catch (error) {
-      setAlertMessageState((prevState) => ({
-        ...prevState,
-        toasts: [
-          ...prevState.toasts,
-          {
-            id: id,
-            heading: 'Form Error',
-            show: true,
-            message: `Error has occurred while changing form state`,
-            background: 'danger',
-            color: 'white'
-          }
-        ]
-      }));
+      addToast('Form Error!', 'Error has occurred while changing form state', 'danger', 'white');
       console.error('Error toggling form:', error);
-    } finally {
-      setTimeout(() => {
-        setAlertMessageState((prevState) => ({
-          ...prevState,
-          toasts: prevState.toasts.filter((toast) => toast.id !== id)
-        }));
-      }, 10000);
     }
   };
 
@@ -153,24 +79,21 @@ const PersonFormAccessCard = () => {
       <Card.Body>
         <dl>
           <div className="form-access">
-            {personDataState &&
-              personDataState.timesheetAccess &&
-              personDataState.timesheetAccess.map((form) => (
+            {timeSheetAccess &&
+              timeSheetAccess.map((form) => (
                 <ToggleWithLabel
                   key={`timesheet-access-${form._id}`}
-                  personId={personDataState.person._id}
+                  personId={currentUser._id}
                   form={form}
                   isFormEnabled={isFormEnabled}
                   toggle={toggleTimeSheet}
                   availableOnDevice={form.availableOnDevice}
                 />
               ))}
-            {personDataState &&
-              personDataState.forms &&
-              personDataState.forms.map((form) => (
+            {forms && forms.map((form) => (
                 <ToggleWithLabel
                   key={`form-${form._id}`}
-                  personId={personDataState.person._id}
+                  personId={currentUser._id}
                   form={form}
                   isFormEnabled={isFormEnabled}
                   toggle={(e) => toggleForm(e, form)}
@@ -183,5 +106,12 @@ const PersonFormAccessCard = () => {
     </Card>
   );
 };
+
+PersonFormAccessCard.propTypes = {
+  currentUser: PropTypes.object.isRequired,
+  timeSheetAccess: PropTypes.array.isRequired,
+  forms: PropTypes.array.isRequired,
+  updateForms: PropTypes.func.isRequired,
+}
 
 export default PersonFormAccessCard;

@@ -5,145 +5,17 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDownload, faEye, faTrash, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { Card, Button, ListGroup } from 'react-bootstrap';
 import { useAlertMessage } from '../AlertMessage';
-import { usePersonData } from '../PersonData';
 import UploadUserDocumentModal from '../Modal/UploadUserDocument';
 import { deletePresignedUrl } from '../../hooks/useFileDelete';
 import { createHandleDownloadClick } from '../../hooks/useFileDownload';
-const PersonDocumentCard = (_account) => {
-  const [uploadPercentage, setUploadPercentage] = useState(0);
-  const { alertMessageState, setAlertMessageState } = useAlertMessage();
-  const { personDataState, setPersonDataState } = usePersonData();
+import PropTypes from 'prop-types';
+import { usePersonFile } from '../../context/PersonFileContext';
+const PersonDocumentCard = ({_account, currentUser, currentUserFiles, setCurrentUserFiles}) => {
+  const { addToast } = useAlertMessage();
+  const { personFiles } = usePersonFile();
   const [isUploadFileModalVisible, setUploadFileModalVisible] = useState(false);
 
-  const handleFileTypeChange = async (file, event) => {
-    const id = new Date().getTime();
-    const fileId = file._id;
-    try {
-      const resp = await axios.post(
-        `${process.env.REACT_APP_URL}/person/updatefiletype/${personDataState.person._id}/${fileId}`,
-        { filetype: event.target.value },
-        {
-          withCredentials: true
-        }
-      );
-
-      if (resp.status === 200) {
-        setAlertMessageState((prevState) => ({
-          ...prevState,
-          toasts: [
-            ...prevState.toasts,
-            {
-              id: id,
-              heading: 'Document Type Changed',
-              show: true,
-              message: `Success! ${file.fileName} has changed file type to ${event.target.value} `,
-              background: 'success',
-              color: 'white'
-            }
-          ]
-        }));
-      }
-    } catch (error) {
-      setAlertMessageState((prevState) => ({
-        ...prevState,
-        toasts: [
-          ...prevState.toasts,
-          {
-            id: id,
-            heading: 'Error',
-            show: true,
-            message: `Error has occurred while handling file type`,
-            background: 'danger',
-            color: 'white'
-          }
-        ]
-      }));
-      console.error('An error has occurred while handling file type');
-    } finally {
-      setTimeout(() => {
-        setAlertMessageState((prevState) => ({
-          ...prevState,
-          toasts: prevState.toasts.filter((toast) => toast.id !== id)
-        }));
-      }, 10000);
-    }
-  };
-
-  const handleFileUpload = async (e) => {
-    const id = new Date().getTime();
-    const fileInput = e.target;
-    const file = fileInput.files[0];
-    const formData = new FormData();
-    formData.append('fileupload', file);
-
-    try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_URL}/person/upload/${personDataState.person._id}`,
-        formData,
-        {
-          withCredentials: true,
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          },
-          onUploadProgress: (progressEvent) => {
-            const percentage = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-            setUploadPercentage(percentage);
-          }
-        }
-      );
-
-      if (response.status === 200) {
-        fileInput.value = '';
-        setPersonDataState((prevState) => ({
-          ...prevState,
-          files: [...prevState.files, response.data.file]
-        }));
-
-        setAlertMessageState((prevState) => ({
-          ...prevState,
-          toasts: [
-            ...prevState.toasts,
-            {
-              id: id,
-              heading: 'Person Document Added',
-              show: true,
-              message: `Success! ${file.name} has been added to ${personDataState.person.name} documents `,
-              background: 'success',
-              color: 'white'
-            }
-          ]
-        }));
-      }
-    } catch (error) {
-      setAlertMessageState((prevState) => ({
-        ...prevState,
-        toasts: [
-          ...prevState.toasts,
-          {
-            id: id,
-            heading: 'Error',
-            show: true,
-            message: `Error has occurred while submitting document, please try again`,
-            background: 'danger',
-            color: 'white'
-          }
-        ]
-      }));
-      fileInput.value = '';
-
-      console.error('Error submitting form:', error);
-    } finally {
-      setTimeout(() => {
-        setAlertMessageState((prevState) => ({
-          ...prevState,
-          toasts: prevState.toasts.filter((toast) => toast.id !== id)
-        }));
-      }, 10000);
-    }
-  };
-
   const handleFileDelete = async (file) => {
-    const id = new Date().getTime();
     const userConfirmed = window.confirm('Are you sure you want to remove file: ' + file.fileName);
 
     if (userConfirmed) {
@@ -157,67 +29,30 @@ const PersonDocumentCard = (_account) => {
 
         if (response.status === 200) {
           await deletePresignedUrl([file.key]);
-          setPersonDataState((prevState) => ({
+          /* setPersonDataState((prevState) => ({
             ...prevState,
             files: prevState.files.filter((f) => f._id !== file._id)
-          }));
-          setAlertMessageState((prevState) => ({
-            ...prevState,
-            toasts: [
-              ...prevState.toasts,
-              {
-                id: id,
-                heading: 'Person Document Removed',
-                show: true,
-                message: `Success! ${file.fileName} has been removed from ${personDataState.person.name} documents `,
-                background: 'success',
-                color: 'white'
-              }
-            ]
-          }));
+          })); */
+          setCurrentUserFiles((prevFiles) => prevFiles.filter((f) => f._id !== file._id));
+          
+          addToast('Person Document Removed!', `Success! ${file.fileName} has been removed from ${currentUser.name} documents`, 'success', 'white');
         } else {
           alert('An Error has occurred, please try again.');
         }
       } catch (error) {
-        setAlertMessageState((prevState) => ({
-          ...prevState,
-          toasts: [
-            ...prevState.toasts,
-            {
-              id: id,
-              heading: 'Error',
-              show: true,
-              message: `Error removing document`,
-              background: 'danger',
-              color: 'white'
-            }
-          ]
-        }));
+        addToast('Error!', 'Error removing document', 'danger', 'white');
         console.error('Error removing document:', error);
-      } finally {
-        setTimeout(() => {
-          setAlertMessageState((prevState) => ({
-            ...prevState,
-            toasts: prevState.toasts.filter((toast) => toast.id !== id)
-          }));
-        }, 10000);
       }
     }
   };
 
   const filesByType = {};
-  personDataState.files.forEach((file) => {
+  currentUserFiles.forEach((file) => {
     if (!filesByType[file.type]) {
       filesByType[file.type] = [];
     }
     filesByType[file.type].push(file);
   });
-
-  console.log('files by type bro: ', filesByType)
-
-
-
-  
 
   return (
     <Card>
@@ -228,6 +63,8 @@ const PersonDocumentCard = (_account) => {
           show={isUploadFileModalVisible}
           close={() => setUploadFileModalVisible(false)}
           _account={_account}
+          person={currentUser}
+          setCurrentUserFiles={setCurrentUserFiles}
         />
 
         {/* Upload button */}
@@ -238,7 +75,7 @@ const PersonDocumentCard = (_account) => {
 
         {/* File list */}
         {Object.entries(filesByType).map(([fileType, files]) => {
-          const matchingFileType = personDataState.fileTypes.find((type) => type._id === fileType);
+          const matchingFileType = personFiles.personFileTypes.find((type) => type._id === fileType);
 
           return(
           <div key={fileType} className="mb-4">
@@ -292,5 +129,12 @@ const PersonDocumentCard = (_account) => {
     </Card>
   );
 };
+
+PersonDocumentCard.propTypes = {
+  _account: PropTypes.number.isRequired,
+  currentUser: PropTypes.object.isRequired,
+  currentUserFiles: PropTypes.array.isRequired,
+  setCurrentUserFiles: PropTypes.func.isRequired,
+}
 
 export default PersonDocumentCard;

@@ -11,7 +11,7 @@ export const AlertMessageProvider = ({ children }) => {
   });
 
   const addToast = (heading, message, background = 'light', color = 'black') => {
-    const id = new Date().getTime();
+    const id = new Date().getTime(); // Generate a unique ID based on current timestamp
 
     setAlertMessageState((prevState) => ({
       ...prevState,
@@ -41,7 +41,7 @@ export const AlertMessageProvider = ({ children }) => {
 };
 
 AlertMessageProvider.propTypes = {
-  children: PropTypes.node.isRequired // Changed from func to node
+  children: PropTypes.node.isRequired
 };
 
 export const useAlertMessage = () => {

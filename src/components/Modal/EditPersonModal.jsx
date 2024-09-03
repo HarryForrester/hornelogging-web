@@ -2,23 +2,17 @@
 import React, { useState, useEffect } from 'react';
 import SelectRoleType from '../SelectList/SelectRoleType';
 import InputWithLabel from '../Input/InputWithLabel';
-import SelectWithLabel from '../Select/SelectWithLabel';
 import axios from 'axios';
 import { Button, Form, Image, Modal, Spinner, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { useSkidModal } from './Skid/SkidModalContext';
-import { useMap } from '../Map/MapContext';
-import { usePersonData } from '../PersonData';
 import { useAlertMessage } from '../AlertMessage';
-import { faL } from '@fortawesome/free-solid-svg-icons';
 import { getPresignedUrl, uploadToPresignedUrl, getFilePathFromUrl } from '../../hooks/useFileUpload';
 import { deletePresignedUrl } from '../../hooks/useFileDelete';
-const EditPersonModal = (_account) => {
-  const { skidModalState, setSkidModalState } = useSkidModal();
-  const { personDataState, setPersonDataState } = usePersonData();
-  const { mapState, setMapState } = useMap();
-  const { alertMessageState, setAlertMessageState } = useAlertMessage();
+import { useCrews } from '../../context/CrewContext';
+import PropTypes from 'prop-types';
+const EditPersonModal = ({_account, person, updatePerson, show, hideModal}) => {
+  const { crews } = useCrews();
+  const { addToast } = useAlertMessage();
   const [showSpinner, setShowSpinner] = useState(false); // shows spinner while submitting to server
-  const person = personDataState?.person;
   const [formState, setFormState] = useState({
     id: '',
     name: '',
@@ -56,16 +50,6 @@ const EditPersonModal = (_account) => {
       archive: person?.archive
     });
   }, [person]);
-
-  const updatePerson = (updatedPerson) => {
-    setPersonDataState((prevState) => ({
-      ...prevState,
-      person: {
-        ...prevState.person,
-        ...updatedPerson
-      }
-    }));
-  };
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -109,19 +93,15 @@ const EditPersonModal = (_account) => {
   };
 
   const handleClose = () => {
-    setSkidModalState((prevState) => ({
-      isEditPersonModalVisible: false
-    }));
+    hideModal();
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setShowSpinner(true);
-    const id = new Date().getTime();
   
     try {
       let response;
-      console.log('this sis the form state',formState)
       if (formState.imgFile) {
         // Upload new image and update with imgUrl
         const [presignedUrl, key] = await getPresignedUrl(`${_account._account}/person/${formState.id}`, 'image/png');
@@ -149,57 +129,17 @@ const EditPersonModal = (_account) => {
         // Delete old profile image if it exists
         if (person.imgUrl) {
           await deletePresignedUrl([person.imgUrl.key]);
-        }
-  
-        // Update UI state after successful update
-        setAlertMessageState((prevState) => ({
-          ...prevState,
-          toasts: [
-            ...prevState.toasts,
-            {
-              id: id,
-              heading: 'Person Updated',
-              show: true,
-              message: `Success! ${formState.name} has been updated from ${formState.crew}`,
-              background: 'success',
-              color: 'white'
-            }
-          ]
-        }));
-        
+        }        
+        addToast('Person Updated!', `Success! ${formState.name} has been updated from ${formState.crew}`, 'success', 'white');
         updatePerson(response.data.updatedPerson); // Update person data in UI
         resetForm(); // Reset form fields
-        setSkidModalState((prevState) => ({
-          ...prevState,
-          isEditPersonModalVisible: false
-        }));
+        hideModal(); // Hide modal
       }
     } catch (error) {
-      // Handle errors
-      setAlertMessageState((prevState) => ({
-        ...prevState,
-        toasts: [
-          ...prevState.toasts,
-          {
-            id: id,
-            heading: 'Update Person',
-            show: true,
-            message: `Error! Updating ${formState.name} from ${formState.crew}`,
-            background: 'danger',
-            color: 'white'
-          }
-        ]
-      }));
+      addToast('Update Person!', `Error! Updating ${formState.name} from ${formState.crew}`, 'danger', 'white');
       console.error('Error:', error);
     } finally {
       setShowSpinner(false);
-      // Remove alert after 10 seconds
-      setTimeout(() => {
-        setAlertMessageState((prevState) => ({
-          ...prevState,
-          toasts: prevState.toasts.filter((toast) => toast.id !== id)
-        }));
-      }, 10000);
     }
   };
   
@@ -211,7 +151,7 @@ const EditPersonModal = (_account) => {
   const imgUrl = person?.imgUrl;
   return (
     <Modal
-      show={skidModalState.isEditPersonModalVisible}
+      show={show}
       onHide={handleClose}
       size="xl"
       backdrop="static"
@@ -322,9 +262,7 @@ const EditPersonModal = (_account) => {
                 <option value="default" disabled>
                   Select Crew
                 </option>
-                {personDataState &&
-                  personDataState.crews &&
-                  personDataState.crews.map((option) => (
+                {crews && crews.map((option) => (
                     <option key={option._id} value={option._id}>
                       {option.name}
                     </option>
@@ -394,5 +332,13 @@ const EditPersonModal = (_account) => {
     </Modal>
   );
 };
+
+EditPersonModal.propTypes = {
+  _account: PropTypes.number.isRequired,
+  person: PropTypes.object.isRequired,
+  show: PropTypes.bool.isRequired,
+  hideModal: PropTypes.func.isRequired,
+  updatePerson: PropTypes.func.isRequired,
+}
 
 export default EditPersonModal;

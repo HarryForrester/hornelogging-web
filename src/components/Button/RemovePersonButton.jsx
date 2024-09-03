@@ -1,13 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
-import DeleteConfirmationModal from '../Modal/DeleteConfirmationModal';
+import React, { useEffect } from 'react';
 import { Button } from 'react-bootstrap';
 import { useConfirmationModal } from '../ConfirmationModalContext';
 import { useNavigate } from 'react-router-dom';
 import { useAlertMessage } from '../AlertMessage';
 import PropTypes from 'prop-types';
 import axios from 'axios';
+import { useCrews } from '../../context/CrewContext';
 import { deletePresignedUrl } from '../../hooks/useFileDelete';
 
 /**
@@ -16,7 +14,8 @@ import { deletePresignedUrl } from '../../hooks/useFileDelete';
  */
 const RemovePersonButton = ({ person, _account }) => {
   const { confirmationModalState, setConfirmationModalState } = useConfirmationModal();
-  const { alertMessageStart, setAlertMessageState } = useAlertMessage();
+  const { addToast } = useAlertMessage();
+  const { crews } = useCrews();
   const navigate = useNavigate();
 
   const deletePerson = () => {
@@ -35,7 +34,7 @@ const RemovePersonButton = ({ person, _account }) => {
 
   useEffect(() => {
     const checkSubmit = async () => {
-      const id = new Date().getTime();
+      const crewName = crews.find(crew => crew._id === person.crew)?.name || "Unassigned";
 
       if (confirmationModalState.confirmed && person._id !== null) {
         await deletePresignedUrl([`${_account}/person/${person._id}/`]);
@@ -47,50 +46,17 @@ const RemovePersonButton = ({ person, _account }) => {
           );
           if (response.status === 200) {
               await deletePresignedUrl([`${person._id}/`]);
-            
-            navigate('/');
-            setAlertMessageState((prevState) => ({
-              ...prevState,
-              toasts: [
-                ...prevState.toasts,
-                {
-                  id: id,
-                  heading: 'Crew Member Removed',
-                  show: true,
-                  message: `${person.name} has been removed successfully`,
-                  background: 'success',
-                  color: 'white'
-                }
-              ]
-            }));
+              navigate('/');
+              addToast('Person Removed!', `${person.name} has been removed from ${crewName} successfully`, 'success', 'white' );
           }
         } catch (error) {
-          setAlertMessageState((prevState) => ({
-            ...prevState,
-            toasts: [
-              ...prevState.toasts,
-              {
-                id: id,
-                heading: 'Remove Person',
-                show: true,
-                message: `Error! Removing ${person.name}  from ${person.crew}`,
-                background: 'danger',
-                color: 'white'
-              }
-            ]
-          }));
+          addToast('Remove Person', `Error! Removing ${person.name}  from ${crewName}`, 'danger', 'white');
           console.error('An error has occured while removing crew member');
         } finally {
           setConfirmationModalState((prevState) => ({
             ...prevState,
             confirmed: false
           }));
-          setTimeout(() => {
-            setAlertMessageState((prevState) => ({
-              ...prevState,
-              toasts: prevState.toasts.filter((toast) => toast.id !== id)
-            }));
-          }, 10000);
         } 
       }
     };
@@ -114,7 +80,7 @@ const RemovePersonButton = ({ person, _account }) => {
 
 RemovePersonButton.propTypes = {
   person: PropTypes.any.isRequired,
-  _account: PropTypes.string.isRequired
+  _account: PropTypes.number.isRequired
 };
 
 export default RemovePersonButton;

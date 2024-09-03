@@ -6,23 +6,23 @@ import PersonDocumentCard from '../components/Card/PersonDocumentCard';
 import PersonFormAccessCard from '../components/Card/PersonFormAccessCard';
 import EditPersonModal from '../components/Modal/EditPersonModal';
 import RemovePersonButton from '../components/Button/RemovePersonButton';
-import { useSkidModal } from '../components/Modal/Skid/SkidModalContext';
 import { Button } from 'react-bootstrap';
-import { usePersonData } from '../components/PersonData';
 import QualificationsCard from '../components/Card/QualificationsCard';
-
+import { usePersonFile } from '../context/PersonFileContext';
 const Person = () => {
   const { id } = useParams();
-  const { skidModalState, setSkidModalState } = useSkidModal();
-  const { personDataState, setPersonDataState } = usePersonData();
   const [_account, setAccount] = useState(null);
+  const { setPersonFiles} = usePersonFile();
   const navigate = useNavigate();
-
+  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUserFiles, setCurrentUserFiles] = useState(null);
+  const [forms, setForms] = useState(null);
+  const [timesheetAccess, setTimesheetAccess] = useState(null);
+  const [quals, setQuals] = useState([]);
+  const [showEditPersonModal, setShowEditPersonModal] = useState(false);
+  
   const handleEditPerson = () => {
-    setSkidModalState((prevState) => ({
-      ...prevState,
-      isEditPersonModalVisible: true
-    }));
+    setShowEditPersonModal(true);
   };
 
   useEffect(() => {
@@ -34,17 +34,16 @@ const Person = () => {
         });
         if (response.data.isLoggedIn) {
           const data = response.data;
-          console.log('dtat', data)
-          setPersonDataState((prevState) => ({
+          setCurrentUser(data.person);
+          setCurrentUserFiles(data.files);
+          setPersonFiles((prevState) => ({
             ...prevState,
-            person: data.person,
-            files: data.files,
-            fileTypes: data.fileTypes,
-            crews: data.crews,
-            timesheetAccess: data.timesheetAccess,
-            forms: data.forms,
-            quals: data.quals
-          }));
+            personFileTypes: data.fileTypes,
+            personFiles: data.personFiles,
+          }))
+          setTimesheetAccess(data.timesheetAccess);
+          setForms(data.forms);
+          setQuals(data.quals);
           setAccount(data._account);
         } else {
           navigate('/login');
@@ -61,7 +60,7 @@ const Person = () => {
     <div className="container" style={{ marginTop: '50px' }}>
       <div>
         <h1>
-          {personDataState.person?.name}{' '}
+          {currentUser?.name}{' '}
           <span
             id="spinny"
             style={{ display: 'none' }}
@@ -79,18 +78,31 @@ const Person = () => {
         >
           Edit
         </Button>
-        <RemovePersonButton person={personDataState.person} _account={_account} />
+        {currentUser && _account && (
+          <RemovePersonButton person={currentUser} _account={_account} />
+        )}
       </div>
 
       <br style={{ clear: 'left' }} />
-      <PersonInfoCard person={personDataState.person} />
       <br />
-      <PersonDocumentCard _account={_account}/>
       <br />
-      <QualificationsCard person={personDataState.person} />
+      {currentUser && (
+        <PersonInfoCard person={currentUser} />
+      )}
+      { _account && currentUser && (
+        <PersonDocumentCard _account={_account} currentUser={currentUser} currentUserFiles={currentUserFiles} setCurrentUserFiles={setCurrentUserFiles}/>
+      )}
+      {currentUser && quals && (
+        <QualificationsCard person={currentUser} quals={quals} setQuals={setQuals} />
 
-      <PersonFormAccessCard />
-      <EditPersonModal _account={_account} />
+      )}
+      {currentUser && timesheetAccess && forms && (
+      <PersonFormAccessCard currentUser={currentUser} timeSheetAccess={timesheetAccess} forms={forms} updateForms={setForms} />
+
+      )}
+      {_account && currentUser && (
+        <EditPersonModal show={showEditPersonModal} hideModal={() => setShowEditPersonModal(false)} _account={_account} person={currentUser} updatePerson={setCurrentUser} />
+      )}
     </div>
   );
 };

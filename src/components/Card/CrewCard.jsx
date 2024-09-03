@@ -4,7 +4,6 @@ import RemoveCrewButton from '../Button/RemoveCrewButton';
 import PersonCard from './PersonCard';
 import PropTypes from 'prop-types';
 const CrewCard = ({ crew }) => {
-  console.log('crewCard', crew);
   return (
     <Card className="mb-3">
       <Card.Header className="bg-light">

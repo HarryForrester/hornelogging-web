@@ -4,13 +4,13 @@ const PersonDataContext = createContext();
 
 export const PersonDataProvider = ({ children }) => {
   const [personDataState, setPersonDataState] = useState({
-    person: [],
-    files: [],
-    fileTypes: [],
-    crews: [],
-    timesheetAccess: [],
-    forms: [],
-    quals: []
+    //person: [],
+    //files: [],
+    //fileTypes: [],
+    //crews: [],
+    //timesheetAccess: [],
+    //forms: [],
+    //quals: []
   });
 
   return (

@@ -6,28 +6,24 @@ import { Table, Button } from 'react-bootstrap';
 import axios from 'axios';
 import { useAlertMessage } from './AlertMessage';
 import { usePersonData } from './PersonData';
-const QualifiedTable = ({ quals, person }) => {
-  const { alertMessageState, setAlertMessageState } = useAlertMessage();
-  const { personDataState, setPersonDataState } = usePersonData();
+const QualifiedTable = ({ quals, setQuals, person }) => {
+  console.log('Qualified', quals);
+  const { addToast } = useAlertMessage();
 
   const handleComplete = async (_id, complete) => {
-    const id = new Date().getTime(); // creates id for alert messages
 
     try {
       const response = await axios.post(
         // eslint-disable-next-line no-undef
         `${process.env.REACT_APP_URL}/complete-qualification`,
-        { _id, complete, employee: personDataState.person._id },
+        { _id, complete, employee: person._id },
         { withCredentials: true }
       );
       if (response.status === 200) {
         console.log('response: ', response.data);
-        setPersonDataState((prevState) => ({
-          ...prevState,
-          quals: response.data.quals
-        }));
+        setQuals(response.data.quals);
 
-        setAlertMessageState((prevState) => ({
+        /* setAlertMessageState((prevState) => ({
           ...prevState,
           toasts: [
             ...prevState.toasts,
@@ -40,17 +36,19 @@ const QualifiedTable = ({ quals, person }) => {
               color: 'white'
             }
           ]
-        }));
+        })); */
+        addToast('Qualification Updated!', 'Success! Qualification has been updated successfully', 'success', 'white');
       }
     } catch (error) {
+      addToast('Error!', 'An error occurred while qualifying or unqualified Qualification', 'danger', 'white');
       console.error('An error has occcured while qualifying or unqualifying qualication: ', error);
     } finally {
-      setTimeout(() => {
+      /* setTimeout(() => {
         setAlertMessageState((prevState) => ({
           ...prevState,
           toasts: prevState.toasts.filter((toast) => toast.id !== id)
         }));
-      }, 10000);
+      }, 10000); */
     }
   };
 
@@ -67,12 +65,9 @@ const QualifiedTable = ({ quals, person }) => {
       );
       if (response.status === 200) {
         console.log('response: ', response.data);
-        setPersonDataState((prevState) => ({
-          ...prevState,
-          quals: response.data.quals
-        }));
+        setQuals(response.data.quals);
 
-        setAlertMessageState((prevState) => ({
+        /* setAlertMessageState((prevState) => ({
           ...prevState,
           toasts: [
             ...prevState.toasts,
@@ -85,11 +80,12 @@ const QualifiedTable = ({ quals, person }) => {
               color: 'white'
             }
           ]
-        }));
+        })); */
+        addToast('Qualification Removed!', 'Success! Qualification has been removed successfully', 'success', 'white');
       }
     } catch (err) {
       console.error('An error occurred', err);
-      setAlertMessageState((prevState) => ({
+      /* setAlertMessageState((prevState) => ({
         ...prevState,
         toasts: [
           ...prevState.toasts,
@@ -102,14 +98,15 @@ const QualifiedTable = ({ quals, person }) => {
             color: 'white'
           }
         ]
-      }));
+      })); */
+      addToast('Error!', 'Error occurred while removing qualification, Please try again', 'danger', 'white');
     } finally {
-      setTimeout(() => {
+      /* setTimeout(() => {
         setAlertMessageState((prevState) => ({
           ...prevState,
           toasts: prevState.toasts.filter((toast) => toast.id !== id)
         }));
-      }, 10000);
+      }, 10000); */
     }
   };
 
@@ -216,6 +213,7 @@ const QualifiedTable = ({ quals, person }) => {
 
 QualifiedTable.propTypes = {
   quals: PropTypes.any.isRequired,
+  setQuals: PropTypes.func.isRequired,
   person: PropTypes.any.isRequired
 };
 export default QualifiedTable;

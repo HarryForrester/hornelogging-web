@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Button, Form, Modal, Spinner } from 'react-bootstrap';
-import { useSkidModal } from './Skid/SkidModalContext';
-import { useMap } from '../Map/MapContext';
 import { useAlertMessage } from '../AlertMessage';
-
-const AddCrewModal = () => {
-  const { skidModalState, setSkidModalState } = useSkidModal();
-  const { mapState, setMapState } = useMap();
-  const { setAlertMessageState } = useAlertMessage();
+import { useCrews } from '../../context/CrewContext';
+import { usePeople } from '../../context/PeopleContext';
+import PropTypes from 'prop-types';
+const AddCrewModal = ({ show, closeModal }) => {
+  const { addToast } = useAlertMessage();
+  const { crews } = useCrews();
+  const { setPeople } = usePeople();
   const [showSpinner, setShowSpinner] = useState(false);
   const [crew, setCrew] = useState('');
 
@@ -16,100 +16,44 @@ const AddCrewModal = () => {
     setCrew(e.target.value);
   };
 
-  const handleClose = () => {
-    setSkidModalState((prevState) => ({
-      ...prevState,
-      isAddCrewModalVisible: false
-    }));
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setShowSpinner(true);
     const id = new Date().getTime();
     try {
-      const doesCrewExist = mapState.crews.some((c) => c.name === crew);
+      const doesCrewExist = crews.some((c) => c.name === crew);
       //If crew already exists then show alert to tell user it already exists
       if (doesCrewExist) {
-        setAlertMessageState((prevState) => ({
-          ...prevState,
-          toasts: [
-            ...prevState.toasts,
-            {
-              id: id,
-              heading: 'Add Crew',
-              show: true,
-              message: 'Crew already exists. Please try another crew name',
-              background: 'danger',
-              color: 'white'
-            }
-          ]
-        }));
+        addToast('Add Crew', `Crew named "${crew}" already exists. Please try another crew name`, 'danger', 'white');
       } // if crew does not exist then add the send crew to server.
       else {
         const response = await axios.post(
           // eslint-disable-next-line no-undef
-          process.env.REACT_APP_URL + '/createcrew',
-          {
-            name: crew
-          },
-          { withCredentials: true }
+          process.env.REACT_APP_URL + '/createcrew', { name: crew }, { withCredentials: true }
         );
 
         if (response.status === 200) {
-          handleClose();
-          setMapState((prevState) => ({
+          closeModal();
+          setPeople((prevState) => ({
             ...prevState,
-            crews: response.data.crews,
+            peopleByCrew: response.data.crews,
             archivedPeople: response.data.archivedPeople
           }));
           
-          setAlertMessageState((prevState) => ({
-            ...prevState,
-            toasts: [
-              ...prevState.toasts,
-              {
-                id: id,
-                heading: 'Add Person',
-                show: true,
-                message: `Success! ${crew} has been added`,
-                background: 'success',
-                color: 'white'
-              }
-            ]
-          }));
+          addToast('Add Crew', `Success! "${crew}" has been added`, 'success', 'white');
           setCrew(null);
         }
       }
     } catch (error) {
-      setAlertMessageState((prevState) => ({
-        ...prevState,
-        toasts: [
-          ...prevState.toasts,
-          {
-            id: id,
-            heading: 'Add Crew',
-            show: true,
-            message: `Error! An Error has occurred adding crew`,
-            background: 'danger',
-            color: 'white'
-          }
-        ]
-      }));
+      addToast('Add Crew', `Error! An Error occurred while adding "${crew}"`, 'danger', 'white');
       console.error('Error submitting form:', error);
     } finally {
       setShowSpinner(false);
-      setTimeout(() => {
-        setAlertMessageState((prevState) => ({
-          ...prevState,
-          toasts: prevState.toasts.filter((toast) => toast.id !== id)
-        }));
-      }, 10000);
     }
   };
 
   return (
-    <Modal show={skidModalState.isAddCrewModalVisible} onHide={handleClose} centered>
+    <Modal show={show} onHide={closeModal} centered>
       <Modal.Header closeButton>
         <Modal.Title>Add Crew</Modal.Title>
       </Modal.Header>
@@ -147,5 +91,10 @@ const AddCrewModal = () => {
     </Modal>
   );
 };
+
+AddCrewModal.propTypes = {
+  show: PropTypes.bool.isRequired,
+  closeModal: PropTypes.func.isRequired,
+}
 
 export default AddCrewModal;

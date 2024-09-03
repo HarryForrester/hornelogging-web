@@ -2,12 +2,11 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { Form, Modal, Button, Spinner } from 'react-bootstrap';
 import { useAlertMessage } from '../AlertMessage';
-import { usePersonData } from '../PersonData';
 import PropTypes from 'prop-types';
 import DragAndDropUpload from '../DragAndDropUpload';
 import { getPresignedUrl, uploadToPresignedUrl, getFilePathFromUrl} from '../../hooks/useFileUpload';
-
-const UploadUserDocumentModal = ({ show, close, _account}) => {
+import { usePersonFile } from '../../context/PersonFileContext';
+const UploadUserDocumentModal = ({ show, close, _account, person, setCurrentUserFiles}) => {
   const [fileName, setFileName] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
   const [fileTypeIsValid, setFileTypeIsValid] = useState(null);
@@ -16,10 +15,8 @@ const UploadUserDocumentModal = ({ show, close, _account}) => {
   const [uploadPercentage, setUploadPercentage] = useState(0);
   const [fileTypeValue, setFileTypeValue] = useState(null);
   const [selectedFileType, setSelectedFileType] = useState('defaultFileType'); // default value
-  const { personDataState, setPersonDataState } = usePersonData();
-  const { alertMessageState, setAlertMessageState } = useAlertMessage();
-  const person = personDataState?.person;
-
+  const { addToast } = useAlertMessage();
+  const { personFiles } = usePersonFile();
   const resetForm = () => {
     setFileName('');
     setSelectedFile(null);
@@ -55,12 +52,6 @@ const UploadUserDocumentModal = ({ show, close, _account}) => {
       setFileTypeIsValid(false); //name is not valid
     else {
       setShowSpinner(true); // show progress bar
-
-      //const formData = new FormData();
-      //formData.append('fileupload', selectedFile);
-      ///formData.append('fileName', fileName);
-      //formData.append('fileType', fileTypeValue);
-      console.log('hey thue', selectedFile )
       const [presignedUrl, key] = await getPresignedUrl(`${_account._account}/person/${person._id}/docs`,selectedFile.type)
       await uploadToPresignedUrl(presignedUrl, selectedFile,selectedFile.type);
       const filePath = getFilePathFromUrl(presignedUrl)
@@ -75,7 +66,7 @@ const UploadUserDocumentModal = ({ show, close, _account}) => {
       try {
         const response = await axios.post(
           // eslint-disable-next-line no-undef
-          `${process.env.REACT_APP_URL}/person/upload/${personDataState.person._id}`,
+          `${process.env.REACT_APP_URL}/person/upload/${person._id}`,
           data,
           {
             withCredentials: true,
@@ -88,55 +79,15 @@ const UploadUserDocumentModal = ({ show, close, _account}) => {
         );
 
         if (response.status === 200) {
-          //fileInput.value = '';
-          setPersonDataState((prevState) => ({
-            ...prevState,
-            files: [...prevState.files, response.data.file]
-          }));
-
-          setAlertMessageState((prevState) => ({
-            ...prevState,
-            toasts: [
-              ...prevState.toasts,
-              {
-                id: id,
-                heading: 'File Uploaded',
-                show: true,
-                message: `Success! ${fileTypeValue} file ${fileName} has been uploaded successfully`,
-                background: 'success',
-                color: 'white'
-              }
-            ]
-          }));
-
+          setCurrentUserFiles((prevFiles) => [...prevFiles, response.data.file]);          
+          addToast('File Uploaded!', `Success! ${fileTypeValue} file ${fileName} has been uploaded successfully`, 'success', 'white');
           handleClose();
         }
       } catch (error) {
-        setAlertMessageState((prevState) => ({
-          ...prevState,
-          toasts: [
-            ...prevState.toasts,
-            {
-              id: id,
-              heading: 'Error',
-              show: true,
-              message: `Error has occurred while submitting ${fileTypeValue} file ${fileName}, please try again`,
-              background: 'danger',
-              color: 'white'
-            }
-          ]
-        }));
-
+        addToast('Error!', `Error has occurred while submitting ${fileTypeValue} file ${fileName}, please try again`, 'danger', 'white');
         console.error('Error submitting form:', error);
       } finally {
         setShowSpinner(false);
-        setTimeout(() => {
-          setAlertMessageState((prevState) => ({
-            ...prevState,
-            toasts: prevState.toasts.filter((toast) => toast.id !== id)
-          }));
-        }, 10000);
-
       }
     }
   };
@@ -160,13 +111,15 @@ const UploadUserDocumentModal = ({ show, close, _account}) => {
               Choose File: <small style={{ fontWeight: 'normal' }}>(required)</small>
               {fileIsValid === false && <span className="text-danger"> * File Required</span>}
             </Form.Label>
-            <DragAndDropUpload
+              <DragAndDropUpload
               setSelectedFile={setSelectedFile}
               setFileIsValid={setFileIsValid}
               selectedFile={selectedFile}
               removeUploadedFile={removeUploadedFile}
               fileTypes={{}}
-            />
+              />
+          
+           
           </Form.Group>
           {selectedFile && (
             <>
@@ -202,9 +155,9 @@ const UploadUserDocumentModal = ({ show, close, _account}) => {
                   <option value="defaultFileType" disabled>
                     Select a file type
                   </option>
-                  {personDataState &&
-                    personDataState.fileTypes &&
-                    personDataState.fileTypes.map((fileType) => (
+                  {personFiles &&
+                    personFiles.personFileTypes &&
+                    personFiles.personFileTypes.map((fileType) => (
                       <option key={fileType._id} value={fileType._id}>
                         {fileType.name}
                       </option>
@@ -247,7 +200,9 @@ const UploadUserDocumentModal = ({ show, close, _account}) => {
 UploadUserDocumentModal.propTypes = {
   show: PropTypes.bool.isRequired,
   close: PropTypes.func.isRequired,
-  _account: PropTypes.object.isRequired,
+  _account: PropTypes.number.isRequired,
+  person: PropTypes.object.isRequired,
+  setCurrentUserFiles: PropTypes.func.isRequired,
 };
 
 export default UploadUserDocumentModal;

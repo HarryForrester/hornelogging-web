@@ -127,7 +127,7 @@ DragAndDropUpload.propTypes = {
   selectedFile: PropTypes.object,
   removeUploadedFile: PropTypes.func.isRequired,
   fileTypes: PropTypes.any.isRequired,
-  id: PropTypes.any.isRequired,
+  id: PropTypes.any,
   error: PropTypes.string // New prop for error message
 };
 

@@ -3,11 +3,14 @@ import { Modal, Button, Form, Spinner } from 'react-bootstrap';
 import axios from 'axios';
 import { useAlertMessage } from '../AlertMessage';
 import { usePeople } from '../../context/PeopleContext';
+import { useCrews } from '../../context/CrewContext';
 import PropTypes from 'prop-types';
+import { v4 as uuidv4 } from 'uuid';
 
 const AddPersonModal = ({ show, closeModal }) => {
   const { addToast } = useAlertMessage();
   const { people, setPeople } = usePeople();
+  const { crews } = useCrews();
   const [showSpinner, setShowSpinner] = useState(false); // shows spinner while submitting to server
   const unassignedCrewId = people.peopleByCrew.find(crew => crew.unassigned === true)._id;
 
@@ -37,7 +40,7 @@ const AddPersonModal = ({ show, closeModal }) => {
 
   const handleSubmit = async (e) => {
     setShowSpinner(true);
-    //const id = new Date().getTime();
+    const crewName = crews.find(crew => crew._id === formData.crewId).name;
 
     e.preventDefault();
 
@@ -80,8 +83,8 @@ const AddPersonModal = ({ show, closeModal }) => {
             peopleByCrew: updatedPeopleByCrew
           };
         });
-
-        addToast('Add Crew', `Success! ${formData.firstName} ${formData.lastName} has been added to ${formData.crewId}`, 'success', 'white');
+        const crewName = crews.find(crew => crew._id === formData.crewId).name;
+        addToast('Add Crew', `Success! ${formData.firstName} ${formData.lastName} has been added to ${crewName}`, 'success', 'white');
 
         resetForm();
       } else {
@@ -89,8 +92,11 @@ const AddPersonModal = ({ show, closeModal }) => {
       }
     } catch (error) {
       console.error('Network error:', error);
+      addToast('Add Crew', `Error! ${formData.firstName} ${formData.lastName} could not be added to ${crewName}`, 'danger', 'white');
+
     } finally {
       setShowSpinner(false);
+
     }
   };
 

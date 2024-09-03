@@ -10,12 +10,14 @@ import CrewCard from '../components/Card/CrewCard';
 import { Card, Button } from 'react-bootstrap';
 import PersonCard from '../components/Card/PersonCard.jsx';
 import { usePeople } from '../context/PeopleContext.js';
+import { useCrews } from '../context/CrewContext.js';
 const Crews = () => {
   const navigate = useNavigate();
   const [showArchived, setShowArchived] = useState(false);
   const { people, setPeople } = usePeople(); // used to get or set peopleByCrew and archivedPeople
-  const [showAddPersonModal, setShowAddPersonModal] = useState(false); //  shows or hides the modal when new person is clicked
-
+  const { crews, setCrews } = useCrews(); // used to get or set crews
+  const [showAddPersonModal, setShowAddPersonModal] = useState(false); //  shows or hides the modal when new person btn is clicked
+  const [showAddCrewModal, setShowAddCrewModal] = useState(false); // shows or hides the modal when new crew btn is clicked
 
 
   const toggleArchivedStaff = () => {
@@ -33,6 +35,7 @@ const Crews = () => {
             peopleByCrew: response.data.peopleByCrew,
             archivedPeople: response.data.archivedPeople
           }));
+          setCrews(response.data.crews);
 
         } else {
           navigate('/login');
@@ -58,7 +61,7 @@ const Crews = () => {
         <div className="row g-0" style={{ marginBottom: '10px' }}>
           <div className="col-md-6" style={{ padding: '0px' }}>
             <NewPersonButton handleClick={() => setShowAddPersonModal(true)}/>
-            <NewCrewButton />
+            <NewCrewButton handleClick={() => setShowAddCrewModal(true)}/>
           </div>
           <PeopleAndCrewSearch />
         </div>
@@ -86,8 +89,9 @@ const Crews = () => {
         {showAddPersonModal && (
           <AddPersonModal show={showAddPersonModal} closeModal={() => setShowAddPersonModal(false)} />
         )}
-
-        <AddCrewModal />
+        {showAddCrewModal && (
+          <AddCrewModal show={showAddCrewModal} closeModal={() => setShowAddCrewModal(false)} />
+        )}
       </div>
     </>
   );

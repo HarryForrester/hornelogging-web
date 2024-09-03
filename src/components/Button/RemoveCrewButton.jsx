@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useConfirmationModal } from '../ConfirmationModalContext';
 import { useAlertMessage } from '../AlertMessage';
-import { useMap } from '../Map/MapContext';
+import { usePeople } from '../../context/PeopleContext';
 import axios from 'axios';
 import PropTypes from 'prop-types';
 
@@ -12,16 +12,13 @@ import PropTypes from 'prop-types';
  * @returns
  */
 const RemoveCrewButton = ({ crew }) => {
-  //const [showDeleteModal, setShowDeleteModal] = useState(false);
   const { confirmationModalState, setConfirmationModalState } = useConfirmationModal();
-  const { alertMessageState, setAlertMessageState } = useAlertMessage();
-  const { mapState, setMapState } = useMap();
+  const { addToast } = useAlertMessage();
+  const { setPeople } = usePeople();
   const [crewId, setCrewId] = useState(null);
   const [crewName, setCrewName] = useState(null);
-  const id = new Date().getTime();
 
   const deleteCrew = (crew) => {
-    console.log('cerew: ', crew);
     setCrewId(crew._id);
     setCrewName(crew.name);
 
@@ -41,9 +38,9 @@ const RemoveCrewButton = ({ crew }) => {
   useEffect(() => {
     const checkSubmit = async () => {
       if (confirmationModalState.confirmed && crewId !== null) {
-        setMapState((prevState) => {
-          let updatedCrews = [...prevState.crews];
-          const removedCrew = prevState.crews.find((crew) => crew._id === crewId);
+        setPeople((prevState) => {
+          let updatedCrews = [...prevState.peopleByCrew];
+          const removedCrew = prevState.peopleByCrew.find((crew) => crew._id === crewId);
 
           if (removedCrew) {
             // Check if the removed crew has people
@@ -86,7 +83,7 @@ const RemoveCrewButton = ({ crew }) => {
 
           return {
             ...prevState,
-            crews: updatedCrews
+            peopleByCrew: updatedCrews
           };
         });
 
@@ -98,48 +95,15 @@ const RemoveCrewButton = ({ crew }) => {
           );
 
           if (response.status === 200) {
-            setAlertMessageState((prevState) => ({
-              ...prevState,
-              toasts: [
-                ...prevState.toasts,
-                {
-                  id: id,
-                  heading: 'Crew Removed',
-                  show: true,
-                  message: `Success! Removed Crew ${crew.name}   `,
-                  background: 'success',
-                  color: 'white'
-                }
-              ]
-            }));
+            addToast('Crew Removed!', `Success! Removed Crew "${crew.name}"`, 'success', 'white');
           }
         } catch (err) {
-          setAlertMessageState((prevState) => ({
-            ...prevState,
-            toasts: [
-              ...prevState.toasts,
-              {
-                id: id,
-                heading: 'Remove Crew',
-                show: true,
-                message: `Error! An error has occured while removing crew: ${crew.name}`,
-                background: 'danger',
-                color: 'white'
-              }
-            ]
-          }));
-          console.log('Error deleting crew: ', err);
+          addToast('Remove Crew!', `Error! An Error occurred while removing crew "${crew.name}", Please try again.`, 'danger', 'white');
         } finally {
           setConfirmationModalState((prevState) => ({
             ...prevState,
             confirmed: false
           }));
-          setTimeout(() => {
-            setAlertMessageState((prevState) => ({
-              ...prevState,
-              toasts: prevState.toasts.filter((toast) => toast.id !== id)
-            }));
-          }, 10000);
         }
       }
     };
