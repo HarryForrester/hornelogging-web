@@ -19,7 +19,6 @@ const AddCrewModal = ({ show, closeModal }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setShowSpinner(true);
-    const id = new Date().getTime();
     try {
       const doesCrewExist = crews.some((c) => c.name === crew);
       //If crew already exists then show alert to tell user it already exists

@@ -5,7 +5,6 @@ import { useAlertMessage } from '../AlertMessage';
 import { usePeople } from '../../context/PeopleContext';
 import { useCrews } from '../../context/CrewContext';
 import PropTypes from 'prop-types';
-import { v4 as uuidv4 } from 'uuid';
 
 const AddPersonModal = ({ show, closeModal }) => {
   const { addToast } = useAlertMessage();
@@ -30,8 +29,6 @@ const AddPersonModal = ({ show, closeModal }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    console.log('name', name);
-    console.log('value', value);
     setFormData((prevFormData) => ({
       ...prevFormData,
       [name]: value,
@@ -85,7 +82,6 @@ const AddPersonModal = ({ show, closeModal }) => {
         });
         const crewName = crews.find(crew => crew._id === formData.crewId).name;
         addToast('Add Crew', `Success! ${formData.firstName} ${formData.lastName} has been added to ${crewName}`, 'success', 'white');
-
         resetForm();
       } else {
         console.error('Failed to create person');
@@ -96,7 +92,6 @@ const AddPersonModal = ({ show, closeModal }) => {
 
     } finally {
       setShowSpinner(false);
-
     }
   };
 

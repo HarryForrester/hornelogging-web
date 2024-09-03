@@ -17,8 +17,6 @@ const PersonCard = ({ people }) => {
   return (
     <Card.Body className="card-padding">
       <div className="row g-0">
-        {' '}
-        {/* Change g-0 to remove gutters */}
         {people.map((person) => (
           <div key={person._id} className="col-md-1" style={{ marginRight: '15px' }}>
             <Figure onClick={() => personInfo(person._id)} className="figure personcard">

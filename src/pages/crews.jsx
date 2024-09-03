@@ -10,15 +10,12 @@ import CrewCard from '../components/Card/CrewCard';
 import { Card, Button } from 'react-bootstrap';
 import PersonCard from '../components/Card/PersonCard.jsx';
 import { usePeople } from '../context/PeopleContext.js';
-import { useCrews } from '../context/CrewContext.js';
 const Crews = () => {
   const navigate = useNavigate();
   const [showArchived, setShowArchived] = useState(false);
   const { people, setPeople } = usePeople(); // used to get or set peopleByCrew and archivedPeople
-  const { crews, setCrews } = useCrews(); // used to get or set crews
   const [showAddPersonModal, setShowAddPersonModal] = useState(false); //  shows or hides the modal when new person btn is clicked
   const [showAddCrewModal, setShowAddCrewModal] = useState(false); // shows or hides the modal when new crew btn is clicked
-
 
   const toggleArchivedStaff = () => {
     setShowArchived(!showArchived);
@@ -27,15 +24,14 @@ const Crews = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/', { withCredentials: true }); // Replace with your API endpoint
+        // eslint-disable-next-line no-undef
+        const response = await axios.get(`${process.env.REACT_APP_URL}/`, { withCredentials: true });
         if (response.data.isLoggedIn) {
-          console.log('repsp', response.data)
           setPeople((prevState) => ({
             ...prevState,
             peopleByCrew: response.data.peopleByCrew,
             archivedPeople: response.data.archivedPeople
           }));
-          setCrews(response.data.crews);
 
         } else {
           navigate('/login');
@@ -67,7 +63,6 @@ const Crews = () => {
         </div>
 
         {people.peopleByCrew.map((crew) => {
-          console.log('creww',crew)
           return (
           <CrewCard key={crew.name} crew={crew} />)
 })}

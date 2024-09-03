@@ -8,22 +8,13 @@ import PropTypes from 'prop-types';
  * Adds a new crew
  * @returns
  */
-const NewCrewButton = ({handleClick}) => {
-  const { setSkidModalState } = useSkidModal();
+const NewCrewButton = ({handleClick}) => (
+  <Button variant="outline-dark" onClick={handleClick}>
+    <FontAwesomeIcon icon={faUserPlus} data-testid="fontawesome-icon" />
+    &nbsp; New Crew
+  </Button>
+);
 
- /*  const handleClick = () => {
-    setSkidModalState((prevState) => ({
-      ...prevState,
-      isAddCrewModalVisible: true
-    }));
-  }; */
-  return (
-    <Button variant="outline-dark" onClick={handleClick}>
-      <FontAwesomeIcon icon={faUserPlus} data-testid="fontawesome-icon" />
-      &nbsp; New Crew
-    </Button>
-  );
-};
 
 NewCrewButton.propTypes = {
   handleClick: PropTypes.func.isRequired,

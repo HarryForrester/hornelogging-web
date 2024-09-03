@@ -4,12 +4,10 @@ import React from 'react';
  * Adds a new person to a crew
  * @returns
  */
-const PeopleAndCrewSearch = () => {
-  return (
-    <div className="col-md-6 text-end">
-      <input type="text" size="30" placeholder="Search" id="search-criteria" />
-    </div>
-  );
-};
+const PeopleAndCrewSearch = () => (
+  <div className="col-md-6 text-end">
+    <input type="text" size="30" placeholder="Search" id="search-criteria" />
+  </div>
+);
 
 export default PeopleAndCrewSearch;
