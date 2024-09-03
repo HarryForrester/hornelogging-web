@@ -10,8 +10,31 @@ export const AlertMessageProvider = ({ children }) => {
     color: 'black'
   });
 
+  const addToast = (heading, message, background = 'light', color = 'black') => {
+    const id = new Date().getTime();
+
+    setAlertMessageState((prevState) => ({
+      ...prevState,
+      toasts: [
+        ...prevState.toasts,
+        { id, heading, show: true, message, background, color }
+      ],
+    }));
+
+    setTimeout(() => {
+      removeToast(id);
+    }, 10000);
+  };
+
+  const removeToast = (id) => {
+    setAlertMessageState((prevState) => ({
+      ...prevState,
+      toasts: prevState.toasts.filter((toast) => toast.id !== id),
+    }));
+  };
+
   return (
-    <AlertMessageContext.Provider value={{ alertMessageState, setAlertMessageState }}>
+    <AlertMessageContext.Provider value={{ alertMessageState, addToast, removeToast }}>
       {children}
     </AlertMessageContext.Provider>
   );

@@ -6,7 +6,7 @@ import { usePeople } from '../../context/PeopleContext';
 import PropTypes from 'prop-types';
 
 const AddPersonModal = ({ show, closeModal }) => {
-  const { setAlertMessageState } = useAlertMessage();
+  const { addToast } = useAlertMessage();
   const { people, setPeople } = usePeople();
   const [showSpinner, setShowSpinner] = useState(false); // shows spinner while submitting to server
   const unassignedCrewId = people.peopleByCrew.find(crew => crew.unassigned === true)._id;
@@ -37,7 +37,7 @@ const AddPersonModal = ({ show, closeModal }) => {
 
   const handleSubmit = async (e) => {
     setShowSpinner(true);
-    const id = new Date().getTime();
+    //const id = new Date().getTime();
 
     e.preventDefault();
 
@@ -81,50 +81,16 @@ const AddPersonModal = ({ show, closeModal }) => {
           };
         });
 
-        setAlertMessageState((prevState) => ({
-          ...prevState,
-          toasts: [
-            ...prevState.toasts,
-            {
-              id: id,
-              heading: 'Add Crew',
-              show: true,
-              message: `Success! ${formData.firstName} ${formData.lastName} has been added to ${formData.crewId}`,
-              background: 'success',
-              color: 'white'
-            }
-          ]
-        }));
+        addToast('Add Crew', `Success! ${formData.firstName} ${formData.lastName} has been added to ${formData.crewId}`, 'success', 'white');
 
         resetForm();
       } else {
         console.error('Failed to create person');
       }
     } catch (error) {
-      setAlertMessageState((prevState) => ({
-        ...prevState,
-        toasts: [
-          ...prevState.toasts,
-          {
-            id: id,
-            heading: 'Add Person',
-            show: true,
-            message: `Error! adding ${formData.firstName} ${formData.lastName} to ${formData.crewId}`,
-            background: 'danger',
-            color: 'white'
-          }
-        ]
-      }));
       console.error('Network error:', error);
     } finally {
       setShowSpinner(false);
-
-      setTimeout(() => {
-        setAlertMessageState((prevState) => ({
-          ...prevState,
-          toasts: prevState.toasts.filter((toast) => toast.id !== id)
-        }));
-      }, 10000);
     }
   };
 
