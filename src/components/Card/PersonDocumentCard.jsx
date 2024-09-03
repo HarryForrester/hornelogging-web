@@ -213,6 +213,8 @@ const PersonDocumentCard = (_account) => {
     filesByType[file.type].push(file);
   });
 
+  console.log('files by type bro: ', filesByType)
+
 
 
   
@@ -235,10 +237,13 @@ const PersonDocumentCard = (_account) => {
         </Button>
 
         {/* File list */}
-        {Object.entries(filesByType).map(([fileType, files]) => (
+        {Object.entries(filesByType).map(([fileType, files]) => {
+          const matchingFileType = personDataState.fileTypes.find((type) => type._id === fileType);
+
+          return(
           <div key={fileType} className="mb-4">
-            <h5>{fileType}</h5>
-            <ListGroup>
+            <h5>{matchingFileType ? matchingFileType.name : 'Unknown File Type'}</h5>
+                <ListGroup>
               {files.map((file) => (
                 <ListGroup.Item
                   key={file._id}
@@ -282,7 +287,7 @@ const PersonDocumentCard = (_account) => {
               ))}
             </ListGroup>
           </div>
-        ))}
+        )})}
       </Card.Body>
     </Card>
   );

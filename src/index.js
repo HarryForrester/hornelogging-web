@@ -15,13 +15,21 @@ import { AlertMessageProvider } from './components/AlertMessage';
 import { PersonDataProvider } from './components/PersonData';
 import { SkidMarkerProvider } from './components/SkidMarkerContext';
 import { HazardProvider } from './components/HazardContext';
+import { LibraryFileProvider } from './context/LibraryFileContext';
+import { PersonFileProvider } from './context/PersonFileContext';
+import { CrewProvider } from './context/CrewContext';
 import { AuthProvider } from './context/AuthContext';
+import { PeopleProvider } from './context/PeopleContext';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <StrictMode>
     <AuthProvider>
     <SkidModalProvider>
       <MapProvider>
+        <LibraryFileProvider>
+          <PersonFileProvider>
+            <CrewProvider>
+              <PeopleProvider>
         <ConfirmationModalProvider>
           <AlertMessageProvider>
             <PersonDataProvider>
@@ -33,6 +41,10 @@ root.render(
             </PersonDataProvider>
           </AlertMessageProvider>
         </ConfirmationModalProvider>
+        </PeopleProvider>
+        </CrewProvider>
+        </PersonFileProvider>
+        </LibraryFileProvider>
       </MapProvider>
     </SkidModalProvider>
     </AuthProvider>

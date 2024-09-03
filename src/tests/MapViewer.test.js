@@ -47,22 +47,37 @@ describe('PDF Map Viewer', () => {
             {
                 _id: 'file_id_1',
                 _account: 2,
-                fileName: 'file_name_1',
-                type: 'type_1',
+                fileName: 'File One',
+                type: 'file_type_id_1',
                 uri: 'uri_1',
             },
             {
                 _id: 'file_id_2',
                 _account: 2,
-                fileName: 'file_name_2',
-                type: 'type_2',
+                fileName: 'File Two',
+                type: 'file_type_id_2',
                 uri: 'uri_2',
+            }
+        ],
+        fileTypes: [
+            {
+                _id: 'file_type_id_1',
+                _account: 2,
+                name: 'File Type One',
+                note: 'An Example Type'
+            },
+            {
+                _id: 'file_type_id_2',
+                _account: 2,
+                name: 'File Type Two',
+                note: 'An Example Type'
             }
         ],
         hazards: [
             { _id: 'hazard_id_1', id: 'H1', title: 'Hazard 1', sev: 'HIGH', cat: 'Category 1', color: '#FF0000', searchText: 'hazard1' },
             { _id: 'hazard_id_2', id: 'H2', title: 'Hazard 2', sev: 'LOW', cat: 'Category 2', color: '#00FF00', searchText: 'hazard2' },
-          ]
+        ],
+
     };
 
     beforeEach(() => {
@@ -81,9 +96,10 @@ describe('PDF Map Viewer', () => {
 
                 ],
                 files: [
-                    { _id: 'file_id_1', owner: 'person_id_1', fileName: 'file1_name', type: 'file_type_1' },
-                    { _id: 'file_id_2', owner: 'person_id_1', fileName: 'file2_name', type: 'file_type_2' },
-                ]
+                    { _id: 'file_id_1', owner: 'person_id_1', fileName: 'File One', type: 'file_type_id_1' },
+                    { _id: 'file_id_2', owner: 'person_id_1', fileName: 'File Two', type: 'file_type_id_1' },
+                ],
+                
             }
         });
 
@@ -126,7 +142,7 @@ describe('PDF Map Viewer', () => {
 
     });
 
-    test('renders 3 skid markers that belong to a map', async() => {
+     test('renders 3 skid markers that belong to a map', async() => {
         const updatedMapState = [
             {
                 _id: "point_1",
@@ -309,8 +325,8 @@ describe('PDF Map Viewer', () => {
               })).toBeInTheDocument();
             expect(screen.getByText(/john doe/i)).toBeInTheDocument();
             expect(screen.getByText(/\(role 1\)/i)).toBeInTheDocument();
-            expect(screen.getByText(/record of learning/i)).toBeInTheDocument();
+            expect(screen.getByText(/file type one/i)).toBeInTheDocument();
         })
-    }); 
+    });  
     
 });

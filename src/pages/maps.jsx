@@ -12,6 +12,9 @@ import { useAlertMessage } from '../components/AlertMessage.js';
 import { deletePresignedUrl } from '../hooks/useFileDelete.js';
 import { useSkidMarker } from '../components/SkidMarkerContext.js';
 import { SkidProvider } from '../context/SkidContext.js';
+import { usePersonFile } from '../context/PersonFileContext.js';
+import { useLibraryFile } from '../context/LibraryFileContext.js';
+import { useCrews } from '../context/CrewContext.js';
 const Maps = () => {
   const [showAddPoint, setShowAddPoint] = useState(false); // used to show/hide Add Point Button for map
   const [showRemoveMap, setShowRemoveMap] = useState(false); // used to show/hide Remove Map Button for map
@@ -23,6 +26,9 @@ const Maps = () => {
   const { setAlertMessageState } = useAlertMessage();
   const [account, setAccount] = useState(null);
   const { setSkidMarkerState } = useSkidMarker();
+  const { personFiles, setPersonFiles } = usePersonFile();
+  const { libraryFiles, setLibraryFiles } = useLibraryFile();
+  const { crews, setCrews } = useCrews();
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -40,12 +46,21 @@ const Maps = () => {
           const data = response.data;
           console.log('dara', data)
           setAccount(data._account);
+          setLibraryFiles({
+            libraryFileTypes: data.libraryFileTypes,
+            libraryFiles: data.libraryFiles
+          });
+
+          setPersonFiles({
+            personFileTypes: data.personFileTypes,
+            personFiles: data.personFiles
+          });
+
+          setCrews(data.crews)
+
           setMapState((prevState) => ({
             ...prevState,
-            files: data.files,
-            fileTypes: data.fileTypes,
-            //crewTypes: data.crew,
-            crews: data.crew,
+            //crews: data.crew,
             maps: data.maps,
             username: data.username,
             hazards: data.hazards,

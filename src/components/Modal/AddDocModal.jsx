@@ -4,6 +4,7 @@ import Button from 'react-bootstrap/Button';
 import { useMap } from '../Map/MapContext';
 import Accordion from 'react-bootstrap/Accordion';
 import { useSkid } from '../../context/SkidContext';
+import { useLibraryFile } from '../../context/LibraryFileContext';
 
 /**
  * AddDocModal component for handling document selection.
@@ -13,6 +14,7 @@ import { useSkid } from '../../context/SkidContext';
  */
 const AddDocModal = () => {
   const { mapState } = useMap();
+  const { libraryFiles } = useLibraryFile();
   const { skidState, setSkidState } = useSkid();
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -77,7 +79,7 @@ const AddDocModal = () => {
     }
   };
 
-  const filteredFiles = mapState.files.filter((file) =>
+  const filteredFiles = libraryFiles.libraryFiles.filter((file) =>
     file.fileName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -109,7 +111,7 @@ const AddDocModal = () => {
         <Accordion defaultActiveKey="0">
   {Object.keys(groupedFiles).map((type, index) => {
     // Find the matching file type by _id
-    const matchingFileType = mapState.fileTypes.find((fileType) => fileType._id === type);
+    const matchingFileType = libraryFiles.libraryFileTypes.find((fileType) => fileType._id === type);
 
     const filesToShow = groupedFiles[type].filter(
       (file) =>

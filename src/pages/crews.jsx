@@ -7,13 +7,16 @@ import NewPersonButton from '../components/Button/NewPersonButton';
 import NewCrewButton from '../components/Button/NewCrewButton';
 import PeopleAndCrewSearch from '../components/Input/PeopleAndCrewSearch';
 import CrewCard from '../components/Card/CrewCard';
-import { useMap } from '../components/Map/MapContext.js';
 import { Card, Button } from 'react-bootstrap';
 import PersonCard from '../components/Card/PersonCard.jsx';
+import { usePeople } from '../context/PeopleContext.js';
 const Crews = () => {
   const navigate = useNavigate();
-  const { mapState, setMapState } = useMap();
   const [showArchived, setShowArchived] = useState(false);
+  const { people, setPeople } = usePeople(); // used to get or set peopleByCrew and archivedPeople
+  const [showAddPersonModal, setShowAddPersonModal] = useState(false); //  shows or hides the modal when new person is clicked
+
+
 
   const toggleArchivedStaff = () => {
     setShowArchived(!showArchived);
@@ -25,9 +28,9 @@ const Crews = () => {
         const response = await axios.get('http://localhost:3001/', { withCredentials: true }); // Replace with your API endpoint
         if (response.data.isLoggedIn) {
           console.log('repsp', response.data)
-          setMapState((prevState) => ({
+          setPeople((prevState) => ({
             ...prevState,
-            crews: response.data.crews,
+            peopleByCrew: response.data.peopleByCrew,
             archivedPeople: response.data.archivedPeople
           }));
 
@@ -54,13 +57,13 @@ const Crews = () => {
         </div>
         <div className="row g-0" style={{ marginBottom: '10px' }}>
           <div className="col-md-6" style={{ padding: '0px' }}>
-            <NewPersonButton />
+            <NewPersonButton handleClick={() => setShowAddPersonModal(true)}/>
             <NewCrewButton />
           </div>
           <PeopleAndCrewSearch />
         </div>
 
-        {mapState.crews.map((crew) => {
+        {people.peopleByCrew.map((crew) => {
           console.log('creww',crew)
           return (
           <CrewCard key={crew.name} crew={crew} />)
@@ -76,12 +79,14 @@ const Crews = () => {
             </Card.Header>
 
             <Card.Body>
-              <PersonCard people={mapState.archivedPeople} />
+              <PersonCard people={people.archivedPeople} />
             </Card.Body>
           </Card>
         )}
+        {showAddPersonModal && (
+          <AddPersonModal show={showAddPersonModal} closeModal={() => setShowAddPersonModal(false)} />
+        )}
 
-        <AddPersonModal />
         <AddCrewModal />
       </div>
     </>

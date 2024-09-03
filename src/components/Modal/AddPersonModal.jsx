@@ -1,41 +1,37 @@
 import React, { useState } from 'react';
 import { Modal, Button, Form, Spinner } from 'react-bootstrap';
 import axios from 'axios';
-import { useSkidModal } from './Skid/SkidModalContext';
 import { useAlertMessage } from '../AlertMessage';
-import { useMap } from '../Map/MapContext';
+import { usePeople } from '../../context/PeopleContext';
+import PropTypes from 'prop-types';
 
-const AddPersonModal = () => {
-  const { skidModalState, setSkidModalState } = useSkidModal();
+const AddPersonModal = ({ show, closeModal }) => {
   const { setAlertMessageState } = useAlertMessage();
-  const { mapState, setMapState } = useMap();
+  const { people, setPeople } = usePeople();
   const [showSpinner, setShowSpinner] = useState(false); // shows spinner while submitting to server
+  const unassignedCrewId = people.peopleByCrew.find(crew => crew.unassigned === true)._id;
 
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    crewName: 'Unassigned'
+    crewId: unassignedCrewId || ''
   });
 
   const resetForm = () => {
     setFormData({
       firstName: '',
       lastName: '',
-      crewName: 'Unassigned'
+      crewId: unassignedCrewId
     });
   };
 
   const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleClose = () => {
-    setSkidModalState((prevState) => ({
-      ...prevState,
-      isAddPersonModalVisible: false
+    const { name, value } = e.target;
+    console.log('name', name);
+    console.log('value', value);
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
     }));
   };
 
@@ -45,35 +41,23 @@ const AddPersonModal = () => {
 
     e.preventDefault();
 
-    /* setAlertMessageState((prevState) => ({
-      ...prevState,
-      show: true,
-      heading: "Add Person",
-      message: "Please wait..."
-    }))
- */
     try {
       // eslint-disable-next-line no-undef
       const response = await axios.post(process.env.REACT_APP_URL + '/createperson', formData, {
         withCredentials: true
       });
 
-      console.log('Error has occured', response.status);
-
       if (response.status === 200) {
-        //window.location.reload();
-        handleClose();
-        console.log('this is the reposne of adding person: ', response.data.person);
-
-        console.log('this is the crews array: ', mapState.crews);
-        setMapState((prevState) => {
-          if (!prevState.crews) {
+  
+        closeModal();
+        setPeople((prevState) => {
+          if (!prevState.peopleByCrew) {
             // If prevState.crews is undefined, initialize it as an empty array
-            prevState = { ...prevState, crews: [] };
+            prevState = { ...prevState, peopleByCrew: [] };
           }
 
-          const updatedCrews = prevState.crews.map((crew) => {
-            if (crew.name === response.data.person.crew) {
+          const updatedPeopleByCrew = prevState.peopleByCrew.map((crew) => {
+            if (crew._id === response.data.person.crew) {
               // If the crew name matches, add the person to the people array
               return {
                 ...crew,
@@ -84,8 +68,8 @@ const AddPersonModal = () => {
           });
 
           // If the crew does not exist, add it with the person in the people array
-          if (!prevState.crews.some((crew) => crew.name === response.data.person.crew)) {
-            updatedCrews.push({
+          if (!prevState.peopleByCrew.some((crew) => crew._id === response.data.person.crew)) {
+            updatedPeopleByCrew.push({
               name: response.data.person.crew,
               people: [response.data.person]
             });
@@ -93,7 +77,7 @@ const AddPersonModal = () => {
 
           return {
             ...prevState,
-            crews: updatedCrews
+            peopleByCrew: updatedPeopleByCrew
           };
         });
 
@@ -105,7 +89,7 @@ const AddPersonModal = () => {
               id: id,
               heading: 'Add Crew',
               show: true,
-              message: `Success! ${formData.firstName} ${formData.lastName} has been added to ${formData.crewName}`,
+              message: `Success! ${formData.firstName} ${formData.lastName} has been added to ${formData.crewId}`,
               background: 'success',
               color: 'white'
             }
@@ -125,7 +109,7 @@ const AddPersonModal = () => {
             id: id,
             heading: 'Add Person',
             show: true,
-            message: `Error! adding ${formData.firstName} ${formData.lastName} to ${formData.crewName}`,
+            message: `Error! adding ${formData.firstName} ${formData.lastName} to ${formData.crewId}`,
             background: 'danger',
             color: 'white'
           }
@@ -147,8 +131,8 @@ const AddPersonModal = () => {
   return (
     <Modal
       centered
-      show={skidModalState?.isAddPersonModalVisible}
-      onHide={handleClose}
+      show={show}
+      onHide={closeModal}
       backdrop="static"
     >
       <Modal.Header closeButton>
@@ -183,22 +167,19 @@ const AddPersonModal = () => {
             />
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label htmlFor='crewName'>
+            <Form.Label htmlFor='crewId'>
               <b>Crew</b>
             </Form.Label>
             <Form.Select
-              id="crewName"
-              name="crewName"
+              id="crewId"
+              name="crewId"
               style={{ height: '38px' }}
               required
-              value={formData.crewName || 'Unassigned'}
+              value={formData.crewId}
               onChange={handleInputChange}
             >
-              <option value="Unassigned" disabled>
-                Unassigned
-              </option>
-              {mapState.crews
-                .filter((crew) => crew.name !== 'Unassigned')
+              
+              {people.peopleByCrew
                 .map((crew) => (
                   <option key={crew._id} value={crew._id}>
                     {crew.name}
@@ -223,5 +204,10 @@ const AddPersonModal = () => {
     </Modal>
   );
 };
+
+AddPersonModal.propTypes = {
+  show: PropTypes.bool.isRequired,
+  closeModal: PropTypes.func.isRequired,
+}
 
 export default AddPersonModal;

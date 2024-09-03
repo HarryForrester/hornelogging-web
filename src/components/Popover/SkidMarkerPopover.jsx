@@ -9,11 +9,16 @@ import axios from 'axios';
 import { deletePresignedUrl } from '../../hooks/useFileDelete';
 import { useNavigate } from 'react-router-dom';
 import { useSkid } from '../../context/SkidContext';
+import { useLibraryFile } from '../../context/LibraryFileContext';
+import { usePersonFile } from '../../context/PersonFileContext';
 const SkidMarkerPopover = () => {
   const { skidModalState, setSkidModalState } = useSkidModal();
   const { mapState, setMapState } = useMap();
   const { setAlertMessageState } = useAlertMessage();
   const { skidMarkerState, setSkidMarkerState } = useSkidMarker();
+  const { libraryFiles} = useLibraryFile();
+  const { personFiles} = usePersonFile();
+
   const { skidState, setSkidState } = useSkid(); // holds information about the skid
   const navigate = useNavigate();
 
@@ -227,7 +232,7 @@ const SkidMarkerPopover = () => {
                         Skid Documents:
                       </div>
                       <ul className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
-                        {skidState?.formik?.values?.selectedDocuments.map(id => mapState.files.find(file => file._id === id)).filter(file => file).map((item, index) => (
+                        {skidState?.formik?.values?.selectedDocuments.map(id => libraryFiles.libraryFiles.find(file => file._id === id)).filter(file => file).map((item, index) => (
                           <li
                             data-testid={`skid-doc-${index}`}
                             key={index}
@@ -383,31 +388,36 @@ const SkidMarkerPopover = () => {
                     {Object.keys(skidMarkerState?.selectedSkidPerson?.filesByPerson || {}).length === 0 ? (
                     <p>No files available</p>
                   ) : (
-                    Array.from(new Set(skidMarkerState?.selectedSkidPerson?.filesByPerson?.map((item) => item.type))).map((type) => (
-                      <div key={type}>
-                        <div
-                          style={{
-                            fontWeight: 'bold',
-                            fontSize: '100%',
-                            textAlign: 'center',
-                            paddingBottom: '10px'
-                          }}
-                        >
-                          {type}
+                    Array.from(new Set(skidMarkerState?.selectedSkidPerson?.filesByPerson?.map((item) => item.type))).map((type) => {
+                      console.log('mapapapa', type)
+                      console.log('hahaha', personFiles.personFileTypes)
+                      const matchingFileType = personFiles.personFileTypes.find((fileType) => fileType._id === type);
+                      console.log('matching file type', matchingFileType)
+                      return(
+                        <div key={type}>
+                          <div
+                            style={{
+                              fontWeight: 'bold',
+                              fontSize: '100%',
+                              textAlign: 'center',
+                              paddingBottom: '10px'
+                            }}
+                          >
+                            {matchingFileType ? matchingFileType.name : 'Unknown File Type'}
+                          </div>
+                          <ul className="list-group">
+                            {skidMarkerState?.selectedSkidPerson?.filesByPerson?.filter((item) => item.type === type).map((item) => (
+                              <li
+                                key={item._id}
+                                className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
+                                onClick={() => window.open(item.fileUrl, '_blank')}
+                              >
+                                {item.fileName}
+                              </li>
+                            ))}
+                          </ul>
                         </div>
-                        <ul className="list-group">
-                          {skidMarkerState?.selectedSkidPerson?.filesByPerson?.filter((item) => item.type === type).map((item) => (
-                            <li
-                              key={item._id}
-                              className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
-                              onClick={() => window.open(item.fileUrl, '_blank')}
-                            >
-                              {item.fileName}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))
+                    )})
                   )}
                 </ul>
               </div>

@@ -205,8 +205,8 @@ const UploadUserDocumentModal = ({ show, close, _account}) => {
                   {personDataState &&
                     personDataState.fileTypes &&
                     personDataState.fileTypes.map((fileType) => (
-                      <option key={fileType} value={fileType}>
-                        {fileType}
+                      <option key={fileType._id} value={fileType._id}>
+                        {fileType.name}
                       </option>
                     ))}
                 </Form.Select>
