@@ -20,6 +20,7 @@ const Person = () => {
   const [timesheetAccess, setTimesheetAccess] = useState(null);
   const [quals, setQuals] = useState([]);
   const [showEditPersonModal, setShowEditPersonModal] = useState(false);
+  const [crews, setCrews] = useState([]);
   
   const handleEditPerson = () => {
     setShowEditPersonModal(true);
@@ -45,6 +46,7 @@ const Person = () => {
           setForms(data.forms);
           setQuals(data.quals);
           setAccount(data._account);
+          setCrews(data.crews);
         } else {
           navigate('/login');
         }
@@ -84,14 +86,14 @@ const Person = () => {
       </div>
 
       <br style={{ clear: 'left' }} />
-      <br />
-      <br />
       {currentUser && (
-        <PersonInfoCard person={currentUser} />
+        <PersonInfoCard person={currentUser} crews={crews}/>
       )}
+      <br />
       { _account && currentUser && (
         <PersonDocumentCard _account={_account} currentUser={currentUser} currentUserFiles={currentUserFiles} setCurrentUserFiles={setCurrentUserFiles}/>
       )}
+      <br />
       {currentUser && quals && (
         <QualificationsCard person={currentUser} quals={quals} setQuals={setQuals} />
 

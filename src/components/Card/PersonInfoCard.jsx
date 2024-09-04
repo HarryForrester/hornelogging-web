@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import InfoCard from './InfoCard';
 import PropTypes from 'prop-types';
 
-const PersonInfoCard = ({ person }) => {
+const PersonInfoCard = ({ person, crews }) => {
   const [imageSrc, setImageSrc] = useState('/img/default.jpg');
   
   useEffect(() => {
@@ -14,8 +14,10 @@ const PersonInfoCard = ({ person }) => {
     }
   }, [person?.imgUrl]);
 
+  const findCrewName = crews.find(crew => crew._id === person.crew).name;
+
   const data = [
-    { label: 'Crew', value: person?.crew },
+    { label: 'Crew', value: findCrewName },
     { label: 'Role', value: person?.role },
     { label: 'DoB', value: person?.dob },
     { label: 'Contact', value: `${person?.name} (${person?.phone})` },
@@ -29,7 +31,8 @@ const PersonInfoCard = ({ person }) => {
 };
 
 PersonInfoCard.propTypes = {
-  person: PropTypes.any.isRequired
+  person: PropTypes.any.isRequired,
+  crews: PropTypes.array.isRequired
 };
 
 export default PersonInfoCard;

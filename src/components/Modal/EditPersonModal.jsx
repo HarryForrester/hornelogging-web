@@ -130,13 +130,13 @@ const EditPersonModal = ({_account, person, updatePerson, show, hideModal}) => {
         if (person.imgUrl) {
           await deletePresignedUrl([person.imgUrl.key]);
         }        
-        addToast('Person Updated!', `Success! ${formState.name} has been updated from ${formState.crew}`, 'success', 'white');
+        addToast('Person Updated!', `Success! ${formState.name} has been updated`, 'success', 'white');
         updatePerson(response.data.updatedPerson); // Update person data in UI
         resetForm(); // Reset form fields
         hideModal(); // Hide modal
       }
     } catch (error) {
-      addToast('Update Person!', `Error! Updating ${formState.name} from ${formState.crew}`, 'danger', 'white');
+      addToast('Update Person!', `Error!, Error occcured while updating ${formState.name}. Please try again later`, 'danger', 'white');
       console.error('Error:', error);
     } finally {
       setShowSpinner(false);

@@ -18,7 +18,7 @@ const PersonFormAccessCard = ({ currentUser, timeSheetAccess, forms, updateForms
     try {
       const response = await axios.post('http://localhost:3001/toggleTimeSheet', data, {
         withCredentials: true
-      }); // Replace with your API endpoint
+      });
       if (response.status === 200) {
         addToast(`Time Sheet ${isChecked ? 'Enabled' : 'Disabled'}`, `Success! Time Sheet has been ${isChecked ? 'Enabled' : 'Disabled'} for ${currentUser.name}`, 'success', 'white');
       }

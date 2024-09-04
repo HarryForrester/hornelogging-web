@@ -10,7 +10,7 @@ const QualificationsCard = ({ person, quals, setQuals }) => {
   return (
     <>
       <AddQualificationModal show={isQualModalVisible} hide={() => setQualModalVisible(false)} />
-      <Card className="mb-5">
+      <Card className="mb-4">
         <Card.Header className="bg-light">Qualifications</Card.Header>
 
         <Card.Body>

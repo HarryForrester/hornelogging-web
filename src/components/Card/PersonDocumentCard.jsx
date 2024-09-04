@@ -29,12 +29,7 @@ const PersonDocumentCard = ({_account, currentUser, currentUserFiles, setCurrent
 
         if (response.status === 200) {
           await deletePresignedUrl([file.key]);
-          /* setPersonDataState((prevState) => ({
-            ...prevState,
-            files: prevState.files.filter((f) => f._id !== file._id)
-          })); */
           setCurrentUserFiles((prevFiles) => prevFiles.filter((f) => f._id !== file._id));
-          
           addToast('Person Document Removed!', `Success! ${file.fileName} has been removed from ${currentUser.name} documents`, 'success', 'white');
         } else {
           alert('An Error has occurred, please try again.');

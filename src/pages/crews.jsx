@@ -17,16 +17,20 @@ const Crews = () => {
   const [showAddPersonModal, setShowAddPersonModal] = useState(false); //  shows or hides the modal when new person btn is clicked
   const [showAddCrewModal, setShowAddCrewModal] = useState(false); // shows or hides the modal when new crew btn is clicked
 
+  // toogles archived staff card to show all archived staff
   const toggleArchivedStaff = () => {
     setShowArchived(!showArchived);
   };
-
+  
+  // fetchs data from server to get related crew data
   useEffect(() => {
     const fetchData = async () => {
       try {
         // eslint-disable-next-line no-undef
         const response = await axios.get(`${process.env.REACT_APP_URL}/`, { withCredentials: true });
+        //is user is logged in
         if (response.data.isLoggedIn) {
+          console.log('data', response.data)
           setPeople((prevState) => ({
             ...prevState,
             peopleByCrew: response.data.peopleByCrew,
@@ -34,6 +38,7 @@ const Crews = () => {
           }));
 
         } else {
+          // user is not logged in
           navigate('/login');
         }
       } catch (error) {
@@ -62,12 +67,12 @@ const Crews = () => {
           <PeopleAndCrewSearch />
         </div>
 
-        {people.peopleByCrew.map((crew) => {
+        {people?.peopleByCrew?.map((crew) => {
           return (
           <CrewCard key={crew.name} crew={crew} />)
 })}
 
-        <Button onClick={toggleArchivedStaff} className="mb-3">
+        <Button onClick={toggleArchivedStaff} className="mb-3" data-testid="toggleArchivedStaff">
           {showArchived ? 'Hide Archived Staff' : 'Show Archived Staff'}
         </Button>
         {showArchived && (
