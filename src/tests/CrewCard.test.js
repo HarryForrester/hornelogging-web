@@ -3,8 +3,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import CrewCard from '../components/Card/CrewCard';
-import RemoveCrewButton from '../components/Button/RemoveCrewButton';
-import PersonCard from '../components/Card/PersonCard';
 // Mock PersonCard and RemoveCrewButton components to simplify testing
 jest.mock('../components/Button/RemoveCrewButton', () => () => <div>Remove Crew Button</div>);
 jest.mock('../components/Card/PersonCard', () => ({ people }) => <div>{people.length} people</div>);
