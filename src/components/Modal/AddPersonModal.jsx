@@ -57,6 +57,7 @@ const AddPersonModal = ({ show, closeModal }) => {
           }
 
           const updatedPeopleByCrew = prevState.peopleByCrew.map((crew) => {
+            console.log('updatedPeopleByCrew: crew object: ', crew);
             if (crew._id === response.data.person.crew) {
               // If the crew name matches, add the person to the people array
               return {
@@ -81,17 +82,18 @@ const AddPersonModal = ({ show, closeModal }) => {
           };
         });
         const crewName = crews.find(crew => crew._id === formData.crewId).name;
-        addToast('Add Crew', `Success! ${formData.firstName} ${formData.lastName} has been added to ${crewName}`, 'success', 'white');
+        addToast('Add Person', `Success! "${formData.firstName} ${formData.lastName}" has been added to "${crewName}"`, 'success', 'white');
         resetForm();
       } else {
         console.error('Failed to create person');
       }
     } catch (error) {
       console.error('Network error:', error);
-      addToast('Add Crew', `Error! ${formData.firstName} ${formData.lastName} could not be added to ${crewName}`, 'danger', 'white');
+      addToast('Add Person', `Error! "${formData.firstName} ${formData.lastName}" could not be added to "${crewName}"`, 'danger', 'white');
 
     } finally {
       setShowSpinner(false);
+
     }
   };
 

@@ -10,10 +10,12 @@ import CrewCard from '../components/Card/CrewCard';
 import { Card, Button } from 'react-bootstrap';
 import PersonCard from '../components/Card/PersonCard.jsx';
 import { usePeople } from '../context/PeopleContext.js';
+import { useCrews } from '../context/CrewContext.js';
 const Crews = () => {
   const navigate = useNavigate();
   const [showArchived, setShowArchived] = useState(false);
   const { people, setPeople } = usePeople(); // used to get or set peopleByCrew and archivedPeople
+  const { setCrews } = useCrews(); // used to set the crew types
   const [showAddPersonModal, setShowAddPersonModal] = useState(false); //  shows or hides the modal when new person btn is clicked
   const [showAddCrewModal, setShowAddCrewModal] = useState(false); // shows or hides the modal when new crew btn is clicked
 
@@ -36,6 +38,7 @@ const Crews = () => {
             peopleByCrew: response.data.peopleByCrew,
             archivedPeople: response.data.archivedPeople
           }));
+          setCrews(response.data.crews);
 
         } else {
           // user is not logged in
