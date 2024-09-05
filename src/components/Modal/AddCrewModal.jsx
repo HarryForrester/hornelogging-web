@@ -23,7 +23,7 @@ const AddCrewModal = ({ show, closeModal }) => {
       const doesCrewExist = crews.some((c) => c.name === crew);
       //If crew already exists then show alert to tell user it already exists
       if (doesCrewExist) {
-        addToast('Add Crew', `Crew named "${crew}" already exists. Please try another crew name`, 'danger', 'white');
+        addToast('Add Crew', `Error! Crew named "${crew}" already exists. Please try another crew name`, 'danger', 'white');
       } // if crew does not exist then add the send crew to server.
       else {
         const response = await axios.post(

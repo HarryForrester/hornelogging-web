@@ -2,63 +2,61 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import axios from 'axios';
 import AddCrewModal from '../components/Modal/AddCrewModal';
-import { useSkidModal } from '../components/Modal/Skid/SkidModalContext';
-import { useMap } from '../components/Map/MapContext';
 import { useAlertMessage } from '../components/AlertMessage';
+import { useCrews } from '../context/CrewContext';
+import { usePeople } from '../context/PeopleContext'
 
 // Mock the necessary contexts
-jest.mock('../components/Modal/Skid/SkidModalContext', () => ({
-  useSkidModal: jest.fn()
+jest.mock('../context/PeopleContext', () => ({
+  usePeople: jest.fn()
 }));
-jest.mock('../components/Map/MapContext', () => ({
-  useMap: jest.fn()
+jest.mock('../context/CrewContext', () => ({
+  useCrews: jest.fn()
 }));
-jest.mock('../components/AlertMessage', () => ({
-  useAlertMessage: jest.fn()
-}));
+jest.mock('../components/AlertMessage');
 jest.mock('axios');
 
-const mockSetSkidModalState = jest.fn();
-const mockSetMapState = jest.fn();
-const mockSetAlertMessageState = jest.fn();
+describe('AddCrewModal', () => {
+  const mockAddToast = jest.fn();
+  const mockCloseModal = jest.fn();
+  const mockSetPeopleState = jest.fn();
+  const mockSetCrews = jest.fn();
 
-beforeEach(() => {
-    // Reset all mocks before each test
-    jest.clearAllMocks();
-  
-    // Provide mock implementations for the contexts
-    useSkidModal.mockReturnValue({
-      skidModalState: { isAddCrewModalVisible: true },
-      setSkidModalState: mockSetSkidModalState
-    });
-  
-    useMap.mockReturnValue({
-      mapState: {
-        crews: [{ _id: '65d52471b65bd4722609c12e', name: '123', people: [] }],
-        archivedPeople: []
-      },
-      setMapState: mockSetMapState
-    });
-  
+  beforeEach(() => {
     useAlertMessage.mockReturnValue({
-      setAlertMessageState: mockSetAlertMessageState
+      addToast: mockAddToast,
+    }); 
+
+    usePeople.mockReturnValue({
+      people: {
+        peopleByCrew: [],
+        archivedPeople: [],
+      },
+      setPeople: mockSetPeopleState
     });
-  
+
+    useCrews.mockReturnValue({crews: [{_id: 'crew_id_1', _account: 2, name: 'Crew One'}]})
+
     // Mock the axios.post method
     axios.post = jest.fn();
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  })
+
  test('renders the modal and form correctly', () => {
-  render(<AddCrewModal />);
+  const mockCloseModal = jest.fn();
+  render(<AddCrewModal show={true} closeModal={mockCloseModal} />);
   
   expect(screen.getByText(/Add Crew/i)).toBeInTheDocument();
   expect(screen.getByLabelText(/Crew Name/i)).toBeInTheDocument();
   expect(screen.getByRole('button', { name: /Add/i })).toBeInTheDocument();
 });
 
-test('handles input change', () => {
-  render(<AddCrewModal />);
-  
+ test('handles input change', () => {
+  const mockCloseModal = jest.fn();
+  render(<AddCrewModal show={true} closeModal={mockCloseModal} />);  
   const input = screen.getByLabelText(/Crew Name/i);
   fireEvent.change(input, { target: { value: 'New Crew' } });
   
@@ -76,8 +74,8 @@ test('submits form with new crew', async () => {
     });
   
     // Render the component
-    render(<AddCrewModal />);
-  
+    const mockCloseModal = jest.fn();
+    render(<AddCrewModal show={true} closeModal={mockCloseModal} />);  
     // Simulate user input
     fireEvent.change(screen.getByLabelText(/Crew Name/i), { target: { value: 'New Crew' } });
     fireEvent.click(screen.getByRole('button', { name: /Add/i }));
@@ -85,111 +83,68 @@ test('submits form with new crew', async () => {
     // Wait for the results
     await waitFor(() => {
       // Verify setMapState was called with the correct updater function
-      const mapStateUpdater = mockSetMapState.mock.calls[0][0];
-      const mapStateInitialState = {
-        crews: [{ _id: '65d52471b65bd4722609c12e', name: '123', people: [] }],
+      const peopleStateUpdater = mockSetPeopleState.mock.calls[0][0];
+      const peopleStateInitialState = {
+        peopleByCrew: [{ _id: 'new-crew-id', name: 'New Crew', people: [] }],
         archivedPeople: []
       };
   
       // Call the updater function with the initial state
-      const mapStateUpdatedState = mapStateUpdater(mapStateInitialState);
+      const peopleStateUpdatedState = peopleStateUpdater(peopleStateInitialState);
   
-      // Define the expected state after update
-      const expectedMapState = {
-        crews: [{ _id: 'new-crew-id', name: 'New Crew', people: [] }],
+       // Define the expected state after update
+      const expectedPeopleState = {
+        peopleByCrew: [{ _id: 'new-crew-id', name: 'New Crew', people: [] }],
         archivedPeople: []
       };
-  
+      console.log('poepleStateUpdatedState', peopleStateUpdatedState)
       // Assert that the state was updated correctly
-      expect(mapStateUpdatedState).toEqual(expectedMapState);
-  
-      // Verify setSkidModalState was called with the correct updater function
-      expect(mockSetSkidModalState).toHaveBeenCalled();
-      const skidModalStateUpdater = mockSetSkidModalState.mock.calls[0][0];
-      const skidModalInitialState = { isAddCrewModalVisible: true };
-      const skidModalUpdatedState = skidModalStateUpdater(skidModalInitialState);
-  
-      // Assert that the modal state is updated correctly
-      expect(skidModalUpdatedState).toEqual({ isAddCrewModalVisible: false });
-  
-      // Verify setAlertMessageState was called with the correct state
-      expect(mockSetAlertMessageState).toHaveBeenCalled();
-      const alertMessageStateUpdater = mockSetAlertMessageState.mock.calls[0][0];
-      const alertMessageInitialState = { toasts: [] };
-      const alertMessageUpdatedState = alertMessageStateUpdater(alertMessageInitialState);
-      // Assert that the alert message state includes the success message
-      expect(alertMessageUpdatedState.toasts).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          id: expect.any(Number),
-          heading: 'Add Person',
-          show: true,
-          message: 'Success! New Crew has been added',
-          background: 'success',
-          color: 'white'
-        })
-      ])
-    );
+      expect(peopleStateUpdatedState).toEqual(expectedPeopleState);
+      expect(mockAddToast).toHaveBeenCalledWith(
+        'Add Crew',
+        'Success! "New Crew" has been added',
+        'success',
+        'white'
+      );
+      expect(mockCloseModal).toHaveBeenCalled();
+
     });
-  });
+  }); 
   
 
  test('shows alert if crew already exists', async () => {
-  useMap.mockReturnValueOnce({
-    mapState: { crews: [{ name: 'Existing Crew' }] },
-    setMapState: mockSetMapState
-  });
-  
-  render(<AddCrewModal />);
-  
-  fireEvent.change(screen.getByLabelText(/Crew Name/i), { target: { value: 'Existing Crew' } });
-  fireEvent.click(screen.getByRole('button', { name: /Add/i }));
-  
-  await waitFor(() => {
+    useCrews.mockReturnValue({crews: [{_id: 'crew_id_1', _account: 2, name: 'Existing Crew'}], setCrews: mockSetCrews})
+    render(<AddCrewModal show={true} closeModal={mockCloseModal} />);  
     
-    const alertMessageStateUpdater = mockSetAlertMessageState.mock.calls[0][0];
-    const alertMessageInitialState = { toasts: [] };
-    const alertMessageUpdatedState = alertMessageStateUpdater(alertMessageInitialState);
-    expect(alertMessageUpdatedState.toasts).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            id: expect.any(Number),
-            heading: 'Add Crew',
-            show: true,
-            message: 'Error! An Error has occurred adding crew',
-            background: 'danger',
-            color: 'white'
-          })
-        ])
+    fireEvent.change(screen.getByLabelText(/Crew Name/i), { target: { value: 'Existing Crew' } });
+    fireEvent.click(screen.getByRole('button', { name: /Add/i }));
+    
+    await waitFor(() => {
+      expect(mockAddToast).toHaveBeenCalledWith(
+        'Add Crew',
+        'Error! Crew named "Existing Crew" already exists. Please try another crew name',
+        'danger',
+        'white'
       );
-  });
-});
+    });
+}); 
  
  test('handles form submission error', async () => {
   axios.post.mockRejectedValueOnce(new Error('Network Error'));
   
-  render(<AddCrewModal />);
+  render(<AddCrewModal show={true} closeModal={mockCloseModal} />);  
   
   fireEvent.change(screen.getByLabelText(/Crew Name/i), { target: { value: 'New Crew' } });
   fireEvent.click(screen.getByRole('button', { name: /Add/i }));
   
   await waitFor(() => {
-    const alertMessageStateUpdater = mockSetAlertMessageState.mock.calls[0][0];
-    const alertMessageInitialState = { toasts: [] };
-    const alertMessageUpdatedState = alertMessageStateUpdater(alertMessageInitialState);
-        expect(alertMessageUpdatedState.toasts).toEqual(
-        expect.arrayContaining([
-            expect.objectContaining({
-                id: expect.any(Number),
-                heading: 'Add Crew',
-                show: true,
-                message: 'Error! An Error has occurred adding crew',
-                background: 'danger',
-                color: 'white'
-              })
-        ])
-      );
-    
+    expect(mockAddToast).toHaveBeenCalledWith(
+      'Add Crew',
+      'Error! An Error occurred while adding "New Crew"',
+      'danger',
+      'white'
+    );
   });
-});
- 
+}); 
+
+})
