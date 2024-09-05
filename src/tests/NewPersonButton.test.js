@@ -1,45 +1,29 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import NewPersonButton from '../components/Button/NewPersonButton';
-import { useSkidModal } from '../components/Modal/Skid/SkidModalContext';
-
-// Mock the useSkidModal hook
-jest.mock('../components/Modal/Skid/SkidModalContext');
-
-// Mock the setSkidModalState function
-const mockSetSkidModalState = jest.fn();
-useSkidModal.mockReturnValue({
-  setSkidModalState: mockSetSkidModalState
-});
 
 describe('NewPersonButton', () => {
+  const mockHandleClick = jest.fn();  // Mock function
+
   test('renders correctly', () => {
-    render(<NewPersonButton />);
+    render(<NewPersonButton handleClick={mockHandleClick} />);
     
     // Check if the button is in the document
     const button = screen.getByRole('button', { name: /New Person/i });
     expect(button).toBeInTheDocument();
     
-    // Check if the button contains the FontAwesome icon
-    // FontAwesome icons are rendered as SVG elements
-    const icon = screen.getByTestId('fontawesome-icon');
+    // Check if the button contains the FontAwesome icon (assuming you're using FontAwesome)
+    const icon = screen.getByTestId('fontawesome-icon');  // Ensure that you add 'data-testid' to the icon in the component
     expect(icon).toBeInTheDocument();
   });
 
-  test('calls setSkidModalState with correct arguments on click', () => {
-    render(<NewPersonButton />);
+  test('calls handleClick when the button is clicked', () => {
+    render(<NewPersonButton handleClick={mockHandleClick} />);
     
     // Click the button
     fireEvent.click(screen.getByRole('button', { name: /New Person/i }));
     
-    // Ensure setSkidModalState is called with the correct arguments
-    expect(mockSetSkidModalState).toHaveBeenCalledWith(expect.any(Function));
-    const stateUpdater = mockSetSkidModalState.mock.calls[0][0];
-    const updatedState = stateUpdater({ isAddPersonModalVisible: false });
-
-    // Check that the state is updated correctly
-    expect(updatedState).toEqual({
-      isAddPersonModalVisible: true
-    });
+    // Verify that the handleClick function was called on click
+    expect(mockHandleClick).toHaveBeenCalledTimes(1);
   });
 });
