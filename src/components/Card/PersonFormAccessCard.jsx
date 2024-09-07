@@ -5,6 +5,7 @@ import { useAlertMessage } from '../AlertMessage';
 import { Card } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 const PersonFormAccessCard = ({ currentUser, timeSheetAccess, forms, updateForms }) => {
+  console.log(timeSheetAccess)
   const { addToast } = useAlertMessage();
 
   const toggleTimeSheet = async (event) => {
