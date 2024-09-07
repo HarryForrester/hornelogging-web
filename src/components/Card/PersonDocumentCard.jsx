@@ -19,6 +19,7 @@ const PersonDocumentCard = ({_account, currentUser, currentUserFiles, setCurrent
     const userConfirmed = window.confirm('Are you sure you want to remove file: ' + file.fileName);
 
     if (userConfirmed) {
+      console.log('user confirmed', userConfirmed);
       try {
         const response = await axios.get(
           `${process.env.REACT_APP_URL}/person/deletefile/${file._id}`,
@@ -32,10 +33,10 @@ const PersonDocumentCard = ({_account, currentUser, currentUserFiles, setCurrent
           setCurrentUserFiles((prevFiles) => prevFiles.filter((f) => f._id !== file._id));
           addToast('Person Document Removed!', `Success! ${file.fileName} has been removed from ${currentUser.name} documents`, 'success', 'white');
         } else {
-          alert('An Error has occurred, please try again.');
+          addToast('Error!', 'An Error has occurred while deleting file, please try again', 'danger', 'white');
         }
       } catch (error) {
-        addToast('Error!', 'Error removing document', 'danger', 'white');
+        addToast('Error!', 'An Error has occurred while deleting file, please try again', 'danger', 'white');
         console.error('Error removing document:', error);
       }
     }
