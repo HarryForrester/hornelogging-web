@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import SelectRoleType from '../SelectList/SelectRoleType';
 import InputWithLabel from '../Input/InputWithLabel';
+import InputWithLabelMulti from '../Input/InputWithLabelMulti';
 import axios from 'axios';
 import { Button, Form, Image, Modal, Spinner, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { useAlertMessage } from '../AlertMessage';
@@ -164,7 +165,8 @@ const EditPersonModal = ({_account, person, updatePerson, show, hideModal, crews
 
       <Modal.Body>
         <Form onSubmit={handleSubmit}>
-          <Form.Group className="row g-4">
+          <Form.Group className="row g-3">
+          <Form.Label style={{ fontSize: '1.2rem' }}>Contact Info:</Form.Label>
             <Form.Group className="col-md-3">
               <Form.Label htmlFor="imgurl" className="image-container">
                 <Image
@@ -173,6 +175,8 @@ const EditPersonModal = ({_account, person, updatePerson, show, hideModal, crews
                   className="figure-img img-fluid z-depth-1 rounded mb-0 border border-dark"
                   alt="..."
                   id="img-preview"
+                  style={{ width: '163px', height: '163px', objectFit: 'cover' }} // Adjust width and height as needed
+
                 />
                 <OverlayTrigger placement="bottom" overlay={<Tooltip>Upload image</Tooltip>}>
                   <div className="image-overlay">Upload image</div>
@@ -186,62 +190,6 @@ const EditPersonModal = ({_account, person, updatePerson, show, hideModal, crews
                   onChange={handleImageChange}
                 />
               </Form.Label>
-            </Form.Group>
-
-            <Form.Group className="col-md-5">
-              <InputWithLabel
-                type={'text'}
-                label={'First Name'}
-                name={'firstName'}
-                value={formState.firstName}
-                onChange={(value) => handleInputChange('firstName', value)}
-              />
-             
-              <InputWithLabel
-                type={'tel'}
-                label={'Phone Number'}
-                name={'phone'}
-                value={formState.phone}
-                onChange={(value) => handleInputChange('phone', value)}
-              />
-              <InputWithLabel
-                type={'email'}
-                label={'Email Address'}
-                name={'email'}
-                value={formState.email}
-                onChange={(value) => handleInputChange('email', value)}
-              />
-              <InputWithLabel
-                type={'text'}
-                label={'Parnter Contact Name'}
-                name={'contact'}
-                value={formState.contact}
-                onChange={(value) => handleInputChange('contact', value)}
-              />
-            </Form.Group>
-
-            <Form.Group className="col-md-4">
-            <InputWithLabel
-                type={'text'}
-                label={'Last Name'}
-                name={'lastName'}
-                value={formState.lastName}
-                onChange={(value) => handleInputChange('lastName', value)}
-              />
-              <InputWithLabel
-                type={'text'}
-                label={'Address'}
-                name={'address'}
-                value={formState.address}
-                onChange={(value) => handleInputChange('address', value)}
-              />
-              <InputWithLabel
-                type={'date'}
-                label={'Date of Birth'}
-                name={'dob'}
-                value={formState.dob}
-                onChange={(value) => handleInputChange('dob', value)}
-              />
               <InputWithLabel
                 type={'date'}
                 label={'Start Date'}
@@ -249,16 +197,6 @@ const EditPersonModal = ({_account, person, updatePerson, show, hideModal, crews
                 value={formState.startDate}
                 onChange={(value) => handleInputChange('startDate', value)}
               />
-              <InputWithLabel
-                type={'tel'}
-                label={'Parnter Contact Number'}
-                name={'contactphone'}
-                value={formState.contactphone}
-                onChange={(value) => handleInputChange('contactphone', value)}
-              />
-            </Form.Group>
-
-            <Form.Group className="col-md-5">
               <Form.Label htmlFor="roleInput" className="form-label">
                 Crew
               </Form.Label>
@@ -282,23 +220,58 @@ const EditPersonModal = ({_account, person, updatePerson, show, hideModal, crews
                 </option>
               </Form.Select>
             </Form.Group>
-            <SelectRoleType
-              onChange={handleRoleChange}
-              selectedRole={formState.role}
-              key={formState.role}
-            />
-            <Form.Group className="col-md-1">
-              <div style={{ paddingTop: '30px' }}>
-                <Form.Check
-                  type="checkbox"
-                  label="Archive"
-                  checked={formState.archive ? JSON.parse(formState.archive) : false}
-                  onChange={(e) => handleInputChange('archive', e.target.checked)}
-                />
-              </div>
+
+            <Form.Group className="col-md-4">
+              <InputWithLabel
+                type={'text'}
+                label={'First Name'}
+                name={'firstName'}
+                value={formState.firstName}
+                onChange={(value) => handleInputChange('firstName', value)}
+              />
+              <InputWithLabel
+                type={'text'}
+                label={'Last Name'}
+                name={'lastName'}
+                value={formState.lastName}
+                onChange={(value) => handleInputChange('lastName', value)}
+              />
+              <InputWithLabel
+                type={'text'}
+                label={'Address'}
+                name={'address'}
+                value={formState.address}
+                onChange={(value) => handleInputChange('address', value)}
+              />
+              <SelectRoleType
+                onChange={handleRoleChange}
+                selectedRole={formState.role}
+                key={formState.role}
+              />
             </Form.Group>
 
-            <Form.Group className="col-md-6">
+            <Form.Group className="col-md-5">
+              <InputWithLabel
+                type={'tel'}
+                label={'Phone Number'}
+                name={'phone'}
+                value={formState.phone}
+                onChange={(value) => handleInputChange('phone', value)}
+              />
+              <InputWithLabel
+                type={'email'}
+                label={'Email Address'}
+                name={'email'}
+                value={formState.email}
+                onChange={(value) => handleInputChange('email', value)}
+              />
+              <InputWithLabel
+                type={'date'}
+                label={'Date of Birth'}
+                name={'dob'}
+                value={formState.dob}
+                onChange={(value) => handleInputChange('dob', value)}
+              />
               <InputWithLabel
                 type={'text'}
                 label={'Doctor'}
@@ -306,16 +279,49 @@ const EditPersonModal = ({_account, person, updatePerson, show, hideModal, crews
                 value={formState.doctor}
                 onChange={(value) => handleInputChange('doctor', value)}
               />
-            </Form.Group>
+            </Form.Group>            
 
-            <Form.Group className="col-md-6">
-              <InputWithLabel
-                type={'text'}
+            <Form.Group className="col-md-12">
+              <InputWithLabelMulti
                 label={'Medical Issues'}
                 name={'medical'}
                 value={formState.medical}
                 onChange={(value) => handleInputChange('medical', value)}
+                rows={3} // Number of rows for the textarea
+                placeholder="Describe any medical issues here..."
               />
+            </Form.Group>
+            <hr style={{ border: '1px solid #ccc', margin: '20px 0' }} />
+            <Form.Label style={{ fontSize: '1.2rem' }}>Emergency Contact:</Form.Label>
+
+            <Form.Group className="col-md-5">
+              <InputWithLabel
+                type={'text'}
+                label={'Parnter Contact Name'}
+                name={'contact'}
+                value={formState.contact}
+                onChange={(value) => handleInputChange('contact', value)}
+              />
+            </Form.Group>
+
+            <Form.Group className="col-md-5">
+              <InputWithLabel
+                  type={'tel'}
+                  label={'Parnter Contact Number'}
+                  name={'contactphone'}
+                  value={formState.contactphone}
+                  onChange={(value) => handleInputChange('contactphone', value)}
+                />              
+            </Form.Group>
+            <hr style={{ border: '1px solid #ccc', margin: '20px 0' }} />
+
+            <Form.Group className="col-md-12">
+                <Form.Check
+                  type="checkbox"
+                  label={`Archive ${formState.firstName} ${formState.lastName}`}
+                  checked={formState.archive ? JSON.parse(formState.archive) : false}
+                  onChange={(e) => handleInputChange('archive', e.target.checked)}
+                />
             </Form.Group>
           </Form.Group>
 

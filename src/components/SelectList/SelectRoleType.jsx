@@ -16,7 +16,7 @@ const SelectRoleType = ({ selectedRole, onChange }) => {
   ];
 
   return (
-    <Form.Group className="col-md-5">
+    <Form.Group>
       <Form.Label htmlFor="roleInput" className="form-label">
         Role
       </Form.Label>
