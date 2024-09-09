@@ -1,7 +1,9 @@
 import React from 'react';
-import { Modal, Button, Form, Spinner } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 import PropTypes from 'prop-types';
-const SelectRoleType = ({ selectedRole, onChange }) => {
+import { Field, ErrorMessage } from 'formik';
+
+const SelectRoleType = ({ name }) => {
   const roleOptions = [
     'Loader Operator',
     'Hauler Operator',
@@ -17,31 +19,39 @@ const SelectRoleType = ({ selectedRole, onChange }) => {
 
   return (
     <Form.Group>
-      <Form.Label htmlFor="roleInput" className="form-label">
+      <Form.Label htmlFor={name} className="form-label">
         Role
       </Form.Label>
-      <Form.Select
-        id="roleInput"
-        name="role"
-        value={selectedRole || 'Select Role'}
-        onChange={onChange}
-        required
-      >
-        <option value="Select Role" disabled>
-          Select Role
-        </option>
-        {roleOptions.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
-        ))}
-      </Form.Select>
+      <Field name={name}>
+        {({ field, form }) => (
+          <>
+            <Form.Select
+              id={name}
+              {...field}
+              isInvalid={form.touched[name] && form.errors[name]}
+              required
+            >
+              <option value="" disabled>
+                Select Role
+              </option>
+              {roleOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </Form.Select>
+            <Form.Control.Feedback type="invalid">
+              <ErrorMessage name={name} />
+            </Form.Control.Feedback>
+          </>
+        )}
+      </Field>
     </Form.Group>
   );
 };
 
 SelectRoleType.propTypes = {
-  selectedRole: PropTypes.string,
-  onChange: PropTypes.func.isRequired
+  name: PropTypes.string.isRequired
 };
+
 export default SelectRoleType;
