@@ -10,8 +10,8 @@ jest.mock('react-router-dom', () => ({
 
 describe('PersonCard Component', () => {
   const people = [
-    { _id: '1', name: 'John Doe', imgUrl: { url: 'http://example.com/johndoe.jpg' } },
-    { _id: '2', name: 'Jane Doe', imgUrl: { url: 'http://example.com/janedoe.jpg' } }
+    { _id: '1', firstName: 'John', lastName: 'Doe', imgUrl: { url: 'http://example.com/johndoe.jpg' } },
+    { _id: '2', firstName: 'Jane', lastName: 'Doe', imgUrl: { url: 'http://example.com/janedoe.jpg' } }
   ];
 
   test('renders PersonCard with correct data', () => {
@@ -31,12 +31,12 @@ describe('PersonCard Component', () => {
   test('handles image URL correctly', () => {
     render(
       <MemoryRouter>
-        <PersonCard people={[{ _id: '3', name: 'Default Image', imgUrl: {} }]} />
+        <PersonCard people={[{ _id: '3', firstName: 'Test', lastName: 'Me', imgUrl: {} }]} />
       </MemoryRouter>
     );
 
     // Check if the default image URL is used
-    const image = screen.getByAltText('Default Image');
+    const image = screen.getByAltText('Test Me');
     expect(image.src).toContain('/img/default.jpg');
   });
 

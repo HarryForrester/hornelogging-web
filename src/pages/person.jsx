@@ -63,7 +63,7 @@ const Person = () => {
     <div className="container" style={{ marginTop: '50px' }}>
       <div>
         <h1>
-          {currentUser?.name}{' '}
+          {currentUser?.firstName + ' ' + currentUser?.lastName}
           <span
             id="spinny"
             style={{ display: 'none' }}

@@ -15,7 +15,8 @@ const EditPersonModal = ({_account, person, updatePerson, show, hideModal}) => {
   const [showSpinner, setShowSpinner] = useState(false); // shows spinner while submitting to server
   const [formState, setFormState] = useState({
     id: '',
-    name: '',
+    firstName: '',
+    lastName: '',
     crew: '',
     role: '',
     phone: '',
@@ -34,7 +35,8 @@ const EditPersonModal = ({_account, person, updatePerson, show, hideModal}) => {
   useEffect(() => {
     setFormState({
       id: person?._id,
-      name: person?.name,
+      firstName: person?.firstName,
+      lastName: person?.lastName,
       crew: person?.crew,
       role: person?.role,
       phone: person?.phone,
@@ -54,7 +56,7 @@ const EditPersonModal = ({_account, person, updatePerson, show, hideModal}) => {
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     const reader = new FileReader();
-
+    console.log('file', file);
     reader.onload = (e) => {
       setFormState({ ...formState, imgPreview: e.target.result, imgFile: file });
     };
@@ -67,7 +69,8 @@ const EditPersonModal = ({_account, person, updatePerson, show, hideModal}) => {
   const resetForm = () => {
     setFormState({
       id: '',
-      name: '',
+      firstName: '',
+      lastName: '',
       crew: '',
       role: '',
       phone: '',
@@ -102,41 +105,41 @@ const EditPersonModal = ({_account, person, updatePerson, show, hideModal}) => {
   
     try {
       let response;
+      let updatedFormState = { ...formState };
+  
       if (formState.imgFile) {
+        console.log('formState.imgFile', formState.imgFile);
         // Upload new image and update with imgUrl
         const [presignedUrl, key] = await getPresignedUrl(`${_account._account}/person/${formState.id}`, 'image/png');
         await uploadToPresignedUrl(presignedUrl, formState.imgFile, 'image/png');
         const filePath = getFilePathFromUrl(presignedUrl);
-  
-        response = await axios.post(
-          `${process.env.REACT_APP_URL}/update-person/${formState.id}`,
-          {
-            ...formState,
-            imgUrl: { key: key, url: filePath }
-          },
-          { withCredentials: true }
-        );
+        
+        updatedFormState.imgUrl = { key: key, url: filePath }; // Add new imgUrl to the updated form state
       } else {
-        // Update without changing the imgUrl
-        response = await axios.post(
-          `${process.env.REACT_APP_URL}/update-person/${formState.id}`,
-          { ...formState },
-          { withCredentials: true }
-        );
+        console.log('without img change');
+        // If no new image is uploaded, remove imgPreview from the submission
+        delete updatedFormState.imgPreview;
       }
   
+      response = await axios.post(
+        `${process.env.REACT_APP_URL}/update-person/${formState.id}`,
+        updatedFormState,
+        { withCredentials: true }
+      );
+  
       if (response.status === 200) {
-        // Delete old profile image if it exists
-        if (person.imgUrl) {
+        // Delete old profile image if it exists and a new one was uploaded
+        if (formState.imgFile && person.imgUrl) {
           await deletePresignedUrl([person.imgUrl.key]);
-        }        
-        addToast('Person Updated!', `Success! ${formState.name} has been updated`, 'success', 'white');
+        }
+  
+        addToast('Person Updated!', `Success! ${formState.firstName} ${formState.lastName} has been updated`, 'success', 'white');
         updatePerson(response.data.updatedPerson); // Update person data in UI
         resetForm(); // Reset form fields
         hideModal(); // Hide modal
       }
     } catch (error) {
-      addToast('Update Person!', `Error!, Error occcured while updating ${formState.name}. Please try again later`, 'danger', 'white');
+      addToast('Update Person!', `Error! An error occurred while updating ${formState.firstName} ${formState.lastName}. Please try again later`, 'danger', 'white');
       console.error('Error:', error);
     } finally {
       setShowSpinner(false);
@@ -189,11 +192,12 @@ const EditPersonModal = ({_account, person, updatePerson, show, hideModal}) => {
             <Form.Group className="col-md-5">
               <InputWithLabel
                 type={'text'}
-                label={'Name'}
-                name={'name'}
-                value={formState.name}
-                onChange={(value) => handleInputChange('name', value)}
+                label={'First Name'}
+                name={'firstName'}
+                value={formState.firstName}
+                onChange={(value) => handleInputChange('firstName', value)}
               />
+             
               <InputWithLabel
                 type={'tel'}
                 label={'Phone Number'}
@@ -218,6 +222,13 @@ const EditPersonModal = ({_account, person, updatePerson, show, hideModal}) => {
             </Form.Group>
 
             <Form.Group className="col-md-4">
+            <InputWithLabel
+                type={'text'}
+                label={'Last Name'}
+                name={'lastName'}
+                value={formState.lastName}
+                onChange={(value) => handleInputChange('lastName', value)}
+              />
               <InputWithLabel
                 type={'text'}
                 label={'Address'}

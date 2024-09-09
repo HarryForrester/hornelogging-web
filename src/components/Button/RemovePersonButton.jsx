@@ -50,7 +50,7 @@ const RemovePersonButton = ({ person, _account }) => {
               addToast('Person Removed!', `${person.name} has been removed from ${crewName} successfully`, 'success', 'white' );
           }
         } catch (error) {
-          addToast('Remove Person', `Error! Removing ${person.name}  from ${crewName}`, 'danger', 'white');
+          addToast('Error!', `An error occurred removing ${person.name} from ${crewName}`, 'danger', 'white');
           console.error('An error has occured while removing crew member');
         } finally {
           setConfirmationModalState((prevState) => ({

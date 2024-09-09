@@ -22,11 +22,11 @@ const PersonCard = ({ people }) => {
             <Figure onClick={() => personInfo(person._id)} className="figure personcard">
               <Figure.Image
                 src={getPersonImageUrl(person)}
-                alt={person.name}
+                alt={person.firstName + ' ' + person.lastName}
                 className="figure-img img-fluid z-depth-1 rounded mb-1"
                 style={{ width: '120px', height: '120px', objectFit: 'cover' }}
               />
-              <Figure.Caption className="figure-caption text-center">{person.name}</Figure.Caption>
+              <Figure.Caption className="figure-caption text-center">{person.firstName +  " " + person.lastName}</Figure.Caption>
             </Figure>
           </div>
         ))}

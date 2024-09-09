@@ -2,13 +2,10 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Modal, Form, Button } from 'react-bootstrap';
 import axios from 'axios';
-import { usePersonData } from '../PersonData';
 import { useAlertMessage } from '../AlertMessage';
-const AddQualificationModal = ({ show, hide, person }) => {
+const AddQualificationModal = ({ show, hide, person, setQuals }) => {
   const [title, setTitle] = useState('');
-
-  const { personDataState, setPersonDataState } = usePersonData();
-  const { alertMessageState, setAlertMessageState } = useAlertMessage();
+  const { addToast } = useAlertMessage();
 
   const handleClose = () => {
     setTitle('');
@@ -16,67 +13,27 @@ const AddQualificationModal = ({ show, hide, person }) => {
   };
 
   const handleSubmit = async () => {
-    console.log('summmy');
-    const id = new Date().getTime(); // creates id for alert messages
-
     const data = {
       title,
-      employee: personDataState.person._id,
+      employee: person._id,
       complete: false
     };
 
     try {
+      // eslint-disable-next-line no-undef
       const response = await axios.post(`${process.env.REACT_APP_URL}/add-qualification`, data, {
         withCredentials: true
       });
 
       if (response.status === 200) {
         console.log('quals are good: ', response.data);
-        setPersonDataState((prevState) => ({
-          ...prevState,
-          quals: response.data.quals
-        }));
-
-        setAlertMessageState((prevState) => ({
-          ...prevState,
-          toasts: [
-            ...prevState.toasts,
-            {
-              id: id,
-              heading: 'Qualification Added',
-              show: true,
-              message: `Success! ${title} has been added to ${personDataState.person.name} Qualifications`,
-              background: 'success',
-              color: 'white'
-            }
-          ]
-        }));
-
+        setQuals(response.data.quals);
+        addToast('Qualification Added!', `Success! ${title} has been added to ${person.name} Qualifications`, 'success', 'white');
         handleClose();
       }
     } catch (err) {
-      setAlertMessageState((prevState) => ({
-        ...prevState,
-        toasts: [
-          ...prevState.toasts,
-          {
-            id: id,
-            heading: 'Error: Could not add qualification',
-            show: true,
-            message: `Error has occurred while adding ${title} to ${personDataState.person.name} qualifications, please try again`,
-            background: 'danger',
-            color: 'white'
-          }
-        ]
-      }));
+      addToast('Error!',`An error has occurred while adding ${title} to ${person.firstName} ${person.lastName}'s qualifications, please try again`, 'danger', 'white');
       console.error('an error has occurred', err);
-    } finally {
-      setTimeout(() => {
-        setAlertMessageState((prevState) => ({
-          ...prevState,
-          toasts: prevState.toasts.filter((toast) => toast.id !== id)
-        }));
-      }, 10000);
     }
   };
 
@@ -85,7 +42,7 @@ const AddQualificationModal = ({ show, hide, person }) => {
   };
 
   return (
-    <Modal show={show} onHide={hide} centered>
+    <Modal show={show} onHide={handleClose} centered>
       <Modal.Header closeButton>Add Qualification</Modal.Header>
       <Modal.Body>
         <Form>
@@ -109,6 +66,7 @@ const AddQualificationModal = ({ show, hide, person }) => {
 AddQualificationModal.propTypes = {
   show: PropTypes.bool.isRequired,
   hide: PropTypes.func.isRequired,
-  person: PropTypes.object
+  person: PropTypes.object,
+  setQuals: PropTypes.func.isRequired,
 };
 export default AddQualificationModal;

@@ -5,7 +5,6 @@ import { faDownLong, faCircleXmark, faUpLong } from '@fortawesome/free-solid-svg
 import { Table, Button } from 'react-bootstrap';
 import axios from 'axios';
 import { useAlertMessage } from './AlertMessage';
-import { usePersonData } from './PersonData';
 const QualifiedTable = ({ quals, setQuals, person }) => {
   console.log('Qualified', quals);
   const { addToast } = useAlertMessage();
@@ -22,39 +21,16 @@ const QualifiedTable = ({ quals, setQuals, person }) => {
       if (response.status === 200) {
         console.log('response: ', response.data);
         setQuals(response.data.quals);
-
-        /* setAlertMessageState((prevState) => ({
-          ...prevState,
-          toasts: [
-            ...prevState.toasts,
-            {
-              id: id,
-              heading: 'Qualification Updated',
-              show: true,
-              message: `Success! Qualification has been updated successfully`,
-              background: 'success',
-              color: 'white'
-            }
-          ]
-        })); */
         addToast('Qualification Updated!', 'Success! Qualification has been updated successfully', 'success', 'white');
       }
     } catch (error) {
       addToast('Error!', 'An error occurred while qualifying or unqualified Qualification', 'danger', 'white');
       console.error('An error has occcured while qualifying or unqualifying qualication: ', error);
-    } finally {
-      /* setTimeout(() => {
-        setAlertMessageState((prevState) => ({
-          ...prevState,
-          toasts: prevState.toasts.filter((toast) => toast.id !== id)
-        }));
-      }, 10000); */
     }
   };
 
   const handleQualDelete = async (_id) => {
     console.log('eme');
-    const id = new Date().getTime(); // creates id for alert messages
 
     try {
       const response = await axios.post(
@@ -66,47 +42,11 @@ const QualifiedTable = ({ quals, setQuals, person }) => {
       if (response.status === 200) {
         console.log('response: ', response.data);
         setQuals(response.data.quals);
-
-        /* setAlertMessageState((prevState) => ({
-          ...prevState,
-          toasts: [
-            ...prevState.toasts,
-            {
-              id: id,
-              heading: 'Qualification Removed',
-              show: true,
-              message: `Success! Qualification has been removed successfully`,
-              background: 'success',
-              color: 'white'
-            }
-          ]
-        })); */
         addToast('Qualification Removed!', 'Success! Qualification has been removed successfully', 'success', 'white');
       }
     } catch (err) {
       console.error('An error occurred', err);
-      /* setAlertMessageState((prevState) => ({
-        ...prevState,
-        toasts: [
-          ...prevState.toasts,
-          {
-            id: id,
-            heading: 'Error: Could not remove qualification',
-            show: true,
-            message: `Error has occurred while removing qualification, please try again`,
-            background: 'danger',
-            color: 'white'
-          }
-        ]
-      })); */
       addToast('Error!', 'Error occurred while removing qualification, Please try again', 'danger', 'white');
-    } finally {
-      /* setTimeout(() => {
-        setAlertMessageState((prevState) => ({
-          ...prevState,
-          toasts: prevState.toasts.filter((toast) => toast.id !== id)
-        }));
-      }, 10000); */
     }
   };
 
