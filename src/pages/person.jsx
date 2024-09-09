@@ -104,7 +104,7 @@ const Person = () => {
 
       )}
       {_account && currentUser && (
-        <EditPersonModal show={showEditPersonModal} hideModal={() => setShowEditPersonModal(false)} _account={_account} person={currentUser} updatePerson={setCurrentUser} />
+        <EditPersonModal show={showEditPersonModal} hideModal={() => setShowEditPersonModal(false)} _account={_account} person={currentUser} updatePerson={setCurrentUser} crews={crews} />
       )}
     </div>
   );

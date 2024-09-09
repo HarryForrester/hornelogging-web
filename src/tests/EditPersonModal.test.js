@@ -2,16 +2,10 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import EditPersonModal from '../components/Modal/EditPersonModal';
-import { useCrews } from '../context/CrewContext';
 import { useAlertMessage } from '../components/AlertMessage';
 import { getPresignedUrl, uploadToPresignedUrl, getFilePathFromUrl } from '../hooks/useFileUpload';
 import { deletePresignedUrl } from '../hooks/useFileDelete';
 import axios from 'axios';
-
-//Mock dependencies
-jest.mock('../context/CrewContext', () => ({
-    useCrews: jest.fn()
-}));
 
 jest.mock('../components/AlertMessage');
 jest.mock('../hooks/useFileUpload', () => ({
@@ -52,7 +46,6 @@ jest.mock('../hooks/useFileUpload', () => ({
       const mockHideModal = jest.fn();
     
       beforeEach(() => {
-        useCrews.mockReturnValue({ crews: mockCrews });
         useAlertMessage.mockReturnValue({ addToast: mockAddToast });
       });
     
@@ -68,6 +61,7 @@ jest.mock('../hooks/useFileUpload', () => ({
             updatePerson={mockUpdatePerson}
             show={true}
             hideModal={mockHideModal}
+            crews={mockCrews}
           />
         );
          // Check if modal fields are populated with person data
@@ -90,6 +84,7 @@ jest.mock('../hooks/useFileUpload', () => ({
             updatePerson={mockUpdatePerson}
             show={true}
             hideModal={mockHideModal}
+            crews={mockCrews}
             />
         );
 
@@ -121,6 +116,7 @@ jest.mock('../hooks/useFileUpload', () => ({
             updatePerson={mockUpdatePerson}
             show={true}
             hideModal={mockHideModal}
+            crews={mockCrews}
           />
         );
       
@@ -173,6 +169,7 @@ jest.mock('../hooks/useFileUpload', () => ({
             updatePerson={mockUpdatePerson}
             show={true}
             hideModal={mockHideModal}
+            crews={mockCrews}
           />
         );
     
@@ -221,6 +218,7 @@ jest.mock('../hooks/useFileUpload', () => ({
             updatePerson={mockUpdatePerson}
             show={true}
             hideModal={mockHideModal}
+            crews={mockCrews}
         />
         );
 

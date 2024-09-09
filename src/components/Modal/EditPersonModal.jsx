@@ -7,10 +7,9 @@ import { Button, Form, Image, Modal, Spinner, OverlayTrigger, Tooltip } from 're
 import { useAlertMessage } from '../AlertMessage';
 import { getPresignedUrl, uploadToPresignedUrl, getFilePathFromUrl } from '../../hooks/useFileUpload';
 import { deletePresignedUrl } from '../../hooks/useFileDelete';
-import { useCrews } from '../../context/CrewContext';
 import PropTypes from 'prop-types';
-const EditPersonModal = ({_account, person, updatePerson, show, hideModal}) => {
-  const { crews } = useCrews();
+const EditPersonModal = ({_account, person, updatePerson, show, hideModal, crews}) => {
+  console.log('haha crews', crews);
   const { addToast } = useAlertMessage();
   const [showSpinner, setShowSpinner] = useState(false); // shows spinner while submitting to server
   const [formState, setFormState] = useState({
@@ -350,6 +349,7 @@ EditPersonModal.propTypes = {
   show: PropTypes.bool.isRequired,
   hideModal: PropTypes.func.isRequired,
   updatePerson: PropTypes.func.isRequired,
+  crews: PropTypes.array.isRequired
 }
 
 export default EditPersonModal;
