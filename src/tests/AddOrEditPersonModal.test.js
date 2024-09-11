@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import EditPersonModal from '../components/Modal/EditPersonModal';
+import EditPersonModal from '../components/Modal/AddOrEditPersonModal';
 import { useAlertMessage } from '../components/AlertMessage';
 import { getPresignedUrl, uploadToPresignedUrl, getFilePathFromUrl } from '../hooks/useFileUpload';
 import { deletePresignedUrl } from '../hooks/useFileDelete';
@@ -18,7 +18,7 @@ jest.mock('../hooks/useFileUpload', () => ({
   }));
   jest.mock('axios');
 
-  describe('EditPersonModal', () => {
+  describe('AddOrEditPersonModal', () => {
     const mockCrews = [
         { _id: 'crew_id_1', name: 'Crew 1' },
         { _id: 'crew_id_2', name: 'Crew 2' },
@@ -27,15 +27,15 @@ jest.mock('../hooks/useFileUpload', () => ({
         _id: 'person_id_1',
         firstName: 'John',
         lastName: 'Doe',
-        crew: 'crew1',
-        role: 'Manager',
-        phone: '1234567890',
+        crew: 'crew_id_1',
+        role: 'Foreman',
+        phone: '0273456789',
         email: 'john@example.com',
         address: '123 Main St',
         dob: '1990-01-01',
         startDate: '2020-01-01',
         contact: 'Jane Doe',
-        contactphone: '0987654321',
+        contactphone: '0273456789',
         doctor: 'Dr. Smith',
         medical: 'None',
         imgUrl: { url: '/img/person1.jpg', key: 'img/person1.jpg' },
@@ -67,11 +67,11 @@ jest.mock('../hooks/useFileUpload', () => ({
          // Check if modal fields are populated with person data
         expect(screen.getByLabelText('First Name').value).toBe('John');
         expect(screen.getByLabelText('Last Name').value).toBe('Doe');
-        expect(screen.getByLabelText('Phone Number').value).toBe('1234567890');
+        expect(screen.getByLabelText('Phone Number').value).toBe('0273456789');
         expect(screen.getByLabelText('Email Address').value).toBe('john@example.com');
         expect(screen.getByLabelText('Address').value).toBe('123 Main St');
         expect(screen.getByLabelText('Parnter Contact Name').value).toBe('Jane Doe');
-        expect(screen.getByLabelText('Parnter Contact Number').value).toBe('0987654321');
+        expect(screen.getByLabelText('Parnter Contact Number').value).toBe('0273456789');
         expect(screen.getByLabelText('Doctor').value).toBe('Dr. Smith');
         expect(screen.getByLabelText('Medical Issues').value).toBe('None');
     });
@@ -117,6 +117,8 @@ jest.mock('../hooks/useFileUpload', () => ({
             show={true}
             hideModal={mockHideModal}
             crews={mockCrews}
+            title='Edit'
+            edit={true}
           />
         );
       
@@ -138,7 +140,7 @@ jest.mock('../hooks/useFileUpload', () => ({
             }),
             { withCredentials: true }
           );
-          expect(mockUpdatePerson).toHaveBeenCalledWith(mockUpdatedPerson);
+          expect(mockUpdatePerson).toHaveBeenCalledWith(expect.objectContaining(mockUpdatedPerson));
           expect(mockAddToast).toHaveBeenCalledWith(
             'Person Updated!',
             `Success! ${mockPerson.firstName + " " + mockPerson.lastName} has been updated`,
@@ -146,7 +148,7 @@ jest.mock('../hooks/useFileUpload', () => ({
             'white'
           );
         });
-      });
+      }); 
 
       test('updates person info without uploading image', async () => {
         const mockUpdatedPerson = {
@@ -170,6 +172,8 @@ jest.mock('../hooks/useFileUpload', () => ({
             show={true}
             hideModal={mockHideModal}
             crews={mockCrews}
+            title={'Edit'}
+            edit={true}
           />
         );
     
@@ -225,13 +229,97 @@ jest.mock('../hooks/useFileUpload', () => ({
         fireEvent.click(screen.getByText(/save changes/i));
 
         await waitFor(() => {
-        expect(mockAddToast).toHaveBeenCalledWith(
-            'Update Person!',
-            'Error! An error occurred while updating John Doe. Please try again later',
+          expect(mockAddToast).toHaveBeenCalledWith(
+            'Error!',
+            `Failed to add "<strong>John Doe</strong>" to "<strong>Crew 1</strong>. Please try again later"`,            
             'danger',
             'white'
         );
         });
+    }); 
+
+    test('displays validation errors on submitting empty form fields', async () => {
+      render(
+        <EditPersonModal
+          _account={1}
+          person={{}} // Empty person to simulate adding a new person
+          updatePerson={jest.fn()}
+          show={true}
+          hideModal={jest.fn()}
+          crews={mockCrews}
+          title={"Add"}
+          edit={false}
+        />
+      );
+  
+      // Simulate clicking the "Save changes" button without filling any fields
+      fireEvent.click(screen.getByText(/save changes/i));
+  
+      // Wait for validation errors to appear
+      await waitFor(() => {
+        expect(screen.getByText('First Name is required')).toBeInTheDocument();
+        expect(screen.getByText('Last Name is required')).toBeInTheDocument();
+        expect(screen.getByText('Phone number is required')).toBeInTheDocument();
+        expect(screen.getByText('Email is required')).toBeInTheDocument();
+        expect(screen.getByText('Address is required')).toBeInTheDocument();
+        expect(screen.getByText('Date of Birth is required')).toBeInTheDocument();
+        expect(screen.getByText('Start Date is required')).toBeInTheDocument();
+        expect(screen.getByText('Contact is required')).toBeInTheDocument();
+        expect(screen.getByText('Contact phone number is required')).toBeInTheDocument();
+        expect(screen.getByText('Doctor is required')).toBeInTheDocument();
+      });
     });
+
+    test('displays error for invalid phone number format', async () => {
+      render(
+        <EditPersonModal
+          _account={1}
+          person={{}} // Empty person to simulate adding a new person
+          updatePerson={jest.fn()}
+          show={true}
+          hideModal={jest.fn()}
+          crews={mockCrews}
+          title="Add"
+          edit={false}
+        />
+      );
+  
+      // Enter invalid phone number
+      fireEvent.change(screen.getByLabelText('Phone Number'), { target: { value: 'invalid-phone' } });
+  
+      // Simulate form submission
+      fireEvent.click(screen.getByText(/save changes/i));
+  
+      // Wait for validation error
+      await waitFor(() => {
+        expect(screen.getByText('Phone number is not valid')).toBeInTheDocument();
+      });
+    });
+
+    test('displays error for invalid email address', async () => {
+      render(
+        <EditPersonModal
+          _account={1}
+          person={{}} // Empty person to simulate adding a new person
+          updatePerson={jest.fn()}
+          show={true}
+          hideModal={jest.fn()}
+          crews={mockCrews}
+          title="Add"
+          edit={false}
+        />
+      );
+  
+      // Enter invalid email
+      fireEvent.change(screen.getByLabelText('Email Address'), { target: { value: 'invalid-email' } });
+  
+      // Simulate form submission
+      fireEvent.click(screen.getByText(/save changes/i));
+  
+      // Wait for validation error
+      await waitFor(() => {
+        expect(screen.getByText('Invalid email address')).toBeInTheDocument();
+      });
+    });   
  
   });

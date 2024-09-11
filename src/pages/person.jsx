@@ -4,7 +4,7 @@ import axios from 'axios';
 import PersonInfoCard from '../components/Card/PersonInfoCard';
 import PersonDocumentCard from '../components/Card/PersonDocumentCard';
 import PersonFormAccessCard from '../components/Card/PersonFormAccessCard';
-import EditPersonModal from '../components/Modal/EditPersonModal';
+import AddOrEditPersonModal from '../components/Modal/AddOrEditPersonModal';
 import RemovePersonButton from '../components/Button/RemovePersonButton';
 import { Button } from 'react-bootstrap';
 import QualificationsCard from '../components/Card/QualificationsCard';
@@ -104,7 +104,7 @@ const Person = () => {
 
       )}
       {_account && currentUser && (
-        <EditPersonModal show={showEditPersonModal} hideModal={() => setShowEditPersonModal(false)} _account={_account} person={currentUser} updatePerson={setCurrentUser} crews={crews} />
+        <AddOrEditPersonModal show={showEditPersonModal} hideModal={() => setShowEditPersonModal(false)} _account={_account} person={currentUser} updatePerson={setCurrentUser} crews={crews} title={"Edit"} edit={true} />
       )}
     </div>
   );

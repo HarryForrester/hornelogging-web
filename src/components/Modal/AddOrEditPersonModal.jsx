@@ -13,7 +13,7 @@ import * as Yup from 'yup';
 import { Formik } from 'formik';
 import { subYears } from 'date-fns'; // To calculate age based on current date
 
-const EditPersonModal = ({_account, person, updatePerson, show, hideModal, crews}) => {
+const AddOrEditPersonModal = ({_account, person, updatePerson, show, hideModal, crews, title, edit}) => {
   console.log('haha crews', crews);
   const { addToast } = useAlertMessage();
   const [showSpinner, setShowSpinner] = useState(false); // shows spinner while submitting to server
@@ -37,87 +37,6 @@ const EditPersonModal = ({_account, person, updatePerson, show, hideModal, crews
     imgPreview: person?.imgPreview || '',
     archive: person?.archive || false
   }
-  /* const [formState, setFormState] = useState({
-    id: '',
-    firstName: '',
-    lastName: '',
-    crew: '',
-    role: '',
-    phone: '',
-    email: '',
-    address: '',
-    dob: '',
-    startDate: '',
-    contact: '',
-    contactphone: '',
-    doctor: '',
-    medical: '',
-    imgPreview: '',
-    archive: ''
-  }); */
-
- /*  useEffect(() => {
-    setFormState({
-      id: person?._id,
-      firstName: person?.firstName,
-      lastName: person?.lastName,
-      crew: person?.crew,
-      role: person?.role,
-      phone: person?.phone,
-      email: person?.email,
-      address: person?.address,
-      dob: person?.dob,
-      startDate: person?.startDate,
-      contact: person?.contact,
-      contactphone: person?.contactphone,
-      doctor: person?.doctor,
-      medical: person?.medical,
-      imgPreview: person?.imgPreview,
-      archive: person?.archive
-    });
-  }, [person]); */
-
- /*  const handleImageChange = (event) => {
-    const file = event.target.files[0];
-    const reader = new FileReader();
-    console.log('file', file);
-    reader.onload = (e) => {
-      setFormState({ ...formState, imgPreview: e.target.result, imgFile: file });
-    };
-
-    if (file) {
-      reader.readAsDataURL(file);
-    }
-  }; */
-
-/*   const resetForm = () => {
-    setFormState({
-      id: '',
-      firstName: '',
-      lastName: '',
-      crew: '',
-      role: '',
-      phone: '',
-      email: '',
-      address: '',
-      dob: '',
-      startDate: '',
-      contact: '',
-      contactphone: '',
-      doctor: '',
-      medical: '',
-      imgPreview: '',
-      archive: ''
-    });
-  }; */
-/* 
-  const handleCrewChange = (e) => {
-    setFormState({ ...formState, crew: e.target.value });
-  };
-
-  const handleRoleChange = (e) => {
-    setFormState({ ...formState, role: e.target.value });
-  }; */
 
   const handleClose = () => {
     hideModal();
@@ -126,54 +45,122 @@ const EditPersonModal = ({_account, person, updatePerson, show, hideModal, crews
   const handleSubmit = async (values) => {
     console.log('handleSubmit');
     setShowSpinner(true);
-  
+    
     try {
-      let response;
-  
-      if (values.imgFile) {
-        console.log('formState.imgFile', values.imgFile);
-        // Upload new image and update with imgUrl
-        const [presignedUrl, key] = await getPresignedUrl(`${_account._account}/person/${values.id}`, 'image/png');
-        await uploadToPresignedUrl(presignedUrl, values.imgFile, 'image/png');
-        const filePath = getFilePathFromUrl(presignedUrl);
-        
-        values.imgUrl = { key: key, url: filePath }; // Add new imgUrl to the updated form state
-      } else {
-        console.log('without img change');
-        // If no new image is uploaded, remove imgPreview from the submission
-        delete values.imgPreview;
-      }
-  
-      response = await axios.post(
-        `${process.env.REACT_APP_URL}/update-person/${values.id}`,
-        values,
-        { withCredentials: true }
-      );
-  
-      if (response.status === 200) {
-        // Delete old profile image if it exists and a new one was uploaded
-        if (values.imgFile && person.imgUrl) {
-          await deletePresignedUrl([person.imgUrl.key]);
+      if (edit) {
+        // Editing an existing person
+        let response;
+    
+        if (values.imgFile) {
+          console.log('formState.imgFile', values.imgFile);
+          // Upload new image and update with imgUrl
+          const [presignedUrl, key] = await getPresignedUrl(`${_account._account}/person/${values.id}`, 'image/png');
+          await uploadToPresignedUrl(presignedUrl, values.imgFile, 'image/png');
+          const filePath = getFilePathFromUrl(presignedUrl);
+          
+          values.imgUrl = { key: key, url: filePath }; // Add new imgUrl to the updated form state
+        } else {
+          console.log('without img change');
+          // If no new image is uploaded, remove imgPreview from the submission
+          delete values.imgPreview;
         }
+    
+        response = await axios.post(
+          `${process.env.REACT_APP_URL}/update-person/${values.id}`,
+          values,
+          { withCredentials: true }
+        );
+    
+        if (response.status === 200) {
+          // Delete old profile image if it exists and a new one was uploaded
+          if (values.imgFile && person.imgUrl) {
+            await deletePresignedUrl([person.imgUrl.key]);
+          }
+    
+          addToast('Person Updated!', `Success! ${values.firstName} ${values.lastName} has been updated`, 'success', 'white');
+          updatePerson(response.data.updatedPerson); // Update person data in UI
+          hideModal(); // Hide modal
+        }
+      } else {
+        // Creating a new person
+        const formData = new FormData();
+        Object.keys(values).forEach(key => {
+          formData.append(key, values[key]);
+        });
+        console.log('crewss',values)
+
+        let crewName;
+
+        if (!values.crew) {
+          crewName = 'Unassigned';
+        } else {
+          const foundCrew = crews.find(crew => crew._id === values.crew);
+          crewName = foundCrew ? foundCrew.name : 'Unassigned';
+        }
+
+        try {
+          // eslint-disable-next-line no-undef
+          const response = await axios.post(`${process.env.REACT_APP_URL}/createperson`, values, {
+            withCredentials: true
+          });
   
-        addToast('Person Updated!', `Success! ${values.firstName} ${values.lastName} has been updated`, 'success', 'white');
-        updatePerson(response.data.updatedPerson); // Update person data in UI
-        //resetForm(); // Reset form fields
-        hideModal(); // Hide modal
+          if (response.status === 200) {
+            //closeModal();
+            hideModal();
+            updatePerson((prevState) => {
+              if (!prevState.peopleByCrew) {
+                // If prevState.crews is undefined, initialize it as an empty array
+                prevState = { ...prevState, peopleByCrew: [] };
+              }
+  
+              const updatedPeopleByCrew = prevState.peopleByCrew.map((crew) => {
+                console.log('updatedPeopleByCrew: crew object: ', crew);
+                if (crew._id === response.data.person.crew) {
+                  // If the crew name matches, add the person to the people array
+                  return {
+                    ...crew,
+                    people: [...crew.people, response.data.person]
+                  };
+                }
+                return crew;
+              });
+  
+              // If the crew does not exist, add it with the person in the people array
+              if (!prevState.peopleByCrew.some((crew) => crew._id === response.data.person.crew)) {
+                updatedPeopleByCrew.push({
+                  name: response.data.person.crew,
+                  people: [response.data.person]
+                });
+              }
+  
+              return {
+                ...prevState,
+                peopleByCrew: updatedPeopleByCrew
+              };
+            });
+  
+            addToast('Add Person', `Success! "${values.firstName} ${values.lastName}" has been added to "${crewName}"`, 'success', 'white');
+            //resetForm();
+          } else {
+            console.error('Failed to create person');
+          }
+        } catch (error) {
+          console.error('Network error:', error);
+          addToast(
+            'Error!',
+            `Failed to add "<strong>${values.firstName} ${values.lastName}</strong>" to "<strong>${crewName}</strong>. Please try again later"`,
+            'danger',
+            'white'
+          );        }
       }
     } catch (error) {
-      addToast('Update Person!', `Error! An error occurred while updating ${values.firstName} ${values.lastName}. Please try again later`, 'danger', 'white');
       console.error('Error:', error);
+      addToast('Update Person!', `Error! An error occurred while updating ${values.firstName} ${values.lastName}. Please try again later`, 'danger', 'white');
     } finally {
       setShowSpinner(false);
     }
   };
-  
 
-  /* const handleInputChange = (name, value) => {
-    setFormState({ ...formState, [name]: value });
-  };
- */
   const imgUrl = person?.imgUrl;
   return (
     <Modal
@@ -183,7 +170,7 @@ const EditPersonModal = ({_account, person, updatePerson, show, hideModal, crews
       backdrop="static"
     >
       <Modal.Header className="modal-header" closeButton>
-        <Modal.Title>Edit Person</Modal.Title>
+        <Modal.Title>{title} Person</Modal.Title>
       </Modal.Header>
 
       <Modal.Body>
@@ -221,7 +208,7 @@ const EditPersonModal = ({_account, person, updatePerson, show, hideModal, crews
             handleSubmit(values);
           }}
         >
-          {({ setFieldValue, values, handleSubmit, resetForm}) => (
+          {({ setFieldValue, values, touched, errors, handleSubmit, getFieldProps}) => (
             <Form>
               <Form.Group className="row g-3">
                 <Form.Label style={{ fontSize: '1.2rem' }}>Contact Info:</Form.Label>
@@ -267,21 +254,19 @@ const EditPersonModal = ({_account, person, updatePerson, show, hideModal, crews
                     Crew
                   </Form.Label>
                   <Form.Select
-                    id="crewInput"
-                    name="crew"
-                  >
-                    <option value="default" disabled>
-                      Select Crew
-                    </option>
-                    {crews && crews.map((option) => (
-                        <option key={option._id} value={option._id}>
-                          {option.name}
-                        </option>
-                      ))}
-                    <option value="Unassigned">
-                      Unassigned
-                    </option>
-                  </Form.Select>
+          id="crewInput"
+          name="crew"
+          {...getFieldProps('crew')}
+          isInvalid={touched.crew && errors.crew}
+        >
+          <option value="" disabled>Select Crew</option>
+          {crews && crews.map((option) => (
+            <option key={option._id} value={option._id}>
+              {option.name}
+            </option>
+          ))}
+          <option value={undefined}>Unassigned</option>
+        </Form.Select>
                 </Form.Group>
 
                 <Form.Group className="col-md-4">
@@ -335,6 +320,31 @@ const EditPersonModal = ({_account, person, updatePerson, show, hideModal, crews
                 placeholder="Describe any medical issues here..."
               />
             </Form.Group>
+
+            <Form.Group className="col-md-5">
+              <InputWithLabel
+                type={'text'}
+                label={'Parnter Contact Name'}
+                name={'contact'}
+              />
+            </Form.Group>
+
+            <Form.Group className="col-md-5">
+              <InputWithLabel
+                  type={'tel'}
+                  label={'Parnter Contact Number'}
+                  name={'contactphone'}
+                />              
+            </Form.Group>
+            <hr style={{ border: '1px solid #ccc', margin: '20px 0' }} />
+
+            <Form.Group className="col-md-12">
+                <Form.Check
+                  type="checkbox"
+                  label={`Archive ${values.firstName} ${values.lastName}`}
+                  checked={values.archive ? JSON.parse(values.archive) : false}
+                />
+            </Form.Group>
             
             </Form.Group>
             <Form.Group className="text-end mt-3">
@@ -363,13 +373,15 @@ const EditPersonModal = ({_account, person, updatePerson, show, hideModal, crews
   );
 };
 
-EditPersonModal.propTypes = {
+AddOrEditPersonModal.propTypes = {
   _account: PropTypes.number.isRequired,
-  person: PropTypes.object.isRequired,
+  person: PropTypes.object,
   show: PropTypes.bool.isRequired,
   hideModal: PropTypes.func.isRequired,
-  updatePerson: PropTypes.func.isRequired,
-  crews: PropTypes.array.isRequired
+  updatePerson: PropTypes.func,
+  crews: PropTypes.array.isRequired,
+  title: PropTypes.string.isRequired,
+  edit: PropTypes.bool.isRequired,
 }
 
-export default EditPersonModal;
+export default AddOrEditPersonModal;

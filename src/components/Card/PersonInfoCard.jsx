@@ -14,10 +14,11 @@ const PersonInfoCard = ({ person, crews }) => {
     }
   }, [person?.imgUrl]);
 
-  const findCrewName = crews.find(crew => crew._id === person.crew).name;
-
+  const findCrew = crews.find(crew => crew._id === person.crew);
+  const crewName = findCrew ? findCrew.name : 'Unassigned';
+  
   const data = [
-    { label: 'Crew', value: findCrewName },
+    { label: 'Crew', value: crewName },
     { label: 'Role', value: person?.role },
     { label: 'DoB', value: person?.dob },
     { label: 'Contact', value: `${person?.firstName} ${person.lastName} (${person?.phone})` },

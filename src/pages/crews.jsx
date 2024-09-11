@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import AddCrewModal from '../components/Modal/AddCrewModal';
-import AddPersonModal from '../components/Modal/AddPersonModal';
+import AddOrEditPersonModal from '../components/Modal/AddOrEditPersonModal.jsx';
 import NewPersonButton from '../components/Button/NewPersonButton';
 import NewCrewButton from '../components/Button/NewCrewButton';
 import PeopleAndCrewSearch from '../components/Input/PeopleAndCrewSearch';
@@ -15,7 +15,7 @@ const Crews = () => {
   const navigate = useNavigate();
   const [showArchived, setShowArchived] = useState(false);
   const { people, setPeople } = usePeople(); // used to get or set peopleByCrew and archivedPeople
-  const { setCrews } = useCrews(); // used to set the crew types
+  const { setCrews, crews } = useCrews(); // used to set the crew types
   const [showAddPersonModal, setShowAddPersonModal] = useState(false); //  shows or hides the modal when new person btn is clicked
   const [showAddCrewModal, setShowAddCrewModal] = useState(false); // shows or hides the modal when new crew btn is clicked
 
@@ -89,8 +89,11 @@ const Crews = () => {
             </Card.Body>
           </Card>
         )}
+
         {showAddPersonModal && (
-          <AddPersonModal show={showAddPersonModal} closeModal={() => setShowAddPersonModal(false)} />
+                  <AddOrEditPersonModal show={showAddPersonModal} hideModal={() => setShowAddPersonModal(false)} _account={2} crews={crews} title={"Add"} edit={false} />
+
+        
         )}
         {showAddCrewModal && (
           <AddCrewModal show={showAddCrewModal} closeModal={() => setShowAddCrewModal(false)} />
