@@ -91,7 +91,7 @@ const Crews = () => {
         )}
 
         {showAddPersonModal && (
-                  <AddOrEditPersonModal show={showAddPersonModal} hideModal={() => setShowAddPersonModal(false)} _account={2} crews={crews} title={"Add"} edit={false} />
+                  <AddOrEditPersonModal show={showAddPersonModal} hideModal={() => setShowAddPersonModal(false)} _account={2} crews={crews} updatePerson={setPeople} title={"Add"} edit={false} />
 
         
         )}

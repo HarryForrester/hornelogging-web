@@ -45,117 +45,108 @@ const AddOrEditPersonModal = ({_account, person, updatePerson, show, hideModal, 
   const handleSubmit = async (values) => {
     console.log('handleSubmit');
     setShowSpinner(true);
-    
+  
     try {
       if (edit) {
         // Editing an existing person
         let response;
-    
+  
         if (values.imgFile) {
           console.log('formState.imgFile', values.imgFile);
           // Upload new image and update with imgUrl
           const [presignedUrl, key] = await getPresignedUrl(`${_account._account}/person/${values.id}`, 'image/png');
           await uploadToPresignedUrl(presignedUrl, values.imgFile, 'image/png');
           const filePath = getFilePathFromUrl(presignedUrl);
-          
+  
           values.imgUrl = { key: key, url: filePath }; // Add new imgUrl to the updated form state
         } else {
           console.log('without img change');
           // If no new image is uploaded, remove imgPreview from the submission
           delete values.imgPreview;
         }
-    
+  
         response = await axios.post(
           `${process.env.REACT_APP_URL}/update-person/${values.id}`,
           values,
           { withCredentials: true }
         );
-    
+  
         if (response.status === 200) {
           // Delete old profile image if it exists and a new one was uploaded
           if (values.imgFile && person.imgUrl) {
             await deletePresignedUrl([person.imgUrl.key]);
           }
-    
+  
           addToast('Person Updated!', `Success! ${values.firstName} ${values.lastName} has been updated`, 'success', 'white');
           updatePerson(response.data.updatedPerson); // Update person data in UI
           hideModal(); // Hide modal
         }
       } else {
         // Creating a new person
-        const formData = new FormData();
-        Object.keys(values).forEach(key => {
-          formData.append(key, values[key]);
+        const response = await axios.post(`${process.env.REACT_APP_URL}/createperson`, values, {
+          withCredentials: true,
         });
-        console.log('crewss',values)
-
-        let crewName;
-
-        if (!values.crew) {
-          crewName = 'Unassigned';
-        } else {
-          const foundCrew = crews.find(crew => crew._id === values.crew);
-          crewName = foundCrew ? foundCrew.name : 'Unassigned';
-        }
-
-        try {
-          // eslint-disable-next-line no-undef
-          const response = await axios.post(`${process.env.REACT_APP_URL}/createperson`, values, {
-            withCredentials: true
-          });
   
-          if (response.status === 200) {
-            //closeModal();
-            hideModal();
-            updatePerson((prevState) => {
-              if (!prevState.peopleByCrew) {
-                // If prevState.crews is undefined, initialize it as an empty array
-                prevState = { ...prevState, peopleByCrew: [] };
-              }
+        if (response.status === 200) {
+          const newPerson = response.data.person;
   
-              const updatedPeopleByCrew = prevState.peopleByCrew.map((crew) => {
-                console.log('updatedPeopleByCrew: crew object: ', crew);
-                if (crew._id === response.data.person.crew) {
-                  // If the crew name matches, add the person to the people array
-                  return {
-                    ...crew,
-                    people: [...crew.people, response.data.person]
-                  };
-                }
-                return crew;
-              });
+          // Check if an image was provided, then upload the image
+          if (values.imgFile) {
+            const [presignedUrl, key] = await getPresignedUrl(`${_account._account}/person/${newPerson._id}`, 'image/png');
+            await uploadToPresignedUrl(presignedUrl, values.imgFile, 'image/png');
+            const filePath = getFilePathFromUrl(presignedUrl);
   
-              // If the crew does not exist, add it with the person in the people array
-              if (!prevState.peopleByCrew.some((crew) => crew._id === response.data.person.crew)) {
-                updatedPeopleByCrew.push({
-                  name: response.data.person.crew,
-                  people: [response.data.person]
-                });
-              }
-  
-              return {
-                ...prevState,
-                peopleByCrew: updatedPeopleByCrew
-              };
+            // Now update the person with the imgUrl
+            const updateResponse = await axios.post(`${process.env.REACT_APP_URL}/update-person/${newPerson._id}`, {
+              imgUrl: { key, url: filePath }
+            }, {
+              withCredentials: true
             });
   
-            addToast('Add Person', `Success! "${values.firstName} ${values.lastName}" has been added to "${crewName}"`, 'success', 'white');
-            //resetForm();
-          } else {
-            console.error('Failed to create person');
+            if (updateResponse.status === 200) {
+              newPerson.imgUrl = { key, url: filePath }; // Update the newPerson object with the imgUrl
+            }
           }
-        } catch (error) {
-          console.error('Network error:', error);
-          addToast(
-            'Error!',
-            `Failed to add "<strong>${values.firstName} ${values.lastName}</strong>" to "<strong>${crewName}</strong>. Please try again later"`,
-            'danger',
-            'white'
-          );        }
+  
+          // Update the UI
+          hideModal();
+          updatePerson((prevState) => {
+            if (!prevState.peopleByCrew) {
+              prevState = { ...prevState, peopleByCrew: [] };
+            }
+  
+            const updatedPeopleByCrew = prevState.peopleByCrew.map((crew) => {
+              if (crew._id === newPerson.crew) {
+                return {
+                  ...crew,
+                  people: [...crew.people, newPerson],
+                };
+              }
+              return crew;
+            });
+  
+            if (!prevState.peopleByCrew.some((crew) => crew._id === newPerson.crew)) {
+              updatedPeopleByCrew.push({
+                name: newPerson.crew,
+                people: [newPerson],
+              });
+            }
+  
+            return {
+              ...prevState,
+              peopleByCrew: updatedPeopleByCrew,
+            };
+          });
+  
+          const crewName = values.crew ? crews.find(crew => crew._id === values.crew)?.name || 'Unassigned' : 'Unassigned';
+          addToast('Add Person', `Success! "${values.firstName} ${values.lastName}" has been added to "${crewName}"`, 'success', 'white');
+        } else {
+          console.error('Failed to create person');
+        }
       }
     } catch (error) {
       console.error('Error:', error);
-      addToast('Update Person!', `Error! An error occurred while updating ${values.firstName} ${values.lastName}. Please try again later`, 'danger', 'white');
+      addToast('Error', 'An error occurred. Please try again later.', 'danger', 'white');
     } finally {
       setShowSpinner(false);
     }
@@ -342,7 +333,8 @@ const AddOrEditPersonModal = ({_account, person, updatePerson, show, hideModal, 
                 <Form.Check
                   type="checkbox"
                   label={`Archive ${values.firstName} ${values.lastName}`}
-                  checked={values.archive ? JSON.parse(values.archive) : false}
+                  checked={values.archive || false}
+                  onChange={() => setFieldValue('archive', !values.archive)}
                 />
             </Form.Group>
             

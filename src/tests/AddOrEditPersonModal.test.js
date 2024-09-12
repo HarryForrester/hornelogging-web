@@ -231,7 +231,7 @@ jest.mock('../hooks/useFileUpload', () => ({
         await waitFor(() => {
           expect(mockAddToast).toHaveBeenCalledWith(
             'Error!',
-            `Failed to add "<strong>John Doe</strong>" to "<strong>Crew 1</strong>. Please try again later"`,            
+            `Failed to add John Doe to Crew 1. Please try again later`,            
             'danger',
             'white'
         );
