@@ -14,11 +14,9 @@ import { Formik } from 'formik';
 import { subYears } from 'date-fns'; // To calculate age based on current date
 
 const AddOrEditPersonModal = ({_account, person, updatePerson, show, hideModal, crews, title, edit}) => {
-  console.log('haha crews', crews);
   const { addToast } = useAlertMessage();
   const [showSpinner, setShowSpinner] = useState(false); // shows spinner while submitting to server
   const phoneRegExp = /^(\+64|0)[2-9]\d{7,9}$/;
-console.log('person', person);
   const initialValues = {
     id: person?._id || '',
     firstName: person?.firstName || '',
@@ -52,9 +50,7 @@ console.log('person', person);
     hideModal();
   };
 
-  const handleSubmit = async (values, { resetForm }) => {
-    console.log('handleSubmit', values);
-    console.log('person: ', person);
+  const handleSubmit = async (values) => {
     setShowSpinner(true);
   
     try {
@@ -62,9 +58,7 @@ console.log('person', person);
         // Editing an existing person
         let response;
         // if an profile image is uploaded
-        console.log('values', values);
         if (values.imgFile) {
-          console.log('formState.imgFile', values.imgFile);
           // Upload new image and update with imgUrl
           const [presignedUrl, key] = await getPresignedUrl(`${_account._account}/person/${values.id}`, 'image/png');
           await uploadToPresignedUrl(presignedUrl, values.imgFile, 'image/png');
@@ -72,7 +66,6 @@ console.log('person', person);
   
           values.imgUrl = { key: key, url: filePath }; // Add new imgUrl to the updated form state
         } else {
-          console.log('without img change');
           // If no new image is uploaded, remove imgPreview from the submission
           delete values.imgPreview;
         }
@@ -86,7 +79,6 @@ console.log('person', person);
         if (response.status === 200) {
           // Delete old profile image if it exists and a new one was uploaded
           if (values.imgFile && person.imgUrl) {
-            console.log('delete person: ', person.imgUrl)
             await deletePresignedUrl([person.imgUrl.key]);
           }
   
@@ -211,7 +203,6 @@ console.log('person', person);
             doctor: Yup.string().max(30, 'Must be 30 characters or less').required('Doctor is required'),
           })}
           onSubmit={(values, {resetForm}) => {
-            console.log('fuck')
             handleSubmit(values, resetForm);
           }}
         >
@@ -262,19 +253,19 @@ console.log('person', person);
                     Crew
                   </Form.Label>
                   <Form.Select
-          id="crewInput"
-          name="crew"
-          {...getFieldProps('crew')}
-          isInvalid={touched.crew && errors.crew}
-        >
-          <option value="" disabled>Select Crew</option>
-          {crews && crews.map((option) => (
-            <option key={option._id} value={option._id}>
-              {option.name}
-            </option>
-          ))}
-          <option value={undefined}>Unassigned</option>
-        </Form.Select>
+                    id="crewInput"
+                    name="crew"
+                    {...getFieldProps('crew')}
+                    isInvalid={touched.crew && errors.crew}
+                  >
+                    <option value="" disabled>Select Crew</option>
+                    {crews && crews.map((option) => (
+                      <option key={option._id} value={option._id}>
+                        {option.name}
+                      </option>
+                    ))}
+                    <option value={undefined}>Unassigned</option>
+                  </Form.Select>
                 </Form.Group>
 
                 <Form.Group className="col-md-4">
@@ -295,7 +286,6 @@ console.log('person', person);
                 />
                 <SelectRoleType name="role"/>
               </Form.Group>
-              
 
               <Form.Group className="col-md-5">
               <InputWithLabel
