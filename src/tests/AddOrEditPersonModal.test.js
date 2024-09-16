@@ -75,6 +75,8 @@ jest.mock('../hooks/useFileUpload', () => ({
             show={true}
             hideModal={mockHideModal}
             crews={mockCrews}
+            edit={true}
+            title={"Edit"}
           />
         );
          // Check if modal fields are populated with person data
@@ -573,6 +575,7 @@ jest.mock('../hooks/useFileUpload', () => ({
           hideModal={mockHideModal}
           crews={mockCrews}
           title='Add'
+          edit={false}
         />
       );
     
