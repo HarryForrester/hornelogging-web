@@ -13,6 +13,20 @@ import * as Yup from 'yup';
 import { Formik } from 'formik';
 import { subYears } from 'date-fns'; // To calculate age based on current date
 
+/**
+ * Renders a modal for adding or editing a person's information.
+ * 
+ * @param {Object} _account - The account details, the companys account id.
+ * @param {Object|null} person - The person object to be edited. If null, the modal is in "add" mode.
+ * @param {Function} updatePerson - Callback to update the person data in the parent component after successful add/edit.
+ * @param {boolean} show - Controls the visibility of the modal.
+ * @param {Function} hideModal - Callback to close the modal.
+ * @param {Array} crews - List of crew objects to populate crew selection in the form.
+ * @param {string} title - Title for the modal, e.g., "Add Person" or "Edit Person".
+ * @param {boolean} edit - Flag indicating if the modal is in edit mode (true) or add mode (false).
+ * 
+ * @returns {JSX.Element} - A modal component that allows users to add or edit person details.
+ */
 const AddOrEditPersonModal = ({_account, person, updatePerson, show, hideModal, crews, title, edit}) => {
   const { addToast } = useAlertMessage();
   const [showSpinner, setShowSpinner] = useState(false); // shows spinner while submitting to server
