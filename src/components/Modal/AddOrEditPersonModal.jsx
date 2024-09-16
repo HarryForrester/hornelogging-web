@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import SelectRoleType from '../SelectList/SelectRoleType';
 import InputWithLabel from '../Input/InputWithLabel';
 import InputWithLabelMulti from '../Input/InputWithLabelMulti';
@@ -18,7 +18,7 @@ const AddOrEditPersonModal = ({_account, person, updatePerson, show, hideModal, 
   const { addToast } = useAlertMessage();
   const [showSpinner, setShowSpinner] = useState(false); // shows spinner while submitting to server
   const phoneRegExp = /^(\+64|0)[2-9]\d{7,9}$/;
-
+console.log('person', person);
   const initialValues = {
     id: person?._id || '',
     firstName: person?.firstName || '',
@@ -38,19 +38,31 @@ const AddOrEditPersonModal = ({_account, person, updatePerson, show, hideModal, 
     archive: person?.archive || false
   }
 
+  const fileInputRef = useRef(null);
+  const formikRef = useRef(null);
+
+  // Clear file input
   const handleClose = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''; // Clear the file input value
+    }
+    if (formikRef.current) {
+      formikRef.current.resetForm(); // Reset Formik form values
+    }
     hideModal();
   };
 
-  const handleSubmit = async (values) => {
-    console.log('handleSubmit');
+  const handleSubmit = async (values, { resetForm }) => {
+    console.log('handleSubmit', values);
+    console.log('person: ', person);
     setShowSpinner(true);
   
     try {
       if (edit) {
         // Editing an existing person
         let response;
-  
+        // if an profile image is uploaded
+        console.log('values', values);
         if (values.imgFile) {
           console.log('formState.imgFile', values.imgFile);
           // Upload new image and update with imgUrl
@@ -74,12 +86,14 @@ const AddOrEditPersonModal = ({_account, person, updatePerson, show, hideModal, 
         if (response.status === 200) {
           // Delete old profile image if it exists and a new one was uploaded
           if (values.imgFile && person.imgUrl) {
+            console.log('delete person: ', person.imgUrl)
             await deletePresignedUrl([person.imgUrl.key]);
           }
   
           addToast('Person Updated!', `Success! ${values.firstName} ${values.lastName} has been updated`, 'success', 'white');
           updatePerson(response.data.updatedPerson); // Update person data in UI
-          hideModal(); // Hide modal
+         // hideModal(); // Hide modal
+          handleClose();
         }
       } else {
         // Creating a new person
@@ -139,14 +153,15 @@ const AddOrEditPersonModal = ({_account, person, updatePerson, show, hideModal, 
           });
   
           const crewName = values.crew ? crews.find(crew => crew._id === values.crew)?.name || 'Unassigned' : 'Unassigned';
-          addToast('Add Person', `Success! "${values.firstName} ${values.lastName}" has been added to "${crewName}"`, 'success', 'white');
+          addToast('Person Created!', `Success! "${values.firstName} ${values.lastName}" has been added to "${crewName}"`, 'success', 'white');
+          handleClose();
         } else {
           console.error('Failed to create person');
         }
       }
     } catch (error) {
       console.error('Error:', error);
-      addToast('Error', 'An error occurred. Please try again later.', 'danger', 'white');
+      addToast('Error!', 'Failed to create/update person due to a network error. Please try again.', 'danger', 'white');
     } finally {
       setShowSpinner(false);
     }
@@ -166,6 +181,7 @@ const AddOrEditPersonModal = ({_account, person, updatePerson, show, hideModal, 
 
       <Modal.Body>
         <Formik
+          innerRef={formikRef}
           initialValues={initialValues}
           validationSchema={Yup.object({
             firstName: Yup.string().max(30, 'Must be 30 characters or less').required('First Name is required'),
@@ -194,12 +210,12 @@ const AddOrEditPersonModal = ({_account, person, updatePerson, show, hideModal, 
               .required('Contact phone number is required'),
             doctor: Yup.string().max(30, 'Must be 30 characters or less').required('Doctor is required'),
           })}
-          onSubmit={(values) => {
+          onSubmit={(values, {resetForm}) => {
             console.log('fuck')
-            handleSubmit(values);
+            handleSubmit(values, resetForm);
           }}
         >
-          {({ setFieldValue, values, touched, errors, handleSubmit, getFieldProps}) => (
+          {({ setFieldValue, values, touched, errors, handleSubmit, getFieldProps, resetForm}) => (
             <Form>
               <Form.Group className="row g-3">
                 <Form.Label style={{ fontSize: '1.2rem' }}>Contact Info:</Form.Label>
@@ -222,6 +238,7 @@ const AddOrEditPersonModal = ({_account, person, updatePerson, show, hideModal, 
                       id="imgurl"
                       name="imgFile"
                       size="sm"
+                      ref={fileInputRef}
                       style={{ display: 'none' }}
                       onChange={(event) => {
                         const file = event.target.files[0];
@@ -273,7 +290,7 @@ const AddOrEditPersonModal = ({_account, person, updatePerson, show, hideModal, 
                 />
                 <InputWithLabel
                   type={'text'}
-                  label={'Address'}
+                  label={'Home Address'}
                   name={'address'}
                 />
                 <SelectRoleType name="role"/>
