@@ -32,7 +32,6 @@ const Crews = () => {
         const response = await axios.get(`${process.env.REACT_APP_URL}/`, { withCredentials: true });
         //is user is logged in
         if (response.data.isLoggedIn) {
-          console.log('data', response.data)
           setPeople((prevState) => ({
             ...prevState,
             peopleByCrew: response.data.peopleByCrew,

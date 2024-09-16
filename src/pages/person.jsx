@@ -35,7 +35,6 @@ const Person = () => {
         });
         if (response.data.isLoggedIn) {
           const data = response.data;
-          console.log('cat data', data);
           setCurrentUser(data.person);
           setCurrentUserFiles(data.files);
           setPersonFiles((prevState) => ({

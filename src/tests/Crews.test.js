@@ -22,34 +22,37 @@ const mockResponse = {
       isLoggedIn: true,
       peopleByCrew: [
         {
-          _id: "1",
+          _id: "pbc_id_1",
           name: "Crew One",
           people: [
             {
-              _id: "12",
-              name: "Person One",
+              _id: "person_id_1",
+              firstName: "Person",
+              lastName: "One",
               imgUrl: {
-                url: "exampleurl"
+                url: "exampleurl1"
               }
             },
             {
-              _id: "13",
-              name: "Person Two",
+              _id: "person_id_2",
+              firstName: "Person",
+              lastName: "Two",
               imgUrl: {
-                url: "exampleurl"
+                url: "exampleurl2"
               }
             }
           ]
         },
         {
-          _id: "2",
+          _id: "pbc_id_2",
           name: "Crew Two",
           people: [
             {
-              _id: "21",
-              name: "Person Three",
+              _id: "person_id_3",
+              firstName: "Person",
+              lastName: "Three",
               imgUrl: {
-                url: "exampleurl"
+                url: "exampleurl3"
               }
             }
           ]
@@ -57,12 +60,14 @@ const mockResponse = {
       ],
       archivedPeople: [
         {
-          _id: "32",
-          name: "Archived One",
+          _id: "person_id_4",
+          firstName: "Archived",
+          lastName: "One",
         },
         {
-          _id: "33",
-          name: "Archived Two",
+          _id: "person_id_5",
+          firstName: "Archived",
+          lastName: "Two",
         }
       ]
     }
@@ -140,7 +145,7 @@ describe('Crews Page', () => {
             expect(screen.getByRole('img', { name: /Person One/i })).toBeInTheDocument();
             expect(screen.getByRole('img', { name: /Person Two/i })).toBeInTheDocument();
         });
-    });
+    }); 
 
     test('handles empty states correctly', async () => {
         axios.get.mockResolvedValue({
