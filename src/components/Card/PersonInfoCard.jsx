@@ -28,7 +28,11 @@ const PersonInfoCard = ({ person, crews }) => {
     { label: 'Medical Issues', value: person?.medical }
   ];
   
-  return <InfoCard data={data} imageSrc={imageSrc} />;
+  return (
+    <div data-testid="person-info-card">
+      <InfoCard data={data} imageSrc={imageSrc} />;
+    </div>
+  );
 };
 
 PersonInfoCard.propTypes = {

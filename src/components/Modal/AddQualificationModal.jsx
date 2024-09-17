@@ -26,7 +26,6 @@ const AddQualificationModal = ({ show, hide, person, setQuals }) => {
       });
 
       if (response.status === 200) {
-        console.log('quals are good: ', response.data);
         setQuals(response.data.quals);
         addToast('Qualification Added!', `Success! ${title} has been added to ${person.name} Qualifications`, 'success', 'white');
         handleClose();

@@ -67,6 +67,7 @@ const RemovePersonButton = ({ person, _account }) => {
   return (
     <>
       <Button
+        data-testid="removePersonBtn"
         type="button"
         className="btn btn-danger"
         onClick={deletePerson}

@@ -5,7 +5,6 @@ import { useAlertMessage } from '../AlertMessage';
 import { Card } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 const PersonFormAccessCard = ({ currentUser, timeSheetAccess, forms, updateForms }) => {
-  console.log(timeSheetAccess)
   const { addToast } = useAlertMessage();
 
   const toggleTimeSheet = async (event) => {
@@ -75,7 +74,8 @@ const PersonFormAccessCard = ({ currentUser, timeSheetAccess, forms, updateForms
   };
 
   return (
-    <Card>
+    <div data-testid="person-form-access-card">
+      <Card>
       <Card.Header>Enable Device Forms</Card.Header>
       <Card.Body>
         <dl>
@@ -105,6 +105,7 @@ const PersonFormAccessCard = ({ currentUser, timeSheetAccess, forms, updateForms
         </dl>
       </Card.Body>
     </Card>
+    </div>
   );
 };
 

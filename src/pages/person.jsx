@@ -6,7 +6,7 @@ import PersonDocumentCard from '../components/Card/PersonDocumentCard';
 import PersonFormAccessCard from '../components/Card/PersonFormAccessCard';
 import AddOrEditPersonModal from '../components/Modal/AddOrEditPersonModal';
 import RemovePersonButton from '../components/Button/RemovePersonButton';
-import { Button } from 'react-bootstrap';
+import { Button, Placeholder } from 'react-bootstrap';
 import QualificationsCard from '../components/Card/QualificationsCard';
 import { usePersonFile } from '../context/PersonFileContext';
 const Person = () => {
@@ -61,6 +61,7 @@ const Person = () => {
   return (
     <div className="container" style={{ marginTop: '50px' }}>
       <div>
+      {currentUser ? (
         <h1>
           {currentUser?.firstName + ' ' + currentUser?.lastName}
           <span
@@ -69,6 +70,12 @@ const Person = () => {
             className="spinner-grow text-secondary"
           ></span>
         </h1>
+      ) : (
+        <Placeholder as="p" animation="glow">
+                  <Placeholder xs={3} size="lg"/>
+
+        </Placeholder>
+      )}
       </div>
 
       <div style={{ display: 'flex', gap: '10px' }}>

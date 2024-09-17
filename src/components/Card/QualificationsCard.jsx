@@ -8,7 +8,7 @@ const QualificationsCard = ({ person, quals, setQuals }) => {
   const [isQualModalVisible, setQualModalVisible] = useState(false);
 
   return (
-    <>
+    <div data-testid="qualifications-card">
       <AddQualificationModal show={isQualModalVisible} hide={() => setQualModalVisible(false)} person={person} setQuals={setQuals} />
       <Card className="mb-4">
         <Card.Header className="bg-light">Qualifications</Card.Header>
@@ -18,7 +18,7 @@ const QualificationsCard = ({ person, quals, setQuals }) => {
           <QualifiedTable quals={quals} person={person} setQuals={setQuals} />
         </Card.Body>
       </Card>
-    </>
+    </div>
   );
 };
 

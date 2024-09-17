@@ -175,7 +175,8 @@ const AddOrEditPersonModal = ({_account, person, updatePerson, show, hideModal, 
 
   const imgUrl = person?.imgUrl;
   return (
-    <Modal
+    <div data-testid="add-or-edit-person-modal">
+      <Modal
       show={show}
       onHide={handleClose}
       size="xl"
@@ -383,6 +384,7 @@ const AddOrEditPersonModal = ({_account, person, updatePerson, show, hideModal, 
         </Formik>
       </Modal.Body>
     </Modal>
+    </div>
   );
 };
 

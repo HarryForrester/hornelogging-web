@@ -6,7 +6,6 @@ import { Table, Button } from 'react-bootstrap';
 import axios from 'axios';
 import { useAlertMessage } from './AlertMessage';
 const QualifiedTable = ({ quals, setQuals, person }) => {
-  console.log('Qualified', quals);
   const { addToast } = useAlertMessage();
 
   const handleComplete = async (_id, complete) => {
@@ -19,7 +18,6 @@ const QualifiedTable = ({ quals, setQuals, person }) => {
         { withCredentials: true }
       );
       if (response.status === 200) {
-        console.log('response: ', response.data);
         setQuals(response.data.quals);
         addToast('Qualification Updated!', 'Success! Qualification has been updated successfully', 'success', 'white');
       }
@@ -30,8 +28,6 @@ const QualifiedTable = ({ quals, setQuals, person }) => {
   };
 
   const handleQualDelete = async (_id) => {
-    console.log('eme');
-
     try {
       const response = await axios.post(
         // eslint-disable-next-line no-undef
@@ -40,7 +36,6 @@ const QualifiedTable = ({ quals, setQuals, person }) => {
         { withCredentials: true }
       );
       if (response.status === 200) {
-        console.log('response: ', response.data);
         setQuals(response.data.quals);
         addToast('Qualification Removed!', 'Success! Qualification has been removed successfully', 'success', 'white');
       }
