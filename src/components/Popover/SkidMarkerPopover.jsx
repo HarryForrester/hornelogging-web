@@ -11,15 +11,17 @@ import { useNavigate } from 'react-router-dom';
 import { useSkid } from '../../context/SkidContext';
 import { useLibraryFile } from '../../context/LibraryFileContext';
 import { usePersonFile } from '../../context/PersonFileContext';
+import { useCrews } from '../../context/CrewContext';
 const SkidMarkerPopover = () => {
   const { skidModalState, setSkidModalState } = useSkidModal();
   const { mapState, setMapState } = useMap();
-  const { setAlertMessageState } = useAlertMessage();
+  const { addToast } = useAlertMessage();
   const { skidMarkerState, setSkidMarkerState } = useSkidMarker();
   const { libraryFiles} = useLibraryFile();
   const { personFiles} = usePersonFile();
+  const { crews } = useCrews();
 
-  const { skidState, setSkidState } = useSkid(); // holds information about the skid
+  const { skidState, setSkidState } = useSkid(); // holds information about the selected skid
   const navigate = useNavigate();
 
   const toggleSkidCrew = (crew) => {
@@ -48,9 +50,6 @@ const SkidMarkerPopover = () => {
   };
 
   const editSelectedSkid = async () => {
-    const { formik } = skidState;
-
-    const id = new Date().getTime();
     try {
       setSkidState((prevState) => ({
         ...prevState,
@@ -58,29 +57,9 @@ const SkidMarkerPopover = () => {
       }))
       
     } catch (error) {
-      setAlertMessageState((prevState) => ({
-        ...prevState,
-        toasts: [
-          ...prevState.toasts,
-          {
-            id: id,
-            heading: 'Selected General Hazards',
-            show: true,
-            message: `Error! cannot save general hazards. Please try again`,
-            background: 'danger',
-            color: 'white'
-          }
-        ]
-      }));
+      addToast('Error!', 'An error has occured while saving general hazards. Please try again later.', 'danger', 'white');
       console.error('Error fetching hazard data:', error);
-    } finally {
-      setTimeout(() => {
-        setAlertMessageState((prevState) => ({
-          ...prevState,
-          toasts: prevState.toasts.filter((toast) => toast.id !== id)
-        }));
-      }, 10000);
-    }
+    } 
     setSkidMarkerState((prevState) => ({
       ...prevState,
       editSkid: true
@@ -112,21 +91,7 @@ const SkidMarkerPopover = () => {
           currentMapMarkers: updatedMarkers
         };
       });
-
-      setAlertMessageState((prevState) => ({
-        ...prevState,
-        toasts: [
-          ...prevState.toasts,
-          {
-            id: id,
-            heading: 'Remove Skid',
-            show: true,
-            message: `Success! Skid: ${skidModalState.skidName} has been removed`,
-            background: 'success',
-            color: 'white'
-          }
-        ]
-      }));
+      addToast('Skid Removed!',`Success! Skid: ${skidModalState.skidName} has been removed`, 'success', 'white' )
     }
 
     setSkidMarkerState((prevState) => ({
@@ -201,7 +166,7 @@ const SkidMarkerPopover = () => {
                 {skidState?.formik?.values?.selectedCrew
                   .map((crewId) => {
                     // Find the corresponding crew object in mapState.crewTypes
-                    const crew = mapState.crews.find((mapCrew) => mapCrew._id === crewId);
+                    const crew = crews.find((mapCrew) => mapCrew._id === crewId);
                     return crew ? (
                       <li
                         key={crewId}
@@ -232,7 +197,7 @@ const SkidMarkerPopover = () => {
                         Skid Documents:
                       </div>
                       <ul className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
-                        {skidState?.formik?.values?.selectedDocuments.map(id => libraryFiles.libraryFiles.find(file => file._id === id)).filter(file => file).map((item, index) => (
+                        {skidState?.formik?.values?.selectedDocuments.map(id => libraryFiles.files.find(file => file._id === id)).filter(file => file).map((item, index) => (
                           <li
                             data-testid={`skid-doc-${index}`}
                             key={index}

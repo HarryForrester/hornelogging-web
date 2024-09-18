@@ -1,11 +1,12 @@
 import React from 'react';
-import { Modal, Button } from 'react-bootstrap';
+import { Modal } from 'react-bootstrap';
 import { useSkidModal } from './Skid/SkidModalContext';
 import tinycolor from 'tinycolor2';
-function HazardModal() {
+import PropTypes from 'prop-types';
+
+function HazardModal({ selectedHazard }) {
   const { skidModalState, setSkidModalState } = useSkidModal();
 
-  const selectedHazard = skidModalState.selectedHazardData;
   const selectedHarms = selectedHazard.harms ? JSON.parse(selectedHazard.harms) : {};
 
   /**
@@ -25,54 +26,57 @@ function HazardModal() {
   const lighterBackgroundColor = tinycolor(selectedHazard.color).lighten(30).toString()
 
   return (
-    <Modal
+    <div data-testid="hazard-modal">
+      <Modal
       show={skidModalState.hazardModalVisible}
       onHide={handleClose}
       size='lg'
       contentClassName='hazard-modal-content'
       className='hazard-modal'
       style={{padding: 0, margin: 0 }}
-    >
-      <Modal.Header style={{ backgroundColor: selectedHazard.color }} data-testid='hazard-header' closeButton>
-        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-          <Modal.Title>
-            <b>
-              {selectedHazard.id}: <em>{selectedHazard.title}</em>
-            </b>{' '}
-            <small>({selectedHazard.sev})</small>
-          </Modal.Title>
-          <div>
-            <b>{selectedHazard.cat}</b>
+      >
+        <Modal.Header style={{ backgroundColor: selectedHazard.color }} data-testid='hazard-header' closeButton>
+          <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+            <Modal.Title>
+              <b>
+                {selectedHazard.id}: <em>{selectedHazard.title}</em>
+              </b>{' '}
+              <small>({selectedHazard.sev})</small>
+            </Modal.Title>
+            <div>
+              <b>{selectedHazard.cat}</b>
+            </div>
           </div>
-        </div>
-      </Modal.Header>
+        </Modal.Header>
 
-      <Modal.Body style={{ backgroundColor: lighterBackgroundColor }}>
-        <dl>
-          {Object.entries(selectedHarms).map(([key, value]) => (
-            <React.Fragment key={key}>
-              <dt style={{ width: '150px' }}>{key}</dt>
-              <dd>
-                <ul>
-                  {value.map((item, index) => (
-                    <li key={index}>{item}</li>
-                  ))}
-                </ul>
-              </dd>
-            </React.Fragment>
-          ))}
-        </dl>
-      </Modal.Body>
-      <Modal.Footer>
-          <em>
-            Reviewed: {selectedHazard.reviewDate} ({selectedHazard.reviewReason})
-          </em>
-        {/* <Button variant="danger" onClick={handleClose}>
-          Close
-        </Button> */}
-      </Modal.Footer>
-    </Modal>
+        <Modal.Body style={{ backgroundColor: lighterBackgroundColor }}>
+          <dl>
+            {Object.entries(selectedHarms).map(([key, value]) => (
+              <React.Fragment key={key}>
+                <dt style={{ width: '150px' }}>{key}</dt>
+                <dd>
+                  <ul>
+                    {value.map((item, index) => (
+                      <li key={index}>{item}</li>
+                    ))}
+                  </ul>
+                </dd>
+              </React.Fragment>
+            ))}
+          </dl>
+        </Modal.Body>
+        <Modal.Footer>
+            <em>
+              Reviewed: {selectedHazard.reviewDate} ({selectedHazard.reviewReason})
+            </em>
+        </Modal.Footer>
+      </Modal>
+    </div>
   );
+}
+
+HazardModal.propTypes = {
+  selectedHazard: PropTypes.object.isRequired
 }
 
 export default HazardModal;

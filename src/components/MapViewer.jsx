@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Document, Page, pdfjs } from 'react-pdf';
+import React, { useState, useEffect } from 'react';
+import { Document, Page } from 'react-pdf';
 import { ProgressBar } from 'react-bootstrap';
 import axios from 'axios';
 import PropTypes from 'prop-types';
@@ -8,22 +8,25 @@ import { useSkidModal } from '../components/Modal/Skid/SkidModalContext';
 import { useMap } from './Map/MapContext';
 import { useAlertMessage } from './AlertMessage';
 import { useSkidMarker } from './SkidMarkerContext';
-import AddOrEditSkidModal from './Modal/Skid/AddOrEditSkidModal';
-import AddDocModal from './Modal/AddDocModal';
-import AddCutPlanModal from './Modal/AddCutPlanModal';
+//import AddOrEditSkidModal from './Modal/Skid/AddOrEditSkidModal';
 import SelectHazardsModal from './Modal/SelectHazardsModal';
 import EditGeneralHazardModal from './Modal/EditGeneralHazardsModal';
 import AddSkidHazardModal from './Modal/AddSkidHazardModal';
 import SkidMarkerPopover from './Popover/SkidMarkerPopover';
 import Spinner from 'react-bootstrap/Spinner';
 import { useSkid } from '../context/SkidContext';
-const PDFViewer = ({ _account }) => {
+/**
+ * 
+ * @param {*} param0 
+ * @returns 
+ */
+const PDFViewer = ({ enableMarker, selectedGeneralHazards, setShowSkidModal }) => {
 
   const { skidModalState, setSkidModalState } = useSkidModal();
   const { skidMarkerState, setSkidMarkerState } = useSkidMarker();
   const { mapState, setMapState } = useMap();
   const { skidState, setSkidState } = useSkid();
-  const { setAlertMessageState } = useAlertMessage();
+  const { addToast } = useAlertMessage();
   const [pdf, setPdf] = useState(null);
 
   /**
@@ -50,13 +53,15 @@ const PDFViewer = ({ _account }) => {
     setSkidState((prevState) => ({
       ...prevState,
       formik: null,
-      skidModalVisible: true,
+      //skidModalVisible: true,
     }))
-    setSkidModalState((prevState) => ({
+
+    setShowSkidModal(true);
+    /* setSkidModalState((prevState) => ({
       ...prevState,
       isSkidModalEdit: false,
       isSkidModalAdd: true
-    }));
+    })); */
   };
 
   /**
@@ -105,55 +110,7 @@ const PDFViewer = ({ _account }) => {
 
   };
 
-  /**
-   * Used For Add Skid
-   * Adds selected files from Add Doc Modal and adds to skid state
-   * @param {*} selectedFiles
-   */
-  const submitDoc = (selectedFiles) => {
-    setSkidModalState((prevState) => ({
-      ...prevState,
-      isAddDocModalVisible: false,
-      isSkidModalVisible: true,
-      selectedDocuments: selectedFiles
-    }));
-  };
-
-  /**
-   * Handles the submission of a cut plan, converting the selected PDF file to base64.
-   * Updates the Skid Modal state with the cut plan information and transitions back to the Skid Modal.
-   * @param {string} fileName - The name of the cut plan file.
-   * @param {File} selectedFile - The selected PDF file for the cut plan.
-   * @returns {void}
-   */
-  const submitCutPlan = (fileName, selectedFile) => {
-    const formik = skidState.formik;
-
-    const tempFile = new File([selectedFile], fileName, {
-      type: selectedFile.type,
-      lastModified: selectedFile.lastModified
-    });
-
-    setSkidState((prevState) => ({
-      ...prevState,
-      formik: {
-        ...prevState.formik,
-        values: {
-          ...formik.values,
-          selectedCutPlan: tempFile
-        }
-        // You may need to update touched and errors as well if applicable
-      }
-    }));
-
-    setSkidModalState((prevState) => ({
-      ...prevState,
-      isAddDocModalVisible: false,
-      isSkidModalVisible: true,
-      selectedCutPlan: tempFile
-    }));
-    
-  };
+  
 
   const submitSelectedHazards = async (selectedHazards) => {
     const id = new Date().getTime();
@@ -202,20 +159,7 @@ const PDFViewer = ({ _account }) => {
         }
       }
     } catch (error) {
-      setAlertMessageState((prevState) => ({
-        ...prevState,
-        toasts: [
-          ...prevState.toasts,
-          {
-            id: id,
-            heading: 'Error!',
-            show: true,
-            message: `Error! fetching hazard data ${error}`,
-            background: 'danger',
-            color: 'white'
-          }
-        ]
-      }));
+      addToast('Error!', `Error! fetching hazard data ${error}`, 'danger', 'white');
       console.error('Error fetching hazard data:', error);
     }
   };
@@ -226,55 +170,21 @@ const PDFViewer = ({ _account }) => {
     try {
       const resp = await axios.post(
         'http://localhost:3001/submitGeneralHazards',
-        mapState.selectedGeneralHazards,
+        selectedGeneralHazards,
         { withCredentials: true }
       );
       if (resp.status === 200) {
         setMapState((prevState) => ({
           ...prevState,
-          generalHazards: mapState.selectedGeneralHazards
+          generalHazards: selectedGeneralHazards
         }));
 
         setSkidModalState((prevState) => ({ ...prevState, isGeneralHazardsModalVisible: false }));
-
-        setAlertMessageState((prevState) => ({
-          ...prevState,
-          toasts: [
-            ...prevState.toasts,
-            {
-              id: id,
-              heading: 'Updated General Hazards',
-              show: true,
-              message: `Success! General hazards have been updated`,
-              background: 'success',
-              color: 'white'
-            }
-          ]
-        }));
+        addToast('General Hazards Updated!', `Error! General hazards have not been updated. Please try again.`, 'danger', 'white');
       }
     } catch (error) {
-      setAlertMessageState((prevState) => ({
-        ...prevState,
-        toasts: [
-          ...prevState.toasts,
-          {
-            id: id,
-            heading: 'Update General Hazards',
-            show: true,
-            message: `Error! General hazards have not been updated. Please try again.`,
-            background: 'danger',
-            color: 'white'
-          }
-        ]
-      }));
+      addToast('Error!', `Success! General hazards have been updated`, 'success', 'white');
       console.error('An error hsa occcured while updating general hazards: ', error);
-    } finally {
-      setTimeout(() => {
-        setAlertMessageState((prevState) => ({
-          ...prevState,
-          toasts: prevState.toasts.filter((toast) => toast.id !== id)
-        }));
-      }, 10000);
     }
   };
 
@@ -387,17 +297,15 @@ const PDFViewer = ({ _account }) => {
   return (
     <>
       
-      <AddDocModal docSumbit={submitDoc} />
-      <AddCutPlanModal submitCutPlan={submitCutPlan} />
       <SelectHazardsModal submitSelectedHazards={submitSelectedHazards} />
       <AddSkidHazardModal />
-      <AddOrEditSkidModal
+      {/* <AddOrEditSkidModal
         mousePosition={skidMarkerState.mousePosition}
         editSkid={skidMarkerState.editSkid}
         _account={_account}
-      />
-      <HazardModal />
-     
+      /> */}
+{/*       <HazardModal />
+ */}     
       <EditGeneralHazardModal
         submitGeneralHazardModal={submitGeneralHazardModal}
         handleClose={handleClose}
@@ -406,6 +314,7 @@ const PDFViewer = ({ _account }) => {
 {/*       {mapState.currentMapName ? (
  */}          <div
             id="pdf-container"
+            data-testid="map-viewer-pdf-container"
             style={{
               border: '2px solid #000',
               borderRadius: '8px',
@@ -440,7 +349,7 @@ const PDFViewer = ({ _account }) => {
             </Document>
             )}
 
-            {mapState.enableMarker === true && (
+            {enableMarker === true && (
               <div
                 className="red-dot"
                 data-testid="cursor-red-dot"
@@ -516,7 +425,9 @@ const PDFViewer = ({ _account }) => {
 };
 
 PDFViewer.propTypes = {
-  _account: PropTypes.any,
+  enableMarker: PropTypes.bool.isRequired,
+  selectedGeneralHazards: PropTypes.array.isRequired,
+  setShowSkidModal: PropTypes.func.isRequired
 };
 
 export default PDFViewer;

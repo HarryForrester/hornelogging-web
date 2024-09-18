@@ -4,8 +4,8 @@ const LibraryFileContext = createContext();
 
 export const LibraryFileProvider = ({ children }) => {
   const [libraryFiles, setLibraryFiles] = useState({
-    libraryFileTypes: [],
-    libraryFiles: [],    
+    types: [],
+    files: [],    
   });
 
   return <LibraryFileContext.Provider value={{ libraryFiles, setLibraryFiles }}>{children}</LibraryFileContext.Provider>;

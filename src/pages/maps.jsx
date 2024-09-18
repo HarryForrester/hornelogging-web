@@ -15,6 +15,7 @@ import { SkidProvider } from '../context/SkidContext.js';
 import { usePersonFile } from '../context/PersonFileContext.js';
 import { useLibraryFile } from '../context/LibraryFileContext.js';
 import { useCrews } from '../context/CrewContext.js';
+import AddOrEditSkidModal from '../components/Modal/Skid/AddOrEditSkidModal.jsx';
 const Maps = () => {
   const [showAddPoint, setShowAddPoint] = useState(false); // used to show/hide Add Point Button for map
   const [showRemoveMap, setShowRemoveMap] = useState(false); // used to show/hide Remove Map Button for map
@@ -23,13 +24,17 @@ const Maps = () => {
   const { mapState, setMapState } = useMap();
   const { setSkidModalState } = useSkidModal();
   const { confirmationModalState, setConfirmationModalState } = useConfirmationModal();
-  const { setAlertMessageState } = useAlertMessage();
+  const { addToast } = useAlertMessage();
   const [account, setAccount] = useState(null);
-  const { setSkidMarkerState } = useSkidMarker();
+  const { skidMarkerState, setSkidMarkerState } = useSkidMarker();
   const { personFiles, setPersonFiles } = usePersonFile();
   const { libraryFiles, setLibraryFiles } = useLibraryFile();
   const { crews, setCrews } = useCrews();
 
+  const [showAddSkidModal, setShowSkidModal] = useState(false);
+  const [enableMarker, setEnableMarker] = useState(false); // Used to hide or show the marker when the user clicks "Add" or "Cancel"
+  const [maps, setMaps] = useState([]); 
+  const [selectedGeneralHazards, setSelectedGeneralHazards] = useState([]);
   const navigate = useNavigate();
   useEffect(() => {
     const fetchData = async () => {
@@ -47,8 +52,8 @@ const Maps = () => {
           console.log('dara', data)
           setAccount(data._account);
           setLibraryFiles({
-            libraryFileTypes: data.libraryFileTypes,
-            libraryFiles: data.libraryFiles
+            types: data.libraryFileTypes,
+            files: data.libraryFiles
           });
 
           setPersonFiles({
@@ -57,15 +62,16 @@ const Maps = () => {
           });
 
           setCrews(data.crews)
-
-          setMapState((prevState) => ({
+          setMaps(data.maps);
+          setSelectedGeneralHazards(data.generalHazards);
+          /* setMapState((prevState) => ({
             ...prevState,
             //crews: data.crew,
-            maps: data.maps,
-            username: data.username,
+            //maps: data.maps,
+            //username: data.username,
             hazards: data.hazards,
-            selectedGeneralHazards: data.generalHazards
-          }));
+            //selectedGeneralHazards: data.generalHazards
+          })); */
         } else {
           navigate('/login');
         }
@@ -116,7 +122,8 @@ const Maps = () => {
       currentMapKey: mapKey,
       currentMapName: mapName,
       currentMapMarkers: parsePoints,
-    }));
+    })); 
+    
 
     setSkidMarkerState((prevState) => ({
       ...prevState,
@@ -146,15 +153,9 @@ const Maps = () => {
   useEffect(() => {
     const deleteMap = async () => {
       if (confirmationModalState.confirmed) {
-        const id = new Date().getTime();
+        const newData = maps.filter((map) => map._id !== mapState.currentMapId);
 
-        setMapState((prevState) => {
-          const newData = mapState.maps.filter((map) => map._id !== mapState.currentMapId);
-          return {
-            ...prevState,
-            maps: newData
-          };
-        });
+        setMaps(newData);
 
         try {
           const resp = await axios.delete(`http://localhost:3001/map/${mapState.currentMapId}`, {
@@ -162,48 +163,14 @@ const Maps = () => {
           });
           if (resp.status === 200) {
             await deletePresignedUrl([mapState.currentMapKey])
-            setAlertMessageState((prevState) => ({
-              ...prevState,
-              toasts: [
-                ...prevState.toasts,
-                {
-                  id: id,
-                  heading: 'Remove Map',
-                  show: true,
-                  message: `Success! ${mapState.currentMapName}  has been removed.`,
-                  background: 'success',
-                  color: 'white'
-                }
-              ]
-            }));
+            addToast('Remove Map!', `Success! ${mapState.currentMapName} has been removed.`, 'success', 'white');
           } else {
             console.log('Failed to remove map');
           }
         } catch (error) {
-          setAlertMessageState((prevState) => ({
-            ...prevState,
-            toasts: [
-              ...prevState.toasts,
-              {
-                id: id,
-                heading: 'Remove Map',
-                show: true,
-                message: `Error! An error occurred while removing map: ${mapState.currentMapName}`,
-                background: 'danger',
-                color: 'white'
-              }
-            ]
-          }));
+          addToast('Remove Map!', `Error! An error occurred while removing map: ${mapState.currentMapName}`, 'danger', 'white');
           console.error('An error occurred while removing map: ', error);
-        } finally {
-
-          setTimeout(() => {
-            setAlertMessageState((prevState) => ({
-              ...prevState,
-              toasts: prevState.toasts.filter((toast) => toast.id !== id)
-            }));
-          }, 10000);
-        }
+        } 
       }
     };
 
@@ -260,9 +227,9 @@ const Maps = () => {
 
   // selects first map in list and calls handleMapClick to render the first map
   useEffect(() => {
-    const length = mapState.maps.length
+    const length = maps.length
     if (length > 0) {
-      const firstMap = mapState.maps[length-1];
+      const firstMap = maps[length-1];
       handleMapClick(firstMap);
     } else {
       setShowAddPoint(false);
@@ -275,15 +242,28 @@ const Maps = () => {
         currentMapMarkers: []
       }));
     }
-  }, [mapState.maps]);
+  }, [maps]);
 
   return (
-    <>
+    <SkidProvider>
+      <AddOrEditSkidModal
+        mousePosition={skidMarkerState.mousePosition}
+        editSkid={skidMarkerState.editSkid}
+        _account={account}
+        showModal={showAddSkidModal}
+        setShowModal={setShowSkidModal}
+      />
       <div className="container" style={{ marginTop: '50px' }}>
         <div id="map-buttons">
           <div style={{ float: 'right' }}>
             <div className="btn-group mb-3" id="button-container" role="group">
-              {showAddPoint && <AddSkidButton pdfContainerRef={pdfContainerRef} />}
+              {showAddPoint && (
+                <AddSkidButton
+                  enableMarker={enableMarker}
+                  setEnableMarker={setEnableMarker}
+                  pdfContainerRef={pdfContainerRef}
+                />
+              )}
 
               <Button variant="outline-secondary" onClick={openEditGeneralHazards}>
                 Edit General Hazards
@@ -296,7 +276,6 @@ const Maps = () => {
               )}
 
               <UploadMapButton _account={account} />
-
             </div>
           </div>
 
@@ -305,28 +284,34 @@ const Maps = () => {
               Current Maps
             </Button>
 
-            {mapState.maps.length > 0 &&
-              mapState.maps.map((map) => (
+            {maps.length > 0 &&
+              maps.map((map) => (
                 <Button
                   key={map._id}
                   className="pdf-button"
                   variant="outline-secondary"
                   data-id={map._id}
                   value={map.name}
-                  onClick={() => handleMapClick(map)}
-                >
+                  onClick={() => handleMapClick(map)}>
                   {map.name}
                 </Button>
               ))}
           </div>
         </div>
-        <div ref={pdfContainerRef} id="pdf-container" className="pdf-container" style={{zIndex: 1 }}>
-          <SkidProvider>
-          <MapViewer percentage={percentage} _account={account} />
-          </SkidProvider>
+        <div
+          ref={pdfContainerRef}
+          id="pdf-container"
+          className="pdf-container"
+          style={{ zIndex: 1 }}>
+          <MapViewer
+            percentage={percentage}
+            enableMarker={enableMarker}
+            selectedGeneralHazards={selectedGeneralHazards}
+            setShowSkidModal={setShowSkidModal}
+          />
         </div>
       </div>
-    </>
+    </SkidProvider>
   );
 };
 

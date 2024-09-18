@@ -1,19 +1,17 @@
 import React, { useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
-import { useMap } from '../Map/MapContext';
 import Accordion from 'react-bootstrap/Accordion';
 import { useSkid } from '../../context/SkidContext';
 import { useLibraryFile } from '../../context/LibraryFileContext';
-
+import PropTypes from 'prop-types';
 /**
  * AddDocModal component for handling document selection.
  * @component
  * @param {Function} docSubmit - Function to be executed on submitting selected documents.
  * @returns {JSX.Element} - Rendered component.
  */
-const AddDocModal = () => {
-  const { mapState } = useMap();
+const AddDocModal = ({ show, close}) => {
   const { libraryFiles } = useLibraryFile();
   const { skidState, setSkidState } = useSkid();
   const [searchQuery, setSearchQuery] = useState('');
@@ -79,7 +77,7 @@ const AddDocModal = () => {
     }
   };
 
-  const filteredFiles = libraryFiles.libraryFiles.filter((file) =>
+  const filteredFiles = libraryFiles.files.filter((file) =>
     file.fileName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -92,7 +90,8 @@ const AddDocModal = () => {
   }, {});
 
   return (
-    <Modal show={skidState.docModalVisible} onHide={handleClose}>
+    <div data-testid="add-doc-modal">
+      <Modal show={show} onHide={close}>
       <Modal.Header closeButton>
         <Modal.Title>Add Doc</Modal.Title>
       </Modal.Header>
@@ -109,88 +108,89 @@ const AddDocModal = () => {
         />
         <br />
         <Accordion defaultActiveKey="0">
-  {Object.keys(groupedFiles).map((type, index) => {
-    // Find the matching file type by _id
-    const matchingFileType = libraryFiles.libraryFileTypes.find((fileType) => fileType._id === type);
+          {Object.keys(groupedFiles).map((type, index) => {
+            // Find the matching file type by _id
+            const matchingFileType = libraryFiles.types.find((fileType) => fileType._id === type);
 
-    const filesToShow = groupedFiles[type].filter(
-      (file) =>
-        skidState.formik &&
-        skidState.formik.values &&
-        Array.isArray(skidState.formik.values.selectedDocuments) &&
-        !skidState.formik.values.selectedDocuments.some(
-          (selectedFile) => selectedFile === file._id
-        )
-    );
+            const filesToShow = groupedFiles[type].filter(
+              (file) =>
+                skidState.formik &&
+                skidState.formik.values &&
+                Array.isArray(skidState.formik.values.selectedDocuments) &&
+                !skidState.formik.values.selectedDocuments.some(
+                  (selectedFile) => selectedFile === file._id
+                )
+            );
 
-    if (filesToShow.length === 0) {
-      return null;
-    }
+            if (filesToShow.length === 0) {
+              return null;
+            }
 
-    return (
-      <Accordion.Item eventKey={index.toString()} key={type} data-testid={`accordion-item-${index}`}>
-        {/* Display the name from the matching file type */}
-        <Accordion.Header data-testid={`accordion-header-${index}`}>
-          {matchingFileType ? matchingFileType.name : 'Unknown Type'}
-        </Accordion.Header>
-        <Accordion.Body data-testid={`accordion-body-${index}`}>
-          {filesToShow.map((file, fileIndex) => (
-            <div
-              className="card"
-              style={{ marginBottom: '10px', backgroundColor: file.color, cursor: 'pointer' }}
-              key={file._id}
-              onClick={() => window.open(file.fileUrl, '_blank')}
-              data-testid={`file-card-${index}-${fileIndex}`}
-            >
-              <div className="search-text-doc" style={{ display: 'none' }}>
-                {file.searchText}
-              </div>
-              <div className="card-header">
-                <div style={{ float: 'left' }}>
-                  <em
-                    style={{
-                      maxWidth: '300px',
-                      display: 'inline-block',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      paddingRight: '5px'
-                    }}
-                  >
-                    {file.fileName}
-                  </em>
-                  &nbsp;&nbsp;
-                </div>
-                <div style={{ float: 'right' }}>
-                  <Button
-                    type="button"
-                    data-filename={file.fileName}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleCheckboxChange(file);
-                    }}
-                    size="sm"
-                    data-testid={`addDocument-${file._id}`}
-                  >
-                    Add
-                  </Button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </Accordion.Body>
-      </Accordion.Item>
-    );
-  })}
-</Accordion>
+            return (
+              <Accordion.Item eventKey={index.toString()} key={type} data-testid={`accordion-item-${index}`}>
+                {/* Display the name from the matching file type */}
+                <Accordion.Header data-testid={`accordion-header-${index}`}>
+                  {matchingFileType ? matchingFileType.name : 'Unknown Type'}
+                </Accordion.Header>
+                <Accordion.Body data-testid={`accordion-body-${index}`}>
+                  {filesToShow.map((file, fileIndex) => (
+                    <div
+                      className="card"
+                      style={{ marginBottom: '10px', backgroundColor: file.color, cursor: 'pointer' }}
+                      key={file._id}
+                      onClick={() => window.open(file.fileUrl, '_blank')}
+                      data-testid={`file-card-${index}-${fileIndex}`}
+                    >
+                      <div className="search-text-doc" style={{ display: 'none' }}>
+                        {file.searchText}
+                      </div>
+                      <div className="card-header">
+                        <div style={{ float: 'left' }}>
+                          <em
+                            style={{
+                              maxWidth: '300px',
+                              display: 'inline-block',
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              paddingRight: '5px'
+                            }}
+                          >
+                            {file.fileName}
+                          </em>
+                          &nbsp;&nbsp;
+                        </div>
+                        <div style={{ float: 'right' }}>
+                          <Button
+                            type="button"
+                            data-filename={file.fileName}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleCheckboxChange(file);
+                            }}
+                            size="sm"
+                            data-testid={`addDocument-${file._id}`}
+                          >
+                            Add
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </Accordion.Body>
+              </Accordion.Item>
+            );
+          })}
+        </Accordion>
       </Modal.Body>
-      {/* <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
-          Close
-        </Button>
-      </Modal.Footer> */}
     </Modal>
+    </div>
   );
 };
+
+AddDocModal.propTypes = {
+  show: PropTypes.bool.isRequired,
+  close: PropTypes.func.isRequired
+}
 
 export default AddDocModal;

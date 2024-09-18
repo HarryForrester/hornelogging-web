@@ -11,7 +11,7 @@ import { useSkid } from '../../context/SkidContext';
 const EditGeneralHazardModal = ({ submitGeneralHazardModal, handleClose }) => {
   const { skidModalState, setSkidModalState } = useSkidModal();
   const { mapState, setMapState } = useMap();
-  const { skidState, setSkidState } = useSkid();
+  const { setSkidState } = useSkid();
 
   /**
    * Opens the SelectHazardsModal and hides the Edit General Hazards Modal.
@@ -39,7 +39,6 @@ const EditGeneralHazardModal = ({ submitGeneralHazardModal, handleClose }) => {
    * @param {*} hazardToRemove - the hazard object to be removed
    */
   const removeSkidHazard = (event, hazardToRemove) => {
-    console.log('removing general hazard', hazardToRemove);
     event.stopPropagation();
 
     setMapState((prevState) => {
@@ -59,7 +58,7 @@ const EditGeneralHazardModal = ({ submitGeneralHazardModal, handleClose }) => {
     : [];
 
   return (
-    <>
+    <div data-testid="edit-general-hazards-modal">
       <Modal
         show={skidModalState.isGeneralHazardsModalVisible}
         onHide={handleClose}
@@ -121,7 +120,7 @@ const EditGeneralHazardModal = ({ submitGeneralHazardModal, handleClose }) => {
           </Button>
         </Modal.Footer>
       </Modal>
-    </>
+    </div>
   );
 };
 
