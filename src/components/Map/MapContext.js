@@ -6,9 +6,9 @@ export const MapProvider = ({ children }) => {
   const [mapState, setMapState] = useState({
     currentMapId: null,
     currentMapKey: null,
-    currentMapName: null,
-    originalWidth: null,
-    originalHeight: null,
+    currentMapName: null, 
+    originalWidth: null, // Width of the pdf
+    originalHeight: null, // Height of thr pdf
     currentMapMarkers: [],
     currentMapUrl: null,
     enableMarker: false,

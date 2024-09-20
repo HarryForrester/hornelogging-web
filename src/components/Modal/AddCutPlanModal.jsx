@@ -2,24 +2,15 @@ import React, { useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import { useSkid } from '../../context/SkidContext';
-import { useSkidModal } from './Skid/SkidModalContext';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import DragAndDropUpload from '../DragAndDropUpload';
+import PropTypes from 'prop-types';
 
-const AddCutPlanModal = () => {
+const AddCutPlanModal = ({showModal, handleClose}) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploadError, setUploadError] = useState('');
   const { skidState, setSkidState } = useSkid();
-  const { setSkidModalState } = useSkidModal();
-
-  const handleClose = () => {
-    setSkidState((prevState) => ({
-      ...prevState,
-      cutPlanModalVisible: false,
-      skidModalVisible: true,
-    }));
-  };
 
   const removeUploadedFile = () => {
     setSelectedFile(null);
@@ -56,20 +47,13 @@ const AddCutPlanModal = () => {
         }
         // You may need to update touched and errors as well if applicable
       }
-    }));
-
-    setSkidModalState((prevState) => ({
-      ...prevState,
-      isAddDocModalVisible: false,
-      isSkidModalVisible: true,
-      selectedCutPlan: tempFile
-    }));
+    }));  
     
   };
 
   return (
     <div data-testid="add-cutplan-modal">
-      <Modal show={skidState.cutPlanModalVisible} onHide={handleClose} backdrop='static'>
+      <Modal show={showModal} onHide={handleClose} backdrop='static'>
         <Modal.Header closeButton>
           <Modal.Title>Add Cut Plan</Modal.Title>
         </Modal.Header>
@@ -138,5 +122,10 @@ const AddCutPlanModal = () => {
     </div>
   );
 };
+
+AddCutPlanModal.propTypes = {
+  showModal: PropTypes.bool.isRequired,
+  handleClose: PropTypes.func.isRequired
+}
 
 export default AddCutPlanModal;

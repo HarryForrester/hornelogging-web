@@ -34,8 +34,10 @@ const Maps = () => {
   const [showAddSkidModal, setShowSkidModal] = useState(false);
   const [enableMarker, setEnableMarker] = useState(false); // Used to hide or show the marker when the user clicks "Add" or "Cancel"
   const [maps, setMaps] = useState([]); 
-  const [selectedGeneralHazards, setSelectedGeneralHazards] = useState([]);
   const navigate = useNavigate();
+
+  const [editGeneralHazardsModalVisible, setEditGeneralHazardsModalVisible] = useState(false); // Shows or hides the EditGeneralHazardsModal when the user clicks "Edit General Hazards"
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -63,15 +65,15 @@ const Maps = () => {
 
           setCrews(data.crews)
           setMaps(data.maps);
-          setSelectedGeneralHazards(data.generalHazards);
-          /* setMapState((prevState) => ({
+          //setSelectedGeneralHazards(data.generalHazards);
+           setMapState((prevState) => ({
             ...prevState,
             //crews: data.crew,
             //maps: data.maps,
             //username: data.username,
             hazards: data.hazards,
-            //selectedGeneralHazards: data.generalHazards
-          })); */
+            generalHazards: data.generalHazards
+          })); 
         } else {
           navigate('/login');
         }
@@ -90,11 +92,12 @@ const Maps = () => {
 
   const openEditGeneralHazards = () => {
     
-    setSkidModalState((prevState) => ({
+   /*  setSkidModalState((prevState) => ({
       ...prevState,
       isGeneralHazardsModalVisible: true, // or false based on your logic
       isSelectHazardsGeneral: true // will display Edit General Hazards as modal label for selecting general hazards
-    }));
+    })); */
+    setEditGeneralHazardsModalVisible(true);
   };
 
   const handleMapClick = (map) => {
@@ -306,8 +309,9 @@ const Maps = () => {
           <MapViewer
             percentage={percentage}
             enableMarker={enableMarker}
-            selectedGeneralHazards={selectedGeneralHazards}
             setShowSkidModal={setShowSkidModal}
+            editGeneralHazardsModalVisible={editGeneralHazardsModalVisible}
+            setEditGeneralHazardsModalVisible={setEditGeneralHazardsModalVisible}
           />
         </div>
       </div>

@@ -3,14 +3,15 @@ import { Modal, Button, Accordion } from 'react-bootstrap';
 import { useSkidModal } from './Skid/SkidModalContext';
 import { useMap } from '../Map/MapContext';
 import { useSkid } from '../../context/SkidContext';
+import PropTypes from 'prop-types';
 
-const SelectHazardsModal = () => {
+const SelectHazardsModal = ({title, showModal, handleClose, handleCheckboxChange, selectedHazards }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const { skidModalState } = useSkidModal();
   const { skidState, setSkidState } = useSkid();
   const { mapState, setMapState } = useMap();
 
-  const handleClose = () => {
+  /* const handleClose = () => {
     if (skidModalState.isSelectHazardsGeneral) {
       setSkidState((prevState) => ({
         ...prevState,
@@ -25,8 +26,8 @@ const SelectHazardsModal = () => {
       }));
     }
   };
-
-  const handleCheckboxChange = (hazard) => {
+ */
+  /* const handleCheckboxChange = (hazard) => {
     const hazardId = hazard._id;
 
     //If in selecting General Hazards mode
@@ -61,13 +62,13 @@ const SelectHazardsModal = () => {
         },
       }));
     }
-  };
+  }; */
 
-  const label = skidModalState.isSelectHazardsGeneral ? 'General' : 'Skid';
+  //const label = skidModalState.isSelectHazardsGeneral ? 'General' : 'Skid';
 
-  const selectedHazardsField = skidModalState.isSelectHazardsGeneral
+/*   const selectedHazardsField = skidModalState.isSelectHazardsGeneral
     ? mapState.selectedGeneralHazards || []
-    : skidState.formik?.values?.selectedSkidHazards || [];
+    : skidState.formik?.values?.selectedSkidHazards || []; */
 
   const filteredHazards = mapState.hazards.filter((hazard) =>
     hazard.searchText.toLowerCase().includes(searchQuery.toLowerCase())
@@ -83,9 +84,9 @@ const SelectHazardsModal = () => {
 
   return (
     <div data-testid="select-hazards-modal">
-      <Modal show={skidState.selectHazardModalVisible} onHide={handleClose}>
+      <Modal show={showModal} onHide={handleClose}>
         <Modal.Header closeButton closeLabel="Close">
-          <Modal.Title>Select {label} Hazards</Modal.Title>
+          <Modal.Title>{title}</Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
@@ -107,7 +108,7 @@ const SelectHazardsModal = () => {
                 {Object.keys(groupedHazards).map((cat, index) => {
                   const hazardsToShow = groupedHazards[cat].filter(
                     (hazard) =>
-                      Array.isArray(selectedHazardsField) && !selectedHazardsField.some(
+                      Array.isArray(selectedHazards) && !selectedHazards.some(
                         (selectedHazard) => selectedHazard === hazard._id
                       )
                   );
@@ -158,5 +159,13 @@ const SelectHazardsModal = () => {
     </div>
   );
 };
+
+SelectHazardsModal.propTypes = {
+  title: PropTypes.string.isRequired,
+  showModal: PropTypes.bool.isRequired,
+  handleClose: PropTypes.func.isRequired,
+  handleCheckboxChange: PropTypes.func.isRequired,
+  selectedHazards: PropTypes.array.isRequired
+}
 
 export default SelectHazardsModal;

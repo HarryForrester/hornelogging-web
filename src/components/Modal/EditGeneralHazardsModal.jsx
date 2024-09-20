@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{ useState, useEffect } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
@@ -7,11 +7,58 @@ import { useMap } from '../Map/MapContext';
 import { ListGroup, ListGroupItem } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import { useSkid } from '../../context/SkidContext';
-
-const EditGeneralHazardModal = ({ submitGeneralHazardModal, handleClose }) => {
+import SelectHazardsModal from './SelectHazardsModal';
+import axios from 'axios';
+import { useAlertMessage } from '../AlertMessage';
+const EditGeneralHazardModal = ({showModal, setShowModal }) => {
   const { skidModalState, setSkidModalState } = useSkidModal();
   const { mapState, setMapState } = useMap();
-  const { setSkidState } = useSkid();
+  const { setSkidState } = useSkid()
+  const { addToast } = useAlertMessage();
+  const [selectHazardsModalVisible, setSelectHazardsModalVisible] = useState(false);
+
+  const [selectedHazards, setSelectedHazards] = useState([]);
+
+  useEffect(() => {
+    if (showModal) {
+      // Set selectedHazards only when the modal opens, not when generalHazards changes.
+      setSelectedHazards((prevSelectedHazards) => {
+        const initialHazards = Array.isArray(mapState.generalHazards) ? mapState.generalHazards : [];
+        return prevSelectedHazards.length === 0 ? initialHazards : prevSelectedHazards;
+      });
+    }
+  }, [showModal]); // Only run when showModal changes
+
+  const handleClose = () => {
+    setShowModal(false);
+    setSelectedHazards([]);
+  }
+
+  const submitGeneralHazardModal = async () => {
+    //const id = new Date().getTime();
+    
+    try {
+      const resp = await axios.post(
+        'http://localhost:3001/submitGeneralHazards',
+        selectedHazards,
+        { withCredentials: true }
+      );
+      if (resp.status === 200) {
+        setMapState((prevState) => ({
+          ...prevState,
+          generalHazards: selectedHazards
+        })); 
+        //setSelectedGeneralHazards(selectedGeneralHazards);
+        setShowModal(false);
+        //setSkidModalState((prevState) => ({ ...prevState, isGeneralHazardsModalVisible: false }));
+        addToast('General Hazards Updated!', `Success! General hazards have been updated.`, 'success', 'white');
+      }
+    } catch (error) {
+      addToast('Error!', `An error has occurred while updating general hazards. Please try again later.`, 'danger', 'white');
+      console.error('An error hsa occcured while updating general hazards: ', error);
+    }
+  };
+  
 
   /**
    * Opens the SelectHazardsModal and hides the Edit General Hazards Modal.
@@ -19,10 +66,12 @@ const EditGeneralHazardModal = ({ submitGeneralHazardModal, handleClose }) => {
    * @returns {void}
    */
   const openSelectHazardModal = () => {
-    setSkidState((prevState) => ({
+    /* setSkidState((prevState) => ({
       ...prevState,
       selectHazardModalVisible: true
-    }));
+    })); */
+    setSelectHazardsModalVisible(true);
+    setShowModal(false);
   };
 
   const handleHazardClick = (hazard) => {
@@ -41,7 +90,7 @@ const EditGeneralHazardModal = ({ submitGeneralHazardModal, handleClose }) => {
   const removeSkidHazard = (event, hazardToRemove) => {
     event.stopPropagation();
 
-    setMapState((prevState) => {
+   /*  setMapState((prevState) => {
       const updatedHazards = prevState.selectedGeneralHazards.filter(
         (hazard) => hazard !== hazardToRemove._id
       );
@@ -49,18 +98,43 @@ const EditGeneralHazardModal = ({ submitGeneralHazardModal, handleClose }) => {
         ...prevState,
         selectedGeneralHazards: updatedHazards
       };
-    });
+    }); */
+    const updatedHazards = selectedHazards.filter(
+      (hazard) => hazard !== hazardToRemove._id
+    );
+    setSelectedHazards(updatedHazards);
+
   };
 
   // Ensure that selectedGeneralHazards is always an array
-  const selectedGeneralHazards = Array.isArray(mapState.selectedGeneralHazards) 
+ /*  const selectedGeneralHazards = Array.isArray(mapState.selectedGeneralHazards) 
     ? mapState.selectedGeneralHazards 
-    : [];
+    : []; */
 
+    const handleSelectHazardModalClose = () => { 
+      setSelectHazardsModalVisible(false);
+      setShowModal(true);
+    }
+
+    const handleCheckboxChange = (hazard) => {
+      const hazardId = hazard._id;
+    
+      setSelectedHazards((prevSelectedHazards) => {
+        const updatedHazards = prevSelectedHazards.includes(hazardId)
+          ? prevSelectedHazards.filter((id) => id !== hazardId)
+          : [...prevSelectedHazards, hazardId];
+        
+        console.log('Previous Selected Hazards:', prevSelectedHazards);
+        console.log('Updated Hazards:', updatedHazards);
+        
+        return updatedHazards;
+      });
+    };
   return (
     <div data-testid="edit-general-hazards-modal">
+      <SelectHazardsModal title="Select General Hazards" showModal={selectHazardsModalVisible} handleClose={handleSelectHazardModalClose} handleCheckboxChange={handleCheckboxChange} selectedHazards={selectedHazards} />
       <Modal
-        show={skidModalState.isGeneralHazardsModalVisible}
+        show={showModal}
         onHide={handleClose}
         backdrop="static"
       >
@@ -85,7 +159,7 @@ const EditGeneralHazardModal = ({ submitGeneralHazardModal, handleClose }) => {
 
             <Form.Group className="col-md-12">
               <ListGroup className="list-group" style={{ maxHeight: '400px', overflowY: 'auto' }}>
-                {selectedGeneralHazards
+                {selectedHazards
                   .map(id => mapState.hazards.find(hazard => hazard._id === id))
                   .filter(hazard => hazard)
                   .map(hazard => (
@@ -125,8 +199,8 @@ const EditGeneralHazardModal = ({ submitGeneralHazardModal, handleClose }) => {
 };
 
 EditGeneralHazardModal.propTypes = {
-  submitGeneralHazardModal: PropTypes.func.isRequired,
-  handleClose: PropTypes.func.isRequired
+  showModal: PropTypes.bool.isRequired,
+  setShowModal: PropTypes.func.isRequired,
 };
 
 export default EditGeneralHazardModal;
