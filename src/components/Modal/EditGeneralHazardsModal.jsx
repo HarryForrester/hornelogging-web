@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import { useMap } from '../Map/MapContext';
 import { ListGroup, ListGroupItem } from 'react-bootstrap';
 import PropTypes from 'prop-types';
+
 import SelectHazardsModal from './SelectHazardsModal';
-import axios from 'axios';
-import { useAlertMessage } from '../AlertMessage';
 import HazardModal from './HazardModal';
+
+import { useAlertMessage } from '../AlertMessage';
+import { useMap } from '../Map/MapContext';
 /**
  * Component for editing general hazards associated with a map.
  * It allows users to add, remove, and modify hazards in a list.
@@ -72,7 +74,7 @@ const EditGeneralHazardModal = ({ showModal, setShowModal }) => {
         addToast('General Hazards Updated!', `Success! General hazards have been updated.`, 'success', 'white'); // Show success toast
       }
     } catch (error) {
-      addToast('Error!', `An error has occurred while updating general hazards. Please try again later.`, 'danger', 'white'); // Show error toast
+      addToast('Error!', `An error has occured while updating general hazards. Please try again later.`, 'danger', 'white'); // Show error toast
       console.error('An error has occurred while updating general hazards: ', error);
     }
   };
@@ -189,6 +191,7 @@ const EditGeneralHazardModal = ({ showModal, setShowModal }) => {
                       </span>
                       <Button
                         type="button"
+                        data-testid={`removehazard-${hazard._id}`}
                         className="btn btn-danger btn-sm"
                         onClick={(event) => removeSkidHazard(event, hazard)}
                       >

@@ -4,7 +4,6 @@ import axios from 'axios';
 import MapViewer from '../components/MapViewer.jsx';
 import UploadMapButton from '../components/Button/UploadMapButton';
 import { useMap } from '../components/Map/MapContext.js';
-import { useSkidModal } from '../components/Modal/Skid/SkidModalContext.js';
 import { useConfirmationModal } from '../components/ConfirmationModalContext.js';
 import { Button } from 'react-bootstrap';
 import AddSkidButton from '../components/Button/AddSkidButton.jsx';
@@ -22,18 +21,16 @@ const Maps = () => {
   const [percentage, setPercentage] = useState(0);
   const pdfContainerRef = useRef(null);
   const { mapState, setMapState } = useMap();
-  const { setSkidModalState } = useSkidModal();
   const { confirmationModalState, setConfirmationModalState } = useConfirmationModal();
   const { addToast } = useAlertMessage();
   const [account, setAccount] = useState(null);
   const { skidMarkerState, setSkidMarkerState } = useSkidMarker();
-  const { personFiles, setPersonFiles } = usePersonFile();
-  const { libraryFiles, setLibraryFiles } = useLibraryFile();
-  const { crews, setCrews } = useCrews();
-
+  const { setPersonFiles } = usePersonFile();
+  const { setLibraryFiles } = useLibraryFile();
+  const { setCrews } = useCrews();
   const [showAddSkidModal, setShowSkidModal] = useState(false);
   const [enableMarker, setEnableMarker] = useState(false); // Used to hide or show the marker when the user clicks "Add" or "Cancel"
-  const [maps, setMaps] = useState([]); 
+  const [maps, setMaps] = useState([]);
   const navigate = useNavigate();
 
   const [editGeneralHazardsModalVisible, setEditGeneralHazardsModalVisible] = useState(false); // Shows or hides the EditGeneralHazardsModal when the user clicks "Edit General Hazards"
@@ -51,7 +48,6 @@ const Maps = () => {
 
         if (response.data.isLoggedIn) {
           const data = response.data;
-          console.log('dara', data)
           setAccount(data._account);
           setLibraryFiles({
             types: data.libraryFileTypes,
@@ -63,17 +59,13 @@ const Maps = () => {
             personFiles: data.personFiles
           });
 
-          setCrews(data.crews)
+          setCrews(data.crews);
           setMaps(data.maps);
-          //setSelectedGeneralHazards(data.generalHazards);
-           setMapState((prevState) => ({
+          setMapState((prevState) => ({
             ...prevState,
-            //crews: data.crew,
-            //maps: data.maps,
-            //username: data.username,
             hazards: data.hazards,
             generalHazards: data.generalHazards
-          })); 
+          }));
         } else {
           navigate('/login');
         }
@@ -91,12 +83,6 @@ const Maps = () => {
   }, [navigate]);
 
   const openEditGeneralHazards = () => {
-    
-   /*  setSkidModalState((prevState) => ({
-      ...prevState,
-      isGeneralHazardsModalVisible: true, // or false based on your logic
-      isSelectHazardsGeneral: true // will display Edit General Hazards as modal label for selecting general hazards
-    })); */
     setEditGeneralHazardsModalVisible(true);
   };
 
@@ -104,10 +90,9 @@ const Maps = () => {
     const mapId = map._id;
     const mapName = map.name;
     const points = map.points;
-    const mapKey = map.map.key
+    const mapKey = map.map.key;
 
     const parsePoints = points;
-    console.log('pints ', parsePoints);
     var pdfButtons = document.querySelectorAll('.pdf-button');
 
     pdfButtons.forEach((button) => {
@@ -124,9 +109,8 @@ const Maps = () => {
       currentMapId: mapId,
       currentMapKey: mapKey,
       currentMapName: mapName,
-      currentMapMarkers: parsePoints,
-    })); 
-    
+      currentMapMarkers: parsePoints
+    }));
 
     setSkidMarkerState((prevState) => ({
       ...prevState,
@@ -138,7 +122,6 @@ const Maps = () => {
   };
 
   const openConfirmRemoveMap = async () => {
-
     try {
       setConfirmationModalState((prevState) => ({
         ...prevState,
@@ -147,7 +130,6 @@ const Maps = () => {
         message: `Are you sure you want to delete ${mapState.currentMapName}?`,
         confirmed: false
       }));
-
     } catch (err) {
       console.error('An error has occurred while removing map', err);
     }
@@ -165,15 +147,23 @@ const Maps = () => {
             withCredentials: true
           });
           if (resp.status === 200) {
-            await deletePresignedUrl([mapState.currentMapKey])
-            addToast('Remove Map!', `Success! ${mapState.currentMapName} has been removed.`, 'success', 'white');
-          } else {
-            console.log('Failed to remove map');
+            await deletePresignedUrl([mapState.currentMapKey]);
+            addToast(
+              'Remove Map!',
+              `Success! ${mapState.currentMapName} has been removed.`,
+              'success',
+              'white'
+            );
           }
         } catch (error) {
-          addToast('Remove Map!', `Error! An error occurred while removing map: ${mapState.currentMapName}`, 'danger', 'white');
+          addToast(
+            'Remove Map!',
+            `Error! An error occurred while removing map: ${mapState.currentMapName}`,
+            'danger',
+            'white'
+          );
           console.error('An error occurred while removing map: ', error);
-        } 
+        }
       }
     };
 
@@ -230,9 +220,9 @@ const Maps = () => {
 
   // selects first map in list and calls handleMapClick to render the first map
   useEffect(() => {
-    const length = maps.length
+    const length = maps.length;
     if (length > 0) {
-      const firstMap = maps[length-1];
+      const firstMap = maps[length - 1];
       handleMapClick(firstMap);
     } else {
       setShowAddPoint(false);
