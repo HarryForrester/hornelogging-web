@@ -2,14 +2,13 @@ import React, { useState, useEffect } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import { useSkidModal } from './Skid/SkidModalContext';
 import { useMap } from '../Map/MapContext';
 import { ListGroup, ListGroupItem } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import SelectHazardsModal from './SelectHazardsModal';
 import axios from 'axios';
 import { useAlertMessage } from '../AlertMessage';
-
+import HazardModal from './HazardModal';
 /**
  * Component for editing general hazards associated with a map.
  * It allows users to add, remove, and modify hazards in a list.
@@ -21,12 +20,14 @@ import { useAlertMessage } from '../AlertMessage';
  * @returns {JSX.Element} The rendered component
  */
 const EditGeneralHazardModal = ({ showModal, setShowModal }) => {
-  const { setSkidModalState } = useSkidModal(); // Function to update skid modal state
   const { mapState, setMapState } = useMap(); // Function to access and update map state
   const { addToast } = useAlertMessage(); // Function to show toast notifications
 
   const [selectHazardsModalVisible, setSelectHazardsModalVisible] = useState(false); // State for controlling the SelectHazardsModal visibility
   const [selectedHazards, setSelectedHazards] = useState([]); // State for tracking selected hazards
+
+  const [hazardModalVisible, setHazardModalVisible] = useState(false); // State for controlling the HazardModal visibility
+  const [selectedHazard, setSelectedHazard] = useState({}); // State for tracking the selected hazazard to be viewed in detail
 
   /**
    * Effect to initialize selected hazards when the modal is shown.
@@ -91,11 +92,8 @@ const EditGeneralHazardModal = ({ showModal, setShowModal }) => {
    * @function handleHazardClick
    */
   const handleHazardClick = (hazard) => {
-    setSkidModalState((prevState) => ({
-      ...prevState,
-      hazardModalVisible: true,
-      selectedHazardData: hazard
-    }));
+    setHazardModalVisible(true);
+    setSelectedHazard(hazard);
   };
 
   /**
@@ -136,8 +134,14 @@ const EditGeneralHazardModal = ({ showModal, setShowModal }) => {
     });
   };
 
+  const handleHazardModalClose = () => {
+    setHazardModalVisible(false);
+    setShowModal(true);
+  }
+
   return (
     <div data-testid="edit-general-hazards-modal">
+      <HazardModal showModal={hazardModalVisible} handleClose={handleHazardModalClose} selectedHazard={selectedHazard} />
       <SelectHazardsModal
         title="Select General Hazards"
         showModal={selectHazardsModalVisible}

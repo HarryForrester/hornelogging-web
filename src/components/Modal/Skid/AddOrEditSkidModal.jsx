@@ -17,6 +17,7 @@ import { useLibraryFile } from '../../../context/LibraryFileContext';
 import AddDocModal from '../AddDocModal';
 import AddCutPlanModal from '../AddCutPlanModal';
 import SelectHazardsModal from '../SelectHazardsModal';
+import HazardModal from '../HazardModal';
 import * as Yup from 'yup';
 
 const AddOrEditSkidModal = ({ showModal, setShowModal, mousePosition, editSkid, _account }) => {
@@ -33,6 +34,8 @@ const AddOrEditSkidModal = ({ showModal, setShowModal, mousePosition, editSkid, 
   const [cutPlanModalVisible, setCutPlanModalVisible] = useState(false);
   const [selectHazardModalVisible, setSelectHazardModalVisible] = useState(false);
   const [docModalVisible, setDocModalVisible] = useState(false);
+  const [hazardModalVisible, setHazardModalVisible] = useState(false);
+  const [selectedHazard, setSelectedHazard] = useState({});
   const getFilePathFromUrl = (url) => {
     const urlObject = new URL(url);
     return `${urlObject.origin}${urlObject.pathname}`;
@@ -240,11 +243,11 @@ const AddOrEditSkidModal = ({ showModal, setShowModal, mousePosition, editSkid, 
    * @returns {void}
    */
   const openSelectHazardModal = (formik) => {
-    setSkidModalState((prevState) => ({
+   /*  setSkidModalState((prevState) => ({
       ...prevState,
       isSkidModalEdit: false,
       isSelectHazardsGeneral: false // SelectHazardsModal label will be Add Hazards
-    }));
+    })); */
     setSkidState((prevState) => ({
       ...prevState,
       formik: {
@@ -297,19 +300,18 @@ const AddOrEditSkidModal = ({ showModal, setShowModal, mousePosition, editSkid, 
   };
 
   const handleHazardClick = (hazard) => {
-    setSkidModalState((prevState) => ({
+    /* setSkidModalState((prevState) => ({
       ...prevState,
       hazardModalVisible: true,
       isSkidModalVisible: false,
       selectedHazardData: hazard
-    }));
+    })); */
+    setHazardModalVisible(true);
+    setSelectedHazard(hazard);
 
   };
 
-  const handleDocModalClose = () => {
-    setDocModalVisible(false); // Closes "AddDocModal"
-    setShowModal(true); // Shows "AddOrEditSkidModal"
-  }
+ 
 
   var name;
 
@@ -327,6 +329,11 @@ const AddOrEditSkidModal = ({ showModal, setShowModal, mousePosition, editSkid, 
     selectedSkidHazards: form?.selectedSkidHazards || [],
   }
 
+  const handleDocModalClose = () => {
+    setDocModalVisible(false); // Closes "AddDocModal"
+    setShowModal(true); // Shows "AddOrEditSkidModal"
+  }
+
   const handleCutPlanClose = () => {
     setCutPlanModalVisible(false);
     setShowModal(true);
@@ -334,6 +341,11 @@ const AddOrEditSkidModal = ({ showModal, setShowModal, mousePosition, editSkid, 
 
   const handleSelectHazardModalClose = () => {
     setSelectHazardModalVisible(false);
+    setShowModal(true);
+  }
+
+  const handleHazardModalClose = () => {
+    setHazardModalVisible(false);
     setShowModal(true);
   }
 
@@ -361,6 +373,7 @@ const AddOrEditSkidModal = ({ showModal, setShowModal, mousePosition, editSkid, 
     <>
       <AddDocModal show={docModalVisible} close={handleDocModalClose} />
       <AddCutPlanModal showModal={cutPlanModalVisible} handleClose={handleCutPlanClose} />
+      <HazardModal showModal={hazardModalVisible} handleClose={handleHazardModalClose} selectedHazard={selectedHazard} />
       <SelectHazardsModal
         title="Select Skid Hazards"
         showModal={selectHazardModalVisible}
