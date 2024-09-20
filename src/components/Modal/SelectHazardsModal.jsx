@@ -71,6 +71,7 @@ const SelectHazardsModal = ({ title, showModal, handleClose, handleCheckboxChang
                         (selectedHazard) => selectedHazard === hazard._id
                       )
                   );
+                  console.log("HAZARDS TO SHOW!!!", hazardsToShow)
 
                   // Skip rendering empty categories
                   if (hazardsToShow.length === 0) {

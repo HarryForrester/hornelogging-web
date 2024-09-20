@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import EditGeneralHazardModal from "../components/Modal/EditGeneralHazardsModal";
 import { useAlertMessage } from "../components/AlertMessage";
 import { useMap } from "../components/Map/MapContext";
@@ -10,10 +10,12 @@ jest.mock('../components/Map/MapContext');
 jest.mock('axios');
 
 const mockMapState = {
-    generalHazards: ['hazard_id_1', 'hazard_id_2'],
+    generalHazards: ['hazard_id_1'],
     hazards: [
         { _id: 'hazard_id_1', id: 'H1', title: 'Hazard 1', sev: 'HIGH', cat: 'Category 1', color: '#FF0000', searchText: 'hazard1' },
         { _id: 'hazard_id_2', id: 'H2', title: 'Hazard 2', sev: 'LOW', cat: 'Category 2', color: '#00FF00', searchText: 'hazard2' },
+        { _id: 'hazard_id_3', id: 'H3', title: 'Hazard 3', sev: 'LOW', cat: 'Category 2', color: '#00FF00', searchText: 'hazard3' },
+
       ],
 }
 
@@ -55,6 +57,20 @@ describe('EditGeneralHazardsModal', () => {
         expect(screen.getByText('Select General Hazards')).toBeInTheDocument(); // Ensure the title of SelectHazardsModal is visible
       
     });
+
+    test('adds an hazard to the general hazards', async() => {
+        render(<EditGeneralHazardModal showModal={true} setShowModal={jest.fn()} />);
+
+        const addButton = screen.getByText('Add Hazard');
+        fireEvent.click(addButton);
+
+        fireEvent.click(screen.getByTestId('addHazard-hazard_id_2'))
+
+        expect(screen.getByTestId('removehazard-hazard_id_1')).toBeInTheDocument()
+
+        expect(screen.getByTestId('removehazard-hazard_id_2')).toBeInTheDocument()
+        
+    })
 
     test('removes hazard when Remove button is clicked', () => {
         render(<EditGeneralHazardModal showModal={true} setShowModal={jest.fn()} />);
