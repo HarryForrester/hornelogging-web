@@ -29,9 +29,9 @@ const Maps = () => {
   const { setLibraryFiles } = useLibraryFile();
   const { setCrews } = useCrews();
   const [showAddSkidModal, setShowSkidModal] = useState(false);
-  const [enableMarker, setEnableMarker] = useState(false); // Used to hide or show the marker when the user clicks "Add" or "Cancel"
   const [maps, setMaps] = useState([]);
   const navigate = useNavigate();
+  const [mousePosition, setMousePosition] = useState(null);
 
   const [editGeneralHazardsModalVisible, setEditGeneralHazardsModalVisible] = useState(false); // Shows or hides the EditGeneralHazardsModal when the user clicks "Edit General Hazards"
 
@@ -64,6 +64,7 @@ const Maps = () => {
           setMapState((prevState) => ({
             ...prevState,
             hazards: data.hazards,
+            people: data.people,
             generalHazards: data.generalHazards
           }));
         } else {
@@ -240,7 +241,8 @@ const Maps = () => {
   return (
     <SkidProvider>
       <AddOrEditSkidModal
-        mousePosition={skidMarkerState.mousePosition}
+        title="Add Skid"
+        mousePosition={mousePosition}
         editSkid={skidMarkerState.editSkid}
         _account={account}
         showModal={showAddSkidModal}
@@ -250,13 +252,7 @@ const Maps = () => {
         <div id="map-buttons">
           <div style={{ float: 'right' }}>
             <div className="btn-group mb-3" id="button-container" role="group">
-              {showAddPoint && (
-                <AddSkidButton
-                  enableMarker={enableMarker}
-                  setEnableMarker={setEnableMarker}
-                  pdfContainerRef={pdfContainerRef}
-                />
-              )}
+              {showAddPoint && <AddSkidButton />}
 
               <Button variant="outline-secondary" onClick={openEditGeneralHazards}>
                 Edit General Hazards
@@ -298,10 +294,11 @@ const Maps = () => {
           style={{ zIndex: 1 }}>
           <MapViewer
             percentage={percentage}
-            enableMarker={enableMarker}
             setShowSkidModal={setShowSkidModal}
             editGeneralHazardsModalVisible={editGeneralHazardsModalVisible}
             setEditGeneralHazardsModalVisible={setEditGeneralHazardsModalVisible}
+            setMousePosition={setMousePosition}
+            mousePosition={mousePosition}
           />
         </div>
       </div>

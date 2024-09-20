@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Document, Page } from 'react-pdf';
-import axios from 'axios';
 import PropTypes from 'prop-types';
 import { useMap } from './Map/MapContext';
-import { useSkidMarker } from './SkidMarkerContext';
 import EditGeneralHazardModal from './Modal/EditGeneralHazardsModal';
 import SkidMarkerPopover from './Popover/SkidMarkerPopover';
 import Spinner from 'react-bootstrap/Spinner';
 import { useSkid } from '../context/SkidContext';
+import { usePersonFile } from '../context/PersonFileContext';
 
 /**
  * The MapViewer component displays a PDF map and allows users to interact with it by adding skid markers,
@@ -16,24 +15,25 @@ import { useSkid } from '../context/SkidContext';
  *
  * @component
  * @param {Object} props - Component props.
- * @param {boolean} props.enableMarker - Flag to enable or disable adding markers on the map.
- * @param {function} props.setShowSkidModal - Function to set the visibility of the skid modal.
+] * @param {function} props.setShowSkidModal - Function to set the visibility of the skid modal.
  * @param {boolean} props.editGeneralHazardsModalVisible - Flag to control the visibility of the edit general hazards modal.
  * @param {function} props.setEditGeneralHazardsModalVisible - Function to set the visibility of the edit general hazards modal.
  *
  * @returns {JSX.Element} MapViewer component.
  */
 const MapViewer = ({
-  enableMarker,
   setShowSkidModal,
   editGeneralHazardsModalVisible,
-  setEditGeneralHazardsModalVisible
+  setEditGeneralHazardsModalVisible,
+  setMousePosition,
+  mousePosition
 }) => {
-
-  const { skidMarkerState, setSkidMarkerState } = useSkidMarker(); // Access and manage skid marker state.
-  const { mapState, setMapState } = useMap(); // Access and manage map state.
   const { skidState, setSkidState } = useSkid(); // Access and manage skid state.
+  const { mapState, setMapState } = useMap(); // Access and manage map state.
+  const { personFiles } = usePersonFile();
   const [pdf, setPdf] = useState(null); // State for holding the PDF file URL.
+  const [showSkidMarkerPopover, setShowSkidModalPopover] = useState(false);
+  const [peopleByCrew, setPeopleByCrew] = useState([]);
 
   /**
    * Handles the mouse move even when user is adding a point to a pdf
@@ -42,13 +42,10 @@ const MapViewer = ({
    */
   const handleMouseMove = (event) => {
     const rect = event.currentTarget.getBoundingClientRect();
-    setSkidMarkerState((prevState) => ({
-      ...prevState,
-      mousePosition: {
-        x: event.clientX - rect.left,
-        y: event.clientY - rect.top
-      }
-    }));
+    setMousePosition({
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top
+    });
   };
 
   /**
@@ -74,20 +71,9 @@ const MapViewer = ({
 
     // Toggle popover visibility if the clicked marker is already selected.
     if (skidState.selectedSkidId === clickedPoint._id) {
-      setSkidMarkerState((prevState) => ({
-        ...prevState,
-        popoverVisible: !prevState.popoverVisible,
-        popoverCrewVisible: false,
-        popoverPersonVisible: false
-      }));
+      setShowSkidModalPopover((prev) => !prev);
     } else {
-      // If it's a different point, close existing popovers and open for the new one.
-      setSkidMarkerState((prevState) => ({
-        ...prevState,
-        popoverVisible: true,
-        popoverCrewVisible: false,
-        popoverPersonVisible: false
-      }));
+      setShowSkidModalPopover((prev) => true);
 
       setSkidState((prevState) => ({
         ...prevState,
@@ -120,21 +106,13 @@ const MapViewer = ({
         console.error('Error fetching PDF data:', error);
       }
     };
-    
+
     /**
      * Fetches the crew data and updates the state with people and their associated files.
      */
     const fetchCrewData = async () => {
       try {
-        const response = await axios.get('http://localhost:3001/people', { withCredentials: true });
-        const data = response.data;
-
-        if (!data.people || !data.files) {
-          console.error('People or files data is missing');
-          return;
-        }
-
-        const files = data.files;
+        const files = personFiles.personFiles;
 
         // Create a map of files by person ID.
         const filesByPerson = files.reduce((acc, file) => {
@@ -145,12 +123,12 @@ const MapViewer = ({
           return acc;
         }, {});
 
-        setSkidMarkerState((prevState) => {
-          if (!data.people) {
+        setPeopleByCrew((prevState) => {
+          if (!mapState.people) {
             return prevState;
           }
 
-          const updatedPeopleByCrew = data.people.reduce(
+          const updatedPeopleByCrew = mapState.people.reduce(
             (updatedCrews, item) => {
               if (item.archive === 'on') return updatedCrews;
               const crewId = item.crew;
@@ -164,7 +142,8 @@ const MapViewer = ({
               if (!existingPerson) {
                 updatedCrews[crewId].push({
                   _id: item._id,
-                  name: item.name,
+                  firstName: item.firstName,
+                  lastName: item.lastName,
                   role: item.role,
                   filesByPerson: filesByPerson[item._id] || []
                 });
@@ -175,36 +154,13 @@ const MapViewer = ({
             { ...prevState.peopleByCrew }
           );
 
-          return {
-            ...prevState,
-            peopleByCrew: updatedPeopleByCrew
-          };
+          return updatedPeopleByCrew;
         });
       } catch (error) {
         console.error('Error fetching crew data:', error);
       }
     };
 
-    /**
-     * Fetches the files data for the map and updates the state.
-     */
-    const fetchFiles = async () => {
-      try {
-        const response = await axios.get('http://localhost:3001/files-for-map', {
-          withCredentials: true
-        });
-        const data = response.data;
-        console.log('Fetched files for map:', data);
-        setSkidMarkerState((prevState) => ({
-          ...prevState,
-          personFiles: data.file
-        }));
-      } catch (error) {
-        console.error('Error fetching files data:', error);
-      }
-    };
-
-    fetchFiles();
     fetchPdfData();
     fetchCrewData();
   }, [mapState.currentMapUrl]);
@@ -254,14 +210,14 @@ const MapViewer = ({
           </Document>
         )}
 
-        {enableMarker === true && (
+        {mapState.enableMarker === true && (
           <div
             className="red-dot"
             data-testid="cursor-red-dot"
             style={{
               position: 'absolute',
-              left: `${skidMarkerState.mousePosition.x}px`,
-              top: `${skidMarkerState.mousePosition.y}px`,
+              left: `${mousePosition.x}px`,
+              top: `${mousePosition.y}px`,
               width: '20px',
               height: '20px',
               backgroundColor: 'red',
@@ -299,17 +255,22 @@ const MapViewer = ({
             </button>
           ))}
       </div>
-      <SkidMarkerPopover />
+      <SkidMarkerPopover
+        showPopover={showSkidMarkerPopover}
+        setShowPopover={setShowSkidModalPopover}
+        peopleByCrew={peopleByCrew}
+      />
     </>
   );
 };
 
 // Prop type validation for MapViewer component props.
 MapViewer.propTypes = {
-  enableMarker: PropTypes.bool.isRequired,
   setShowSkidModal: PropTypes.func.isRequired,
   editGeneralHazardsModalVisible: PropTypes.bool.isRequired,
-  setEditGeneralHazardsModalVisible: PropTypes.func.isRequired
+  setEditGeneralHazardsModalVisible: PropTypes.func.isRequired,
+  setMousePosition: PropTypes.func.isRequired,
+  mousePosition: PropTypes.object.isRequired
 };
 
 export default MapViewer;

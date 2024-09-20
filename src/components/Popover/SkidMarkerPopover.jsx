@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import RemoveSkidButton from '../Button/RemoveSkidButton';
 import EditSkidButton from '../Button/EditSkidButton';
-import { useSkidModal } from '../Modal/Skid/SkidModalContext';
+import HazardModal from '../Modal/HazardModal';
 import { useMap } from '../Map/MapContext';
 import { useAlertMessage } from '../AlertMessage';
-import { useSkidMarker } from '../SkidMarkerContext';
 import axios from 'axios';
 import { deletePresignedUrl } from '../../hooks/useFileDelete';
 import { useNavigate } from 'react-router-dom';
@@ -12,36 +11,38 @@ import { useSkid } from '../../context/SkidContext';
 import { useLibraryFile } from '../../context/LibraryFileContext';
 import { usePersonFile } from '../../context/PersonFileContext';
 import { useCrews } from '../../context/CrewContext';
-const SkidMarkerPopover = () => {
-  const { skidModalState, setSkidModalState } = useSkidModal();
+import PropTypes from 'prop-types';
+import AddOrEditSkidModal from '../Modal/Skid/AddOrEditSkidModal';
+
+const SkidMarkerPopover = ({showPopover, setShowPopover, peopleByCrew}) => {
   const { mapState, setMapState } = useMap();
   const { addToast } = useAlertMessage();
-  const { skidMarkerState, setSkidMarkerState } = useSkidMarker();
   const { libraryFiles} = useLibraryFile();
   const { personFiles} = usePersonFile();
   const { crews } = useCrews();
 
-  const { skidState, setSkidState } = useSkid(); // holds information about the selected skid
+  const { skidState } = useSkid(); // holds information about the selected skid
   const navigate = useNavigate();
 
+  const [popoverPersonVisible, setPopoverPersonVisible] = useState(false);
+  const [popoverCrewVisible, setpopoverCrewVisible] = useState(false);
+  const [selectedCrew, setSelectedCrew] = useState(null);
+  const [selectedPerson, setSelectedPerson] = useState(null);
+  const [selectedHazard, setSelectedHazard] = useState({});
+  const [editSkid, setEditSkid] = useState(false);
+  const [hazardModalVisible, setHazardModalVisible] = useState(false);
+  const [editSkidModalVisible, setEditSkidModalVisible] = useState(false);
+
   const toggleSkidCrew = (crew) => {
-    console.log('toggleSkidCrew clicked', crew);
-    setSkidMarkerState((prevState) => ({
-      ...prevState,
-      selectedSkidCrew: crew,
-      popoverCrewVisible: !prevState.popoverCrewVisible,
-      popoverPersonVisible: prevState.popoverPersonVisible ? false : prevState.popoverPersonVisible
-    }));
+    setSelectedCrew(crew);
+    setpopoverCrewVisible((prev) => !prev);
+    setPopoverPersonVisible((prev) => prev ? false: prev)
   };
 
   const handleHazardClick = (hazard) => {
-    console.log('hazard color', hazard.color);
-    setSkidModalState((prevState) => ({
-      ...prevState,
-      hazardModalVisible: true,
-      isSkidModalVisible: false,
-      selectedHazardData: hazard
-    }));
+    setHazardModalVisible(true);
+    setShowPopover(false);
+    setSelectedHazard(hazard);
 
   };
 
@@ -50,27 +51,14 @@ const SkidMarkerPopover = () => {
   };
 
   const editSelectedSkid = async () => {
-    try {
-      setSkidState((prevState) => ({
-        ...prevState,
-        skidModalVisible: true,
-      }))
-      
-    } catch (error) {
-      addToast('Error!', 'An error has occured while saving general hazards. Please try again later.', 'danger', 'white');
-      console.error('Error fetching hazard data:', error);
-    } 
-    setSkidMarkerState((prevState) => ({
-      ...prevState,
-      editSkid: true
-    }));
+      setEditSkidModalVisible(true);
+      setEditSkid(true);
   };
 
   const removeSelectedSkid = async () => {
-    const id = new Date().getTime();
 
     if (skidState.formik.selectedCutPlan) {
-      const cutPlanKey = skidMarkerState.selectedMarker.info.cutPlans.key;
+      const cutPlanKey = skidState?.formik?.values?.selectedCutPlan?.key;
 
       await deletePresignedUrl([cutPlanKey]); // removes cutplan file from s3
     }
@@ -91,14 +79,10 @@ const SkidMarkerPopover = () => {
           currentMapMarkers: updatedMarkers
         };
       });
-      addToast('Skid Removed!',`Success! Skid: ${skidModalState.skidName} has been removed`, 'success', 'white' )
+      addToast('Skid Removed!',`Success! Skid: ${skidState?.formik?.values?.skidName} has been removed`, 'success', 'white' )
     }
 
-    setSkidMarkerState((prevState) => ({
-      ...prevState,
-      popoverVisible: false,
-      selectedMarker: null
-    }));
+    setShowPopover(false);
 
     setMapState((prevState) => ({
       ...prevState,
@@ -107,31 +91,19 @@ const SkidMarkerPopover = () => {
   };
   
   const handlePersonClick = async (person) => {
-    /* try {
-      // eslint-disable-next-line no-undef
-      const response = await axios.get(`${process.env.REACT_APP_URL}/person-files/${person._id}`, {
-        withCredentials: true
-      });
-      if (response.data.isLoggedIn) {
-        const data = response.data;
-        console.log('dtat', data)
-       
-      } else {
-        navigate('/login');
-      }
-    } catch (error) {
-      console.error('An error has occuring fetching person data', error);
-    } */
-    
-    setSkidMarkerState((prevState) => ({
-      ...prevState,
-      selectedSkidPerson: person,
-      popoverPersonVisible: !prevState.popoverPersonVisible
-    }))
+    setSelectedPerson(person);
+    setPopoverPersonVisible((prev) => !prev);
+  }
+
+  const handleHazardModalClose = () => {
+    setHazardModalVisible(false);
+    setShowPopover(true)
   }
   return (
     <>
-      {skidMarkerState.popoverVisible && (
+    <HazardModal showModal={hazardModalVisible} handleClose={handleHazardModalClose} selectedHazard={selectedHazard}/>
+    <AddOrEditSkidModal title="Edit Skid" mousePosition={skidState.selectedSkidPos} setShowModal={setEditSkidModalVisible} showModal={editSkidModalVisible} editSkid={editSkid} _account={2}/>
+      {showPopover && (
         <div
           className="popover"
           data-testid="popover"
@@ -145,7 +117,7 @@ const SkidMarkerPopover = () => {
             zIndex: 99
           }}
         >
-          {!skidMarkerState.popoverCrewVisible ? (
+          {!popoverCrewVisible ? (
             <>
               <div className="popover-header">
                 Skid: {skidState?.formik?.values?.skidName}
@@ -237,35 +209,6 @@ const SkidMarkerPopover = () => {
                     </>
                   )}
                 </div>
-                {/* {mapState.generalHazardsData && mapState.generalHazardsData.length > 0 && (
-                  <>
-                    <div
-                      style={{
-                        fontWeight: 'bold',
-                        fontSize: '100%',
-                        textAlign: 'center',
-                        paddingBottom: '10px'
-                      }}
-                    >
-                      General Hazards:
-                    </div>
-                    <div>
-                      <ul className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
-                        {mapState.generalHazardsData.map((hazard) => (
-                          <li
-                            data-testid={``}
-                            key={hazard._id}
-                            className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
-                            style={{ textAlign: 'center', backgroundColor: hazard.color }}
-                            onClick={() => handleHazardClick(hazard)}
-                          >
-                            {hazard.id} : {hazard.title}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </>
-                )} */}
                 {skidState?.formik?.values?.selectedSkidHazards && skidState?.formik?.values?.selectedSkidHazards.length > 0 && (
                   <>
                     <div
@@ -300,13 +243,13 @@ const SkidMarkerPopover = () => {
                 )}
               </div>
             </>
-          ) : !skidMarkerState.popoverPersonVisible ? (
+          ) : !popoverPersonVisible ? (
             <>
               <div className="popover-header">
                 <button type="button" className="btn btn-link" onClick={() => toggleSkidCrew(null)}>
                   ←
                 </button>
-                Crew: {skidMarkerState.selectedSkidCrew.name}
+                Crew: {selectedCrew.name}
               </div>
               <div className="popover-body">
                 <ul className="list-group" style={{ maxHeight: '200px', overflowY: 'auto' }}>
@@ -320,7 +263,7 @@ const SkidMarkerPopover = () => {
                     >
                       People:
                     </div>
-                  {skidMarkerState.peopleByCrew[skidMarkerState.selectedSkidCrew._id] && skidMarkerState.peopleByCrew[skidMarkerState.selectedSkidCrew._id].map((person) => (
+                  {peopleByCrew[selectedCrew._id] && peopleByCrew[selectedCrew._id].map((person) => (
                     <li
                       key={person._id}
                       data-testid={`popover_${person._id}`}
@@ -331,7 +274,7 @@ const SkidMarkerPopover = () => {
                         handlePersonClick(person);
                         }}
                     >
-                      {person.name}
+                      {person.firstName + " " + person.lastName}
                     </li>
                   ))}
                 </ul>
@@ -340,20 +283,17 @@ const SkidMarkerPopover = () => {
           ) : (
             <>
               <div className="popover-header">
-                <button type="button" className="btn btn-link" onClick={() => setSkidMarkerState((prevState) => ({
-                  ...prevState,
-                  popoverPersonVisible: !prevState.popoverPersonVisible
-                }))}>
+                <button type="button" className="btn btn-link" onClick={() => setPopoverPersonVisible((prev) => !prev)}>
                   ←
                 </button>
-                {skidMarkerState.selectedSkidPerson.name} <span className="smaller-text">({skidMarkerState.selectedSkidPerson.role})</span>
+                {selectedPerson.firstName + " " + selectedPerson.lastName} <span className="smaller-text">({selectedPerson.role})</span>
               </div>
               <div className="popover-body">
                 <ul className="list-group" style={{ maxHeight: '100px', overflowY: 'auto' }}>
-                    {Object.keys(skidMarkerState?.selectedSkidPerson?.filesByPerson || {}).length === 0 ? (
+                    {Object.keys(selectedPerson?.filesByPerson || {}).length === 0 ? (
                     <p>No files available</p>
                   ) : (
-                    Array.from(new Set(skidMarkerState?.selectedSkidPerson?.filesByPerson?.map((item) => item.type))).map((type) => {
+                    Array.from(new Set(selectedPerson?.filesByPerson?.map((item) => item.type))).map((type) => {
                       console.log('mapapapa', type)
                       console.log('hahaha', personFiles.personFileTypes)
                       const matchingFileType = personFiles.personFileTypes.find((fileType) => fileType._id === type);
@@ -371,7 +311,7 @@ const SkidMarkerPopover = () => {
                             {matchingFileType ? matchingFileType.name : 'Unknown File Type'}
                           </div>
                           <ul className="list-group">
-                            {skidMarkerState?.selectedSkidPerson?.filesByPerson?.filter((item) => item.type === type).map((item) => (
+                            {selectedPerson?.filesByPerson?.filter((item) => item.type === type).map((item) => (
                               <li
                                 key={item._id}
                                 className="list-group-item d-flex justify-content-between align-items-center list-group-item-action"
@@ -393,5 +333,11 @@ const SkidMarkerPopover = () => {
     </>
   );
 };
+
+SkidMarkerPopover.propTypes = {
+  showPopover: PropTypes.bool.isRequired,
+  setShowPopover: PropTypes.func.isRequired,
+  peopleByCrew: PropTypes.array.isRequired
+}
 
 export default SkidMarkerPopover;

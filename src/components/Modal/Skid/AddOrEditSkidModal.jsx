@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import axios from 'axios';
-import { useSkidModal } from './SkidModalContext';
-import { useMap } from '../../Map/MapContext';
 import { Anchor, ListGroup, ListGroupItem, Spinner } from 'react-bootstrap';
-import { useAlertMessage } from '../../AlertMessage';
-import { useSkidMarker } from '../../SkidMarkerContext';
+import axios from 'axios';
 import PropTypes from 'prop-types';
-import { getPresignedUrl, uploadToPresignedUrl } from '../../../hooks/useFileUpload';
 import { Formik } from 'formik';
-import { useSkid } from '../../../context/SkidContext';
-import { useCrews } from '../../../context/CrewContext';
-import { useLibraryFile } from '../../../context/LibraryFileContext';
+
+import Button from 'react-bootstrap/Button';
 import AddDocModal from '../AddDocModal';
 import AddCutPlanModal from '../AddCutPlanModal';
 import SelectHazardsModal from '../SelectHazardsModal';
 import HazardModal from '../HazardModal';
+
+
+import { useMap } from '../../Map/MapContext';
+import { useAlertMessage } from '../../AlertMessage';
+import { useSkidMarker } from '../../SkidMarkerContext';
+import { useSkid } from '../../../context/SkidContext';
+import { useCrews } from '../../../context/CrewContext';
+import { useLibraryFile } from '../../../context/LibraryFileContext';
+import { getPresignedUrl, uploadToPresignedUrl } from '../../../hooks/useFileUpload';
+
+
 import * as Yup from 'yup';
 
-const AddOrEditSkidModal = ({ showModal, setShowModal, mousePosition, editSkid, _account }) => {
-  const { skidModalState, setSkidModalState } = useSkidModal();
+const AddOrEditSkidModal = ({ title, showModal, setShowModal, mousePosition, editSkid, _account }) => {
   const { skidState, setSkidState } = useSkid(); //holds the information for formik when opening and closing modals to add files, hazards, cutplans to skid
   const { mapState, setMapState } = useMap();
   const { crews } = useCrews(); 
@@ -36,6 +39,7 @@ const AddOrEditSkidModal = ({ showModal, setShowModal, mousePosition, editSkid, 
   const [docModalVisible, setDocModalVisible] = useState(false);
   const [hazardModalVisible, setHazardModalVisible] = useState(false);
   const [selectedHazard, setSelectedHazard] = useState({});
+
   const getFilePathFromUrl = (url) => {
     const urlObject = new URL(url);
     return `${urlObject.origin}${urlObject.pathname}`;
@@ -53,11 +57,9 @@ const AddOrEditSkidModal = ({ showModal, setShowModal, mousePosition, editSkid, 
       ...prevState,
       enableMarker: false
     }));
-    setSkidModalState((prevState) => ({ ...prevState, isSkidModalVisible: false }));
   };
 
   const submitSkidModal = async (values) => {
-    const id = new Date().getTime();
     const selectedFile = values.selectedCutPlan;
 
     setShowSpinner(true);
@@ -137,18 +139,9 @@ const AddOrEditSkidModal = ({ showModal, setShowModal, mousePosition, editSkid, 
               },
             },
           })); 
-          addToast('Skid Updated!', `Success! Skid: ${skidModalState.skidName} has been updated`, 'success', 'white');
-  
-          /* setSkidState((prevState) => ({
-            ...prevState,
-            skidModalVisible: false,
-          })) */
-         setShowModal(false);
-          setSkidModalState((prevState) => ({
-            ...prevState,
-            isSkidModalEdit: false,
-            isSkidModalAdd: false
-          }))
+          addToast('Skid Updated!', `Success! Skid: ${val.info.pointName} has been updated`, 'success', 'white');
+          setShowModal(false);
+      
         }
       } else {
         await axios
@@ -167,12 +160,8 @@ const AddOrEditSkidModal = ({ showModal, setShowModal, mousePosition, editSkid, 
               });
 
               resetAddSkidModal();
-              setSkidModalState((prevState) => ({
-                ...prevState,
-                isSkidModalEdit: false,
-                isSkidModalAdd: false
-              }))
-              addToast('Skid Added!', `Success! Skid: ${skidModalState.skidName} has been created!`, 'success', 'white');
+              
+              addToast('Skid Added!', `Success! Skid: ${values.skidName} has been created!`, 'success', 'white');
             }
           });
 
@@ -180,7 +169,7 @@ const AddOrEditSkidModal = ({ showModal, setShowModal, mousePosition, editSkid, 
       }
 
     } catch (err) {
-      addToast('Error!', `An error occurred while adding skid ${skidModalState.skidName}. Please try again`, 'danger', 'white');
+      addToast('Error!', `An error occurred while adding skid ${values.skidName}. Please try again`, 'danger', 'white');
       console.error('Error has occured while adding or updating skid object', err);
     } finally {
       setShowSpinner(false);
@@ -188,11 +177,6 @@ const AddOrEditSkidModal = ({ showModal, setShowModal, mousePosition, editSkid, 
   };
 
   const handleClose = () => {
-   /*  setSkidState((prevState) => ({
-      ...prevState,
-      skidModalVisible: false,
-      docModalVisible: false
-    })) */
    setShowModal(false);
    setDocModalVisible(false);
   };
@@ -210,8 +194,6 @@ const AddOrEditSkidModal = ({ showModal, setShowModal, mousePosition, editSkid, 
         touched: formik.touched,
         errors: formik.errors,
       },
-      //skidModalVisible: false, // hide add/edit skid modal
-      //docModalVisible: true, // show doc modal 
     }));
     setShowModal(false);
     setDocModalVisible(true);
@@ -230,8 +212,6 @@ const AddOrEditSkidModal = ({ showModal, setShowModal, mousePosition, editSkid, 
         touched: formik.touched,
         errors: formik.errors,
       },
-      //skidModalVisible: false, // hide add/edit skid modal
-      //cutPlanModalVisible: true, // show doc modal 
     }));
     setCutPlanModalVisible(true);
     setShowModal(false);
@@ -243,11 +223,6 @@ const AddOrEditSkidModal = ({ showModal, setShowModal, mousePosition, editSkid, 
    * @returns {void}
    */
   const openSelectHazardModal = (formik) => {
-   /*  setSkidModalState((prevState) => ({
-      ...prevState,
-      isSkidModalEdit: false,
-      isSelectHazardsGeneral: false // SelectHazardsModal label will be Add Hazards
-    })); */
     setSkidState((prevState) => ({
       ...prevState,
       formik: {
@@ -255,8 +230,6 @@ const AddOrEditSkidModal = ({ showModal, setShowModal, mousePosition, editSkid, 
         touched: formik.touched,
         errors: formik.errors,
       },
-      //skidModalVisible: false, // hide add/edit skid modal
-      //selectHazardModalVisible: true, // show doc modal 
     }));
     setShowModal(false);
     setSelectHazardModalVisible(true);
@@ -300,26 +273,11 @@ const AddOrEditSkidModal = ({ showModal, setShowModal, mousePosition, editSkid, 
   };
 
   const handleHazardClick = (hazard) => {
-    /* setSkidModalState((prevState) => ({
-      ...prevState,
-      hazardModalVisible: true,
-      isSkidModalVisible: false,
-      selectedHazardData: hazard
-    })); */
     setHazardModalVisible(true);
     setSelectedHazard(hazard);
 
   };
 
- 
-
-  var name;
-
-  if (skidModalState.isSkidModalEdit) {
-    name = 'Edit';
-  } else {
-    name = 'Add';
-  }
   const form = skidState?.formik?.values;
   const initValues = {
     skidName: form?.skidName || '',
@@ -389,7 +347,7 @@ const AddOrEditSkidModal = ({ showModal, setShowModal, mousePosition, editSkid, 
           className="addOrEditSkid-modal"
           backdrop="static">
           <Modal.Header closeButton data-testid="addOrEditSkid-modal-header">
-            <Modal.Title>{name} Skid</Modal.Title>
+            <Modal.Title>{title}</Modal.Title>
           </Modal.Header>
 
           <Modal.Body>
@@ -638,6 +596,7 @@ const AddOrEditSkidModal = ({ showModal, setShowModal, mousePosition, editSkid, 
 };
 
 AddOrEditSkidModal.propTypes = {
+  title: PropTypes.string.isRequired,
   showModal: PropTypes.bool.isRequired,
   setShowModal: PropTypes.func.isRequired,
   editSkid: PropTypes.any.isRequired,

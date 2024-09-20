@@ -15,17 +15,18 @@ export const MapProvider = ({ children }) => {
     //files: [],
     //crews: [],
     //archivedPeople: [],
-    crewTypes: [],
-    maps: [],
-    username: null,
+    //crewTypes: [],
+    //maps: [],
+    //username: null,
     hazards: [],
     generalHazards: [],
-    generalHazardsData: [],
-    skidFiles: [],
+    //generalHazardsData: [],
+    //skidFiles: [],
     //fileTypes: [],
-    confirmModalLabel: null,
-    confirmModalMessage: null,
-    selectedGeneralHazards: []
+    //confirmModalLabel: null,
+    //confirmModalMessage: null,
+    //selectedGeneralHazards: [],
+    people: []
   });
 
   return <MapContext.Provider value={{ mapState, setMapState }}>{children}</MapContext.Provider>;

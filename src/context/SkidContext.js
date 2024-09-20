@@ -18,10 +18,6 @@ export const SkidProvider = ({ children }) => {
     selectedSkidId: null, // ID of the selected skid
     selectedSkidPos: null, // Position of the selected skid
     formik: null, // Formik form object, potentially shared across modals
-    //skidModalVisible: false, // Visibility state of the skid modal
-    //docModalVisible: false, // Visibility state of the document modal
-    //cutPlanModalVisible: false, // Visibility state of the cut plan modal
-    //selectHazardModalVisible: false // Visibility state of the hazard selection modal
   });
 
   // The context provider component supplies skidState and its setter to any descendants
