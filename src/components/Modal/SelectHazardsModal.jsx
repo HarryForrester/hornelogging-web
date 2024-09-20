@@ -1,79 +1,37 @@
 import React, { useState } from 'react';
 import { Modal, Button, Accordion } from 'react-bootstrap';
-import { useSkidModal } from './Skid/SkidModalContext';
 import { useMap } from '../Map/MapContext';
-import { useSkid } from '../../context/SkidContext';
 import PropTypes from 'prop-types';
 
-const SelectHazardsModal = ({title, showModal, handleClose, handleCheckboxChange, selectedHazards }) => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const { skidModalState } = useSkidModal();
-  const { skidState, setSkidState } = useSkid();
-  const { mapState, setMapState } = useMap();
-
-  /* const handleClose = () => {
-    if (skidModalState.isSelectHazardsGeneral) {
-      setSkidState((prevState) => ({
-        ...prevState,
-        selectHazardModalVisible: false,
-        generalHazardsModalVisible: true,
-      }));
-    } else {
-      setSkidState((prevState) => ({
-        ...prevState,
-        selectHazardModalVisible: false,
-        skidModalVisible: true,
-      }));
-    }
-  };
+/**
+ * SelectHazardsModal component allows users to search, filter, and select hazards from a list.
+ * It displays hazards grouped by their categories and allows adding them to a selected list.
+ * 
+ * @component
+ * @param {Object} props - React props
+ * @param {string} props.title - Title of the modal
+ * @param {boolean} props.showModal - Indicates whether the modal is shown or hidden
+ * @param {Function} props.handleClose - Function to close the modal
+ * @param {Function} props.handleCheckboxChange - Function to handle checkbox changes
+ * @param {Array} props.selectedHazards - Array of selected hazard IDs
+ * @returns {JSX.Element} The rendered component
  */
-  /* const handleCheckboxChange = (hazard) => {
-    const hazardId = hazard._id;
+const SelectHazardsModal = ({ title, showModal, handleClose, handleCheckboxChange, selectedHazards }) => {
+  const [searchQuery, setSearchQuery] = useState(''); // State for the search query
+  const { mapState } = useMap(); // Access map state from context
 
-    //If in selecting General Hazards mode
-    if (skidModalState.isSelectHazardsGeneral) {
-      const selectedGeneralHazards = Array.isArray(mapState.selectedGeneralHazards)
-        ? mapState.selectedGeneralHazards
-        : [];
-
-      const updatedHazards = selectedGeneralHazards.includes(hazardId)
-        ? selectedGeneralHazards.filter((id) => id !== hazardId)
-        : [...selectedGeneralHazards, hazardId];
-
-      setMapState((prevState) => ({
-        ...prevState,
-        selectedGeneralHazards: updatedHazards,
-      }));
-    } else {
-      //selecting skid (site) hazards
-      const selectedSkidHazards = skidState.formik?.values?.selectedSkidHazards || [];
-      const updatedHazards = selectedSkidHazards.includes(hazardId)
-        ? selectedSkidHazards.filter((id) => id !== hazardId)
-        : [...selectedSkidHazards, hazardId];
-
-      setSkidState((prevState) => ({
-        ...prevState,
-        formik: {
-          ...prevState.formik,
-          values: {
-            ...prevState.formik?.values,
-            selectedSkidHazards: updatedHazards,
-          },
-        },
-      }));
-    }
-  }; */
-
-  //const label = skidModalState.isSelectHazardsGeneral ? 'General' : 'Skid';
-
-/*   const selectedHazardsField = skidModalState.isSelectHazardsGeneral
-    ? mapState.selectedGeneralHazards || []
-    : skidState.formik?.values?.selectedSkidHazards || []; */
-
+  /**
+   * Filters hazards based on the search query.
+   * @constant {Array} filteredHazards
+   */
   const filteredHazards = mapState.hazards.filter((hazard) =>
     hazard.searchText.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  /**
+   * Groups hazards by their categories.
+   * @constant {Object} groupedHazards
+   */
   const groupedHazards = filteredHazards.reduce((acc, hazard) => {
     if (!acc[hazard.cat]) {
       acc[hazard.cat] = [];
@@ -106,6 +64,7 @@ const SelectHazardsModal = ({title, showModal, handleClose, handleCheckboxChange
             <div className="modal-hazards">
               <Accordion defaultActiveKey="0">
                 {Object.keys(groupedHazards).map((cat, index) => {
+                  // Filters hazards that are not selected
                   const hazardsToShow = groupedHazards[cat].filter(
                     (hazard) =>
                       Array.isArray(selectedHazards) && !selectedHazards.some(
@@ -113,6 +72,7 @@ const SelectHazardsModal = ({title, showModal, handleClose, handleCheckboxChange
                       )
                   );
 
+                  // Skip rendering empty categories
                   if (hazardsToShow.length === 0) {
                     return null;
                   }
@@ -160,12 +120,13 @@ const SelectHazardsModal = ({title, showModal, handleClose, handleCheckboxChange
   );
 };
 
+// Prop type validation for the component's props
 SelectHazardsModal.propTypes = {
-  title: PropTypes.string.isRequired,
-  showModal: PropTypes.bool.isRequired,
-  handleClose: PropTypes.func.isRequired,
-  handleCheckboxChange: PropTypes.func.isRequired,
-  selectedHazards: PropTypes.array.isRequired
+  title: PropTypes.string.isRequired, // title must be a string and is required
+  showModal: PropTypes.bool.isRequired, // showModal must be a boolean and is required
+  handleClose: PropTypes.func.isRequired, // handleClose must be a function and is required
+  handleCheckboxChange: PropTypes.func.isRequired, // handleCheckboxChange must be a function and is required
+  selectedHazards: PropTypes.array.isRequired // selectedHazards must be an array and is required
 }
 
 export default SelectHazardsModal;
