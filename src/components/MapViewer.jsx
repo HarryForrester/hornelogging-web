@@ -1,34 +1,40 @@
 import React, { useState, useEffect } from 'react';
 import { Document, Page } from 'react-pdf';
-import { ProgressBar } from 'react-bootstrap';
 import axios from 'axios';
 import PropTypes from 'prop-types';
-import HazardModal from './Modal/HazardModal';
-import { useSkidModal } from '../components/Modal/Skid/SkidModalContext';
 import { useMap } from './Map/MapContext';
-import { useAlertMessage } from './AlertMessage';
 import { useSkidMarker } from './SkidMarkerContext';
-//import AddOrEditSkidModal from './Modal/Skid/AddOrEditSkidModal';
-//import SelectHazardsModal from './Modal/SelectHazardsModal';
 import EditGeneralHazardModal from './Modal/EditGeneralHazardsModal';
-import AddSkidHazardModal from './Modal/AddSkidHazardModal';
 import SkidMarkerPopover from './Popover/SkidMarkerPopover';
 import Spinner from 'react-bootstrap/Spinner';
 import { useSkid } from '../context/SkidContext';
-/**
- * 
- * @param {*} param0 
- * @returns 
- */
-const MapViewer = ({ enableMarker, setShowSkidModal, editGeneralHazardsModalVisible, setEditGeneralHazardsModalVisible }) => {
 
-  const { skidModalState, setSkidModalState } = useSkidModal();
-  const { skidMarkerState, setSkidMarkerState } = useSkidMarker();
-  const { mapState, setMapState } = useMap();
-  const { skidState, setSkidState } = useSkid();
-  const { addToast } = useAlertMessage();
-  const [pdf, setPdf] = useState(null);
-  //const [generalHazardsModalVisible, setGeneralHazardsModalVisible] = useState(false); // Shows or hides the SelectHazardModal when the user clicks "Add Hazard" inside 'EditGeneralHazardsModal.jsx'
+/**
+ * The MapViewer component displays a PDF map and allows users to interact with it by adding skid markers,
+ * viewing details, and editing general hazards. It utilizes various state contexts and modals to manage
+ * its functionalities.
+ *
+ * @component
+ * @param {Object} props - Component props.
+ * @param {boolean} props.enableMarker - Flag to enable or disable adding markers on the map.
+ * @param {function} props.setShowSkidModal - Function to set the visibility of the skid modal.
+ * @param {boolean} props.editGeneralHazardsModalVisible - Flag to control the visibility of the edit general hazards modal.
+ * @param {function} props.setEditGeneralHazardsModalVisible - Function to set the visibility of the edit general hazards modal.
+ *
+ * @returns {JSX.Element} MapViewer component.
+ */
+const MapViewer = ({
+  enableMarker,
+  setShowSkidModal,
+  editGeneralHazardsModalVisible,
+  setEditGeneralHazardsModalVisible
+}) => {
+
+  const { skidMarkerState, setSkidMarkerState } = useSkidMarker(); // Access and manage skid marker state.
+  const { mapState, setMapState } = useMap(); // Access and manage map state.
+  const { skidState, setSkidState } = useSkid(); // Access and manage skid state.
+  const [pdf, setPdf] = useState(null); // State for holding the PDF file URL.
+
   /**
    * Handles the mouse move even when user is adding a point to a pdf
    * This function sets the mouse position event the mouse postion is on the page
@@ -52,28 +58,21 @@ const MapViewer = ({ enableMarker, setShowSkidModal, editGeneralHazardsModalVisi
   const addPointToPDF = () => {
     setSkidState((prevState) => ({
       ...prevState,
-      formik: null,
-      //skidModalVisible: true,
-    }))
-
+      formik: null
+    }));
     setShowSkidModal(true);
-    /* setSkidModalState((prevState) => ({
-      ...prevState,
-      isSkidModalEdit: false,
-      isSkidModalAdd: true
-    })); */
   };
 
   /**
-   * Handles the clicked skid point when a user clicks the marker
-   * This function opens and the skid modal where the clicked point ish
-   * @param {*} clickedPoint
+   * Handles the event triggered when a user clicks on a skid marker.
+   * This function opens the skid modal with the details of the clicked skid point.
+   *
+   * @param {Object} clickedPoint - The clicked skid point object.
    */
   const handleMarkerClick = async (clickedPoint) => {
-    console.log('handleMarkerClick', clickedPoint);
     const { formik } = skidState;
 
-    // if the clicked marker is already visible then hide it
+    // Toggle popover visibility if the clicked marker is already selected.
     if (skidState.selectedSkidId === clickedPoint._id) {
       setSkidMarkerState((prevState) => ({
         ...prevState,
@@ -81,9 +80,8 @@ const MapViewer = ({ enableMarker, setShowSkidModal, editGeneralHazardsModalVisi
         popoverCrewVisible: false,
         popoverPersonVisible: false
       }));
-      
     } else {
-      // If it's a different point, close the existing popover and then open it for the new popovers
+      // If it's a different point, close existing popovers and open for the new one.
       setSkidMarkerState((prevState) => ({
         ...prevState,
         popoverVisible: true,
@@ -94,7 +92,7 @@ const MapViewer = ({ enableMarker, setShowSkidModal, editGeneralHazardsModalVisi
       setSkidState((prevState) => ({
         ...prevState,
         selectedSkidId: clickedPoint._id,
-        selectedSkidPos: {x: clickedPoint.point.x, y: clickedPoint.point.y},
+        selectedSkidPos: { x: clickedPoint.point.x, y: clickedPoint.point.y },
         formik: {
           ...formik,
           values: {
@@ -105,98 +103,13 @@ const MapViewer = ({ enableMarker, setShowSkidModal, editGeneralHazardsModalVisi
             selectedSkidHazards: clickedPoint.info.siteHazards
           }
         }
-      }))      
+      }));
     }
-
   };
 
-  
-
-  /* const submitSelectedHazards = async (selectedHazards) => {
-    const id = new Date().getTime();
-
-    try {
-      const response = await axios.get('http://localhost:3001/findhazard', {
-        params: {
-          name: selectedHazards.join(',') // Convert the array to a comma-separated string
-        },
-        withCredentials: true
-      });
-
-      if (response.status === 200) {
-        if (skidModalState.isSelectHazardsGeneral) {
-          setSkidModalState((prevState) => ({
-            ...prevState,
-            isGeneralHazardsModalVisible: true,
-            isSelectHazardModalVisible: false
-          }));
-          setMapState((prevState) => {
-            const existingIds = prevState.generalHazardsData.map((hazard) => hazard.id);
-            const newData = response.data.filter(
-              (newHazard) => !existingIds.includes(newHazard.id)
-            );
-
-            return {
-              ...prevState,
-              generalHazards: selectedHazards,
-              generalHazardsData: [...prevState.generalHazardsData, ...newData]
-            };
-          });
-        } else {
-          setSkidModalState((prevState) => {
-            const existingIds = prevState.selectedSkidHazardsData.map((hazard) => hazard._id);
-            const newData = response.data.filter(
-              (newHazard) => !existingIds.includes(newHazard._id)
-            );
-            return {
-              ...prevState,
-              isSelectHazardModalVisible: false,
-              isSkidModalVisible: true,
-              selectedSkidHazards: [...existingIds, ...selectedHazards],
-              selectedSkidHazardsData: [...prevState.selectedSkidHazardsData, ...newData]
-            };
-          });
-        }
-      }
-    } catch (error) {
-      addToast('Error!', `Error! fetching hazard data ${error}`, 'danger', 'white');
-      console.error('Error fetching hazard data:', error);
-    }
-  }; */
-
-  /* const submitGeneralHazardModal = async () => {
-    //const id = new Date().getTime();
-    
-    try {
-      const resp = await axios.post(
-        'http://localhost:3001/submitGeneralHazards',
-        selectedGeneralHazards,
-        { withCredentials: true }
-      );
-      if (resp.status === 200) {
-        /* setMapState((prevState) => ({
-          ...prevState,
-          generalHazards: selectedGeneralHazards
-        })); 
-        setSelectedGeneralHazards(selectedGeneralHazards);
-        setEditGeneralHazardsModalVisible(false);
-        //setSkidModalState((prevState) => ({ ...prevState, isGeneralHazardsModalVisible: false }));
-        addToast('General Hazards Updated!', `Success! General hazards have been updated.`, 'success', 'white');
-      }
-    } catch (error) {
-      addToast('Error!', `An error has occurred while updating general hazards. Please try again later.`, 'danger', 'white');
-      console.error('An error hsa occcured while updating general hazards: ', error);
-    }
-  }; */
-/* 
-  const handleClose = () => {
-/*     setSkidModalState((prevState) => ({
-      ...prevState,
-      isGeneralHazardsModalVisible: false // or false based on your logic
-    })); 
-    setEditGeneralHazardsModalVisible(false);
-  }; */
-
+  /**
+   * Fetches the PDF data based on the current map URL.
+   */
   useEffect(() => {
     const fetchPdfData = async () => {
       try {
@@ -207,21 +120,23 @@ const MapViewer = ({ enableMarker, setShowSkidModal, editGeneralHazardsModalVisi
         console.error('Error fetching PDF data:', error);
       }
     };
-  
+    
+    /**
+     * Fetches the crew data and updates the state with people and their associated files.
+     */
     const fetchCrewData = async () => {
       try {
         const response = await axios.get('http://localhost:3001/people', { withCredentials: true });
         const data = response.data;
-        console.log('Fetched people data:', data);
-  
+
         if (!data.people || !data.files) {
           console.error('People or files data is missing');
           return;
         }
-  
+
         const files = data.files;
-  
-        // Create a map of files by person ID
+
+        // Create a map of files by person ID.
         const filesByPerson = files.reduce((acc, file) => {
           if (!acc[file.owner]) {
             acc[file.owner] = [];
@@ -229,41 +144,37 @@ const MapViewer = ({ enableMarker, setShowSkidModal, editGeneralHazardsModalVisi
           acc[file.owner].push(file);
           return acc;
         }, {});
-  
-        console.log('Files mapped by person:', filesByPerson);
-  
+
         setSkidMarkerState((prevState) => {
           if (!data.people) {
             return prevState;
           }
-  
-          const updatedPeopleByCrew = data.people.reduce((updatedCrews, item) => {
-            if (item.archive === 'on') return updatedCrews;
-            console.log('item bro', item.crew)
-            const crewId = item.crew;
-  
-            if (!updatedCrews[crewId]) {
-              updatedCrews[crewId] = [];
-            }
-  
-            const existingPerson = updatedCrews[crewId].find(
-              (person) => person._id === item._id
-            );
-  
-            if (!existingPerson) {
-              updatedCrews[crewId].push({
-                _id: item._id,
-                name: item.name,
-                role: item.role,
-                filesByPerson: filesByPerson[item._id] || []
-              });
-            }
-  
-            return updatedCrews;
-          }, { ...prevState.peopleByCrew });
-  
-          console.log('Updated people by crew:', updatedPeopleByCrew);
-  
+
+          const updatedPeopleByCrew = data.people.reduce(
+            (updatedCrews, item) => {
+              if (item.archive === 'on') return updatedCrews;
+              const crewId = item.crew;
+
+              if (!updatedCrews[crewId]) {
+                updatedCrews[crewId] = [];
+              }
+
+              const existingPerson = updatedCrews[crewId].find((person) => person._id === item._id);
+
+              if (!existingPerson) {
+                updatedCrews[crewId].push({
+                  _id: item._id,
+                  name: item.name,
+                  role: item.role,
+                  filesByPerson: filesByPerson[item._id] || []
+                });
+              }
+
+              return updatedCrews;
+            },
+            { ...prevState.peopleByCrew }
+          );
+
           return {
             ...prevState,
             peopleByCrew: updatedPeopleByCrew
@@ -273,7 +184,10 @@ const MapViewer = ({ enableMarker, setShowSkidModal, editGeneralHazardsModalVisi
         console.error('Error fetching crew data:', error);
       }
     };
-  
+
+    /**
+     * Fetches the files data for the map and updates the state.
+     */
     const fetchFiles = async () => {
       try {
         const response = await axios.get('http://localhost:3001/files-for-map', {
@@ -289,35 +203,11 @@ const MapViewer = ({ enableMarker, setShowSkidModal, editGeneralHazardsModalVisi
         console.error('Error fetching files data:', error);
       }
     };
-  
+
     fetchFiles();
     fetchPdfData();
     fetchCrewData();
   }, [mapState.currentMapUrl]);
-  
-  // Closes the SelectGeneralHazards Modal and opens EditGeneralHazardsModal
-  /* const handleGeneralHazardsClose = () => {
-    setGeneralHazardsModalVisible(false);
-    setEditGeneralHazardsModalVisible(true);
-  }
- */
-  /* const handleCheckboxChange = (hazard) => {
-    const hazardId = hazard._id;
-
-   /*  const selectedGeneralHazards = Array.isArray(mapState.selectedGeneralHazards)
-        ? mapState.selectedGeneralHazards
-        : []; 
-
-      const updatedHazards = selectedGeneralHazards.includes(hazardId)
-        ? selectedGeneralHazards.filter((id) => id !== hazardId)
-        : [...selectedGeneralHazards, hazardId];
-
-     /*  setMapState((prevState) => ({
-        ...prevState,
-        selectedGeneralHazards: updatedHazards,
-      })); 
-      setSelectedGeneralHazards(updatedHazards)
-  } */
 
   return (
     <>
@@ -325,23 +215,6 @@ const MapViewer = ({ enableMarker, setShowSkidModal, editGeneralHazardsModalVisi
         showModal={editGeneralHazardsModalVisible}
         setShowModal={setEditGeneralHazardsModalVisible}
       />
-      {/* <SelectHazardsModal
-        title='Select General Hazards'
-        showModal={generalHazardsModalVisible}
-        handleClose={handleGeneralHazardsClose}
-        handleCheckboxChange={handleCheckboxChange}
-        selectedHazards={selectedGeneralHazards}
-      /> */}
-      <AddSkidHazardModal />
-      {/* <AddOrEditSkidModal
-        mousePosition={skidMarkerState.mousePosition}
-        editSkid={skidMarkerState.editSkid}
-        _account={_account}
-      /> */}
-      {/*       <HazardModal />
-       */}
-      {/*       {mapState.currentMapName ? (
-       */}{' '}
       <div
         id="pdf-container"
         data-testid="map-viewer-pdf-container"
@@ -425,34 +298,13 @@ const MapViewer = ({ enableMarker, setShowSkidModal, editGeneralHazardsModalVisi
               <span className="visually-hidden">Map Marker</span>
             </button>
           ))}
-        {/* {percentage > 0 && percentage < 100 && (
-            <ProgressBar
-              variant="info"
-              now={percentage}
-              label={`Uploading: ${percentage}%`}
-              className="mt-2"
-            />
-          )} */}
       </div>
-      {/* ) : (
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100vh'
-          }}
-        >
-          
-          
-        </div>
-        
-      )} */}
       <SkidMarkerPopover />
     </>
   );
 };
 
+// Prop type validation for MapViewer component props.
 MapViewer.propTypes = {
   enableMarker: PropTypes.bool.isRequired,
   setShowSkidModal: PropTypes.func.isRequired,
