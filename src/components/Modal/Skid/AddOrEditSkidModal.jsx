@@ -30,7 +30,7 @@ const AddOrEditSkidModal = ({ title, showModal, setShowModal, mousePosition, edi
   const { crews } = useCrews(); 
   const { libraryFiles } = useLibraryFile();
   const { addToast } = useAlertMessage();
-  const {setSkidMarkerState } = useSkidMarker();
+  ////const {setSkidMarkerState } = useSkidMarker();
   const [showSpinner, setShowSpinner] = useState(false); // shows spinner while submitting to server
   const [formikState] = useState(null);
 
@@ -48,10 +48,10 @@ const AddOrEditSkidModal = ({ title, showModal, setShowModal, mousePosition, edi
   const resetAddSkidModal = () => {
     handleClose();
 
-    setSkidMarkerState((prevState) => ({
+   /*  setSkidMarkerState((prevState) => ({
       ...prevState,
       selectedMarker: null
-    }));
+    })); */
 
     setMapState((prevState) => ({
       ...prevState,

@@ -67,6 +67,8 @@ const MapViewer = ({
    * @param {Object} clickedPoint - The clicked skid point object.
    */
   const handleMarkerClick = async (clickedPoint) => {
+    console.log('fuck yah', skidState)
+
     const { formik } = skidState;
 
     // Toggle popover visibility if the clicked marker is already selected.
@@ -74,7 +76,6 @@ const MapViewer = ({
       setShowSkidModalPopover((prev) => !prev);
     } else {
       setShowSkidModalPopover((prev) => true);
-
       setSkidState((prevState) => ({
         ...prevState,
         selectedSkidId: clickedPoint._id,

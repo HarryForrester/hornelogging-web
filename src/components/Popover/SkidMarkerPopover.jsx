@@ -6,7 +6,6 @@ import { useMap } from '../Map/MapContext';
 import { useAlertMessage } from '../AlertMessage';
 import axios from 'axios';
 import { deletePresignedUrl } from '../../hooks/useFileDelete';
-import { useNavigate } from 'react-router-dom';
 import { useSkid } from '../../context/SkidContext';
 import { useLibraryFile } from '../../context/LibraryFileContext';
 import { usePersonFile } from '../../context/PersonFileContext';
@@ -20,9 +19,8 @@ const SkidMarkerPopover = ({showPopover, setShowPopover, peopleByCrew}) => {
   const { libraryFiles} = useLibraryFile();
   const { personFiles} = usePersonFile();
   const { crews } = useCrews();
-
   const { skidState } = useSkid(); // holds information about the selected skid
-  const navigate = useNavigate();
+  console.log('meow!', skidState)
 
   const [popoverPersonVisible, setPopoverPersonVisible] = useState(false);
   const [popoverCrewVisible, setpopoverCrewVisible] = useState(false);
@@ -56,38 +54,49 @@ const SkidMarkerPopover = ({showPopover, setShowPopover, peopleByCrew}) => {
   };
 
   const removeSelectedSkid = async () => {
-
-    if (skidState.formik.selectedCutPlan) {
-      const cutPlanKey = skidState?.formik?.values?.selectedCutPlan?.key;
-
-      await deletePresignedUrl([cutPlanKey]); // removes cutplan file from s3
+    try {
+      if (skidState.formik.selectedCutPlan !== null) {
+        const cutPlanKey = skidState?.formik?.values?.selectedCutPlan?.key;
+        await deletePresignedUrl([cutPlanKey]); // removes cutplan file from s3
+      }
+  
+      const response = await axios.delete(
+        `http://localhost:3001/pointonmap/${skidState.selectedSkidId}/${mapState.currentMapId}`,
+        { withCredentials: true }
+      );
+  
+      if (response.status === 200) {
+        //call api to delete file 
+        setMapState((prevState) => {
+          const updatedMarkers = prevState.currentMapMarkers.filter(
+            (marker) => marker._id !== skidState.selectedSkidId
+          );
+          return {
+            ...prevState,
+            currentMapMarkers: updatedMarkers
+          };
+        });
+        addToast('Skid Removed!',`Success! Skid: ${skidState?.formik?.values?.skidName} has been removed`, 'success', 'white' )
+      }
+  
+      setShowPopover(false);
+  
+      setMapState((prevState) => ({
+        ...prevState,
+        enableMarker: false
+      }));  
+    } catch (error) {
+      console.error('Error removing skid:', error);
+      // Show error toast notification on any caught error
+      addToast(
+        'Error Removing Skid!',
+        `An error occurred while removing skid: ${skidState?.formik?.values?.skidName}. Please try again.`,
+        'danger',
+        'white'
+      );
     }
 
-    const response = await axios.delete(
-      `http://localhost:3001/pointonmap/${skidState.selectedSkidId}/${mapState.currentMapId}`,
-      { withCredentials: true }
-    );
-
-    if (response.status === 200) {
-      //call api to delete file 
-      setMapState((prevState) => {
-        const updatedMarkers = prevState.currentMapMarkers.filter(
-          (marker) => marker._id !== skidState.selectedSkidId
-        );
-        return {
-          ...prevState,
-          currentMapMarkers: updatedMarkers
-        };
-      });
-      addToast('Skid Removed!',`Success! Skid: ${skidState?.formik?.values?.skidName} has been removed`, 'success', 'white' )
-    }
-
-    setShowPopover(false);
-
-    setMapState((prevState) => ({
-      ...prevState,
-      enableMarker: false
-    }));  
+    
   };
   
   const handlePersonClick = async (person) => {

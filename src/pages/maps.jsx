@@ -48,6 +48,7 @@ const Maps = () => {
 
         if (response.data.isLoggedIn) {
           const data = response.data;
+          console.log('cint ', data)
           setAccount(data._account);
           setLibraryFiles({
             types: data.libraryFileTypes,
