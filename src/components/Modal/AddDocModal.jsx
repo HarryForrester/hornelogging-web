@@ -17,19 +17,6 @@ const AddDocModal = ({ show, close}) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   /**
-   * Closes the Add Document Modal and opens the Skid Modal by updating the state.
-   * @function handleClose
-   * @returns {void}
-   */
-  const handleClose = () => {
-    setSkidState((prevState) => ({
-      ...prevState,
-      docModalVisible: false,
-      skidModalVisible: true,
-    }));
-  };
-
-  /**
    * Handles the change event when a checkbox is clicked for a file.
    * If the file has a valid _id and is not already selected, adds it to the selectedDocuments state.
    * @param {Object} fileUrl - The file object associated with the checkbox.
@@ -127,7 +114,7 @@ const AddDocModal = ({ show, close}) => {
             }
 
             return (
-              <Accordion.Item eventKey={index.toString()} key={type} data-testid={`accordion-item-${index}`}>
+              <Accordion.Item eventKey={index.toString()} key={type} data-testid={`accordion-item-${type}`}>
                 {/* Display the name from the matching file type */}
                 <Accordion.Header data-testid={`accordion-header-${index}`}>
                   {matchingFileType ? matchingFileType.name : 'Unknown Type'}
@@ -145,7 +132,7 @@ const AddDocModal = ({ show, close}) => {
                         {file.searchText}
                       </div>
                       <div className="card-header">
-                        <div style={{ float: 'left' }}>
+                        <div style={{ float: 'left' }} data-testid={`accordion-fileName-${file._id}`}>
                           <em
                             style={{
                               maxWidth: '300px',
