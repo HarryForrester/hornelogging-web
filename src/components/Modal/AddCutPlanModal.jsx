@@ -109,6 +109,7 @@ const AddCutPlanModal = ({showModal, handleClose}) => {
                   <Button
                     variant="primary"
                     type="submit"
+                    data-testid="addCutPlan-submit"
                     disabled={isSubmitting}
                   >
                     Save changes

@@ -60,6 +60,7 @@ const AddOrEditSkidModal = ({ title, showModal, setShowModal, mousePosition, edi
   };
 
   const submitSkidModal = async (values) => {
+    console.log('SEI FUKNE I', values)
     const selectedFile = values.selectedCutPlan;
 
     setShowSpinner(true);
@@ -345,9 +346,10 @@ const AddOrEditSkidModal = ({ title, showModal, setShowModal, mousePosition, edi
           onHide={handleClose}
           contentClassName="addOrEditSkidModal-content"
           className="addOrEditSkid-modal"
+          aria-labelledby="modal-title"
           backdrop="static">
           <Modal.Header closeButton data-testid="addOrEditSkid-modal-header">
-            <Modal.Title>{title}</Modal.Title>
+            <Modal.Title id='modal-title'>{title}</Modal.Title>
           </Modal.Header>
 
           <Modal.Body>
@@ -426,6 +428,7 @@ const AddOrEditSkidModal = ({ title, showModal, setShowModal, mousePosition, edi
                         id="siteDocs"
                         className="btn btn-secondary btn-block"
                         aria-label="Add Document"
+                        data-testid="openDocModal"
                         onClick={() => openDocModal(formik)}>
                         Add Document
                       </Button>
@@ -569,7 +572,7 @@ const AddOrEditSkidModal = ({ title, showModal, setShowModal, mousePosition, edi
                         ))}
                     </ListGroup>
                   </Form.Group>
-                  <Button type="submit" variant="primary" onClick={formik.handleSubmit}>
+                  <Button type="submit" variant="primary" data-testid="addOrEditSkid-submit" onClick={formik.handleSubmit}>
                     {showSpinner ? (
                       <>
                         <Spinner

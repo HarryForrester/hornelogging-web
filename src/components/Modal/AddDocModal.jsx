@@ -91,9 +91,9 @@ const AddDocModal = ({ show, close}) => {
 
   return (
     <div data-testid="add-doc-modal">
-      <Modal show={show} onHide={close}>
-      <Modal.Header closeButton>
-        <Modal.Title>Add Doc</Modal.Title>
+      <Modal show={show} onHide={close} aria-labelledby="addDocModal-title" >
+      <Modal.Header closeButton data-testid="addDocModal-header">
+        <Modal.Title id="addDocModal-title">Add Doc</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <label htmlFor="search-criteria-doc">Search:</label>
