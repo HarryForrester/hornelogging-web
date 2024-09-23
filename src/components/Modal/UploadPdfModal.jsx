@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Modal, Button, Spinner } from 'react-bootstrap';
-import { useSkidModal } from './Skid/SkidModalContext';
+///import { useSkidModal } from './Skid/SkidModalContext';
 import { useAlertMessage } from '../AlertMessage';
 import { useMap } from '../Map/MapContext';
 import DragAndDropUpload from '../DragAndDropUpload';
 import { getPresignedUrl, uploadToPresignedUrl, getFilePathFromUrl } from '../../hooks/useFileUpload';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-
-const UploadPdfModal = (_account) => {
-  const { skidModalState, setSkidModalState } = useSkidModal();
+import PropTypes from 'prop-types';
+const UploadPdfModal = ({_account, show, setShow}) => {
+  //const { skidModalState, setSkidModalState } = useSkidModal();
   const { setAlertMessageState } = useAlertMessage();
   const { setMapState } = useMap();
   const [selectedFile, setSelectedFile] = useState(null);
@@ -65,10 +65,11 @@ const UploadPdfModal = (_account) => {
           currentMapUrl: filePath
         }));
 
-        setSkidModalState((prevState) => ({
+        /* setSkidModalState((prevState) => ({
           ...prevState,
           isUploadMapModalVisible: false
-        }));
+        })); */
+        setShow(false);
       }
     } catch (error) {
       setAlertMessageState((prevState) => ({
@@ -98,16 +99,17 @@ const UploadPdfModal = (_account) => {
   };
 
   const handleClose = () => {
-    setSkidModalState((prevState) => ({
+    /* setSkidModalState((prevState) => ({
       ...prevState,
       isUploadMapModalVisible: false
-    }));
+    })); */
+    setShow(false);
     setSelectedFile(null);
   };
 
   return (
     <Modal
-      show={skidModalState.isUploadMapModalVisible}
+      show={show}
       onHide={handleClose}
       backdrop="static"
       centered
@@ -187,5 +189,11 @@ const UploadPdfModal = (_account) => {
     </Modal>
   );
 };
+
+UploadPdfModal.propTypes = {
+  _account: PropTypes.any,
+  show: PropTypes.bool.isRequired,
+  setShow: PropTypes.func.isRequired
+}
 
 export default UploadPdfModal;

@@ -24,14 +24,14 @@ const Maps = () => {
   const { confirmationModalState, setConfirmationModalState } = useConfirmationModal();
   const { addToast } = useAlertMessage();
   const [account, setAccount] = useState(null);
-  const { skidMarkerState, setSkidMarkerState } = useSkidMarker();
+  ////const { skidMarkerState, setSkidMarkerState } = useSkidMarker();
   const { setPersonFiles } = usePersonFile();
   const { setLibraryFiles } = useLibraryFile();
   const { setCrews } = useCrews();
   const [showAddSkidModal, setShowSkidModal] = useState(false);
   const [maps, setMaps] = useState([]);
   const navigate = useNavigate();
-  const [mousePosition, setMousePosition] = useState(null);
+  const [mousePosition, setMousePosition] = useState({x: 0, y: 0});
 
   const [editGeneralHazardsModalVisible, setEditGeneralHazardsModalVisible] = useState(false); // Shows or hides the EditGeneralHazardsModal when the user clicks "Edit General Hazards"
 
@@ -114,11 +114,11 @@ const Maps = () => {
       currentMapMarkers: parsePoints
     }));
 
-    setSkidMarkerState((prevState) => ({
+    /* setSkidMarkerState((prevState) => ({
       ...prevState,
       popoverVisible: false,
       selectedMarker: null
-    }));
+    })); */
 
     loadFromDB(mapName);
   };
@@ -244,7 +244,7 @@ const Maps = () => {
       <AddOrEditSkidModal
         title="Add Skid"
         mousePosition={mousePosition}
-        editSkid={skidMarkerState.editSkid}
+        editSkid={false}
         _account={account}
         showModal={showAddSkidModal}
         setShowModal={setShowSkidModal}

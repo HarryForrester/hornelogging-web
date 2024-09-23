@@ -34,7 +34,7 @@ const MapViewer = ({
   const [pdf, setPdf] = useState(null); // State for holding the PDF file URL.
   const [showSkidMarkerPopover, setShowSkidModalPopover] = useState(false);
   const [peopleByCrew, setPeopleByCrew] = useState([]);
-
+console.log('yummy', mapState.currentMapMarkers)
   /**
    * Handles the mouse move even when user is adding a point to a pdf
    * This function sets the mouse position event the mouse postion is on the page
@@ -67,8 +67,6 @@ const MapViewer = ({
    * @param {Object} clickedPoint - The clicked skid point object.
    */
   const handleMarkerClick = async (clickedPoint) => {
-    console.log('fuck yah', skidState)
-
     const { formik } = skidState;
 
     // Toggle popover visibility if the clicked marker is already selected.
@@ -268,7 +266,7 @@ const MapViewer = ({
 // Prop type validation for MapViewer component props.
 MapViewer.propTypes = {
   setShowSkidModal: PropTypes.func.isRequired,
-  editGeneralHazardsModalVisible: PropTypes.bool.isRequired,
+  editGeneralHazardsModalVisible: PropTypes.any.isRequired,
   setEditGeneralHazardsModalVisible: PropTypes.func.isRequired,
   setMousePosition: PropTypes.func.isRequired,
   mousePosition: PropTypes.object.isRequired

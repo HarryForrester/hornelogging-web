@@ -103,6 +103,7 @@ const DragAndDropUpload = ({
             </div>
             <Button
               variant="danger"
+              data-testid="dragAndDropUpload-remove"
               onClick={removeUploadedFile}
               size="sm"
               style={{ marginLeft: 'auto' }}

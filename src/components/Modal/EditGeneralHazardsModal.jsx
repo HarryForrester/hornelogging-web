@@ -218,7 +218,7 @@ const EditGeneralHazardModal = ({ showModal, setShowModal }) => {
 
 // Prop type validation for the component's props
 EditGeneralHazardModal.propTypes = {
-  showModal: PropTypes.bool.isRequired, // showModal must be a boolean and is required
+  showModal: PropTypes.any.isRequired, // showModal must be a boolean and is required
   setShowModal: PropTypes.func.isRequired, // setShowModal must be a function and is required
 };
 

@@ -20,7 +20,6 @@ const SkidMarkerPopover = ({showPopover, setShowPopover, peopleByCrew}) => {
   const { personFiles} = usePersonFile();
   const { crews } = useCrews();
   const { skidState } = useSkid(); // holds information about the selected skid
-  console.log('meow!', skidState)
 
   const [popoverPersonVisible, setPopoverPersonVisible] = useState(false);
   const [popoverCrewVisible, setpopoverCrewVisible] = useState(false);

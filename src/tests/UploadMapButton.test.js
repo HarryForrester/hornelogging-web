@@ -1,62 +1,61 @@
-import React from "react";
+import React, { useState as useStateMock } from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import UploadMapButton from "../components/Button/UploadMapButton";
-import { useSkidModal } from "../components/Modal/Skid/SkidModalContext";
+import UploadMapButton from '../components/Button/UploadMapButton';
+import { useAlertMessage } from '../components/AlertMessage';
+import { useMap } from '../components/Map/MapContext';
 
-jest.mock('../components/Modal/Skid/SkidModalContext', () => ({
-    useSkidModal: jest.fn(),
-}));
+// Mock the external hooks
+jest.mock('../components/AlertMessage');
+jest.mock('../components/Map/MapContext');
 
 // eslint-disable-next-line react/display-name
 jest.mock('../components/Modal/UploadPdfModal', () => () => <div data-testid="upload-pdf-modal" />);
 
-const mockSetSkidModalState = jest.fn();
-useSkidModal.mockReturnValue({
-    setSkidModalState: mockSetSkidModalState,
-});
+// Mock useState
+jest.mock('react', () => ({
+  ...jest.requireActual('react'),
+  useState: jest.fn(),
+}));
 
 describe('UploadMapButton', () => {
-    let setSkidModalStateMock;
+  const mockAddToast = jest.fn();
+  let setShowModalMock;
 
-    beforeEach(() => {
-      setSkidModalStateMock = jest.fn();
-      useSkidModal.mockReturnValue({
-        setSkidModalState: setSkidModalStateMock,
-      });
+  beforeEach(() => {
+    setShowModalMock = jest.fn();
+    useStateMock.mockImplementation((init) => [init, setShowModalMock]);
+
+    useAlertMessage.mockReturnValue({
+      addToast: mockAddToast,
     });
 
-    test('renders the Upload Map button', () => {
-        render(<UploadMapButton _account={{}} />);
-        
-        const button = screen.getByRole('button', { name: /upload map/i });
-        expect(button).toBeInTheDocument();
+    useMap.mockReturnValue({
+      setMapState: jest.fn(),
     });
+  });
 
-    test('shows the upload PDF modal when the button is clicked', () => {
-        render(<UploadMapButton _account={{}} />);
-        
-        const button = screen.getByRole('button', { name: /upload map/i });
-        fireEvent.click(button);
-        
-        expect(setSkidModalStateMock).toHaveBeenCalledWith(expect.any(Function));
-        
-        const modal = screen.getByTestId('upload-pdf-modal');
-        expect(modal).toBeInTheDocument();
-    });
+  afterEach(() => {
+    jest.clearAllMocks(); // Clear all mocks after each test
+  });
 
-    test('calls setSkidModalState with the correct state when the button is clicked', () => {
-        render(<UploadMapButton _account={{}} />);
-        
-        const button = screen.getByRole('button', { name: /upload map/i });
-        fireEvent.click(button);
-        
-        expect(setSkidModalStateMock).toHaveBeenCalledWith(expect.any(Function));
-        
-        const updateFunction = setSkidModalStateMock.mock.calls[0][0];
-        const prevState = { isUploadMapModalVisible: false };
-        const newState = updateFunction(prevState);
-        
-        expect(newState.isUploadMapModalVisible).toBe(true);
-      });
+  test('renders the Upload Map button', () => {
+    render(<UploadMapButton />);
 
-})
+    const button = screen.getByRole('button', { name: /upload map/i });
+    expect(button).toBeInTheDocument();
+  });
+
+  test('shows the upload PDF modal when the button is clicked', () => {
+    render(<UploadMapButton />);
+
+    const button = screen.getByRole('button', { name: /upload map/i });
+    fireEvent.click(button);
+
+    // Check if setShowModal was called with `true`
+    expect(setShowModalMock).toHaveBeenCalledWith(true);
+
+    // Verify the modal is rendered after the button is clicked
+    const modal = screen.getByTestId('upload-pdf-modal');
+    expect(modal).toBeInTheDocument();
+  });
+});
