@@ -131,12 +131,22 @@ const AddOrEditPersonModal = ({_account, person, updatePerson, show, hideModal, 
           // Update the UI
           hideModal();
           updatePerson((prevState) => {
+            // Ensure peopleByCrew exists in the previous state
             if (!prevState.peopleByCrew) {
               prevState = { ...prevState, peopleByCrew: [] };
             }
-  
+          
+            // Check if the person is being added to the "Unassigned" crew by name
+            const isUnassignedCrew = newPerson.crew === "Unassigned";
+          
+            // Create a flag to indicate if the crew already exists
+            let crewExists = false;
+          
+            // Update the crew if it already exists, otherwise, prepare to add a new one
             const updatedPeopleByCrew = prevState.peopleByCrew.map((crew) => {
-              if (crew._id === newPerson.crew) {
+              // Check if it's the correct crew to update based on id or "Unassigned" name
+              if (crew._id === newPerson.crew || (isUnassignedCrew && crew.name === "Unassigned")) {
+                crewExists = true;
                 return {
                   ...crew,
                   people: [...crew.people, newPerson],
@@ -144,14 +154,17 @@ const AddOrEditPersonModal = ({_account, person, updatePerson, show, hideModal, 
               }
               return crew;
             });
-  
-            if (!prevState.peopleByCrew.some((crew) => crew._id === newPerson.crew)) {
+          
+            // If the crew doesn't exist, add it as a new crew entry
+            if (!crewExists) {
               updatedPeopleByCrew.push({
-                name: newPerson.crew,
+                _id: isUnassignedCrew ? "unassigned_id" : newPerson.crew, // Use a default id if Unassigned
+                name: isUnassignedCrew ? "Unassigned" : newPerson.crew,
                 people: [newPerson],
               });
             }
-  
+          
+            // Return the updated state with the updated peopleByCrew
             return {
               ...prevState,
               peopleByCrew: updatedPeopleByCrew,

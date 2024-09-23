@@ -1,16 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Card, Form } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
 const HazardCard = ({ hazard, selectAll, handleHazardChange }) => {
   const { _id, color, id, title, cat, harms, reviewDate, reviewReason } = hazard;
-  //const [toggle, setToggle] = useState(selectAll);
-
-  /* useEffect(() => {
-    setToggle(selectAll);
-    console.log('selectalll buttjksdfblsf: ', selectAll);
-  }, [selectAll]); */
-
+ 
   return (
     <Card style={{ marginBottom: '10px' }}>
       <div className="search-text" style={{ display: 'none' }}>

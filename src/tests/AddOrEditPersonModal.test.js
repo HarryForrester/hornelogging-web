@@ -333,7 +333,7 @@ jest.mock('../hooks/useFileUpload', () => ({
           ...mockPerson,
           firstName: 'John',
           lastName: 'Smith',
-          phone: '0987654321',
+          phone: '0273456789',
         };
     
         // Mock axios to return a successful response

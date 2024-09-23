@@ -1,14 +1,7 @@
 /* eslint-disable no-undef */
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-//import PersonInfoCard from '../components/Card/PersonInfoCard';
-//import PersonDocumentArticle from '../components/Article/PersonDocumentArticle';
-//import PersonFormAccessArticle from '../components/Article/PersonFormAccessArticle';
-//import EditPersonModal from '../components/Modal/EditPersonModal';
-//import RemovePersonButton from '../components/Button/RemovePersonButton';
-import { useSkidModal } from '../components/Modal/Skid/SkidModalContext';
-import { usePersonData } from '../components/PersonData';
 import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 import HazardCard from '../components/Card/HazardCard';
 import CreateHazardModal from '../components/Modal/CreateHazardModal';
@@ -19,14 +12,12 @@ import { useAlertMessage } from '../components/AlertMessage';
 import { useConfirmationModal } from '../components/ConfirmationModalContext';
 
 const Hazards = () => {
-  const { skidModalState, setSkidModalState } = useSkidModal();
-  const { personDataState, setPersonDataState } = usePersonData();
   const { hazardState, setHazardState } = useHazardState();
   const [hazards, setHazards] = useState([]);
   const navigate = useNavigate();
   const [selectAll, setSelectAll] = useState(false);
   const [selectedHazardIds, setSelectedHazardIds] = useState([]);
-  const { alertMesssageState, setAlertMessageState } = useAlertMessage();
+  const { addToast } = useAlertMessage();
   const [showSpinner, setShowSpinner] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const { confirmationModalState, setConfirmationModalState } = useConfirmationModal();
@@ -71,47 +62,20 @@ const Hazards = () => {
         } else {
           message = `Success! multiple hazard review comments has been updated`;
         }
-        setAlertMessageState((prevState) => ({
-          ...prevState,
-          toasts: [
-            ...prevState.toasts,
-            {
-              id: id,
-              heading: 'Hazard Review Updated',
-              show: true,
-              message: message,
-              background: 'success',
-              color: 'white'
-            }
-          ]
-        }));
+        addToast('Hazard Review Updated', message, 'success', 'white');
         setHazards(response.data.hazards);
         resetHazard();
       }
     } catch (error) {
-      setAlertMessageState((prevState) => ({
-        ...prevState,
-        toasts: [
-          ...prevState.toasts,
-          {
-            id: id,
-            heading: 'Add Person',
-            show: true,
-            message: `Error! An error has occured while updating hazard review`,
-            background: 'danger',
-            color: 'white'
-          }
-        ]
-      }));
+      addToast(
+        'Add Person',
+        `Error! An error has occured while updating hazard review`,
+        'danger',
+        'white'
+      );
       console.error('Error updating review:', error);
     } finally {
       setShowSpinner(false);
-      setTimeout(() => {
-        setAlertMessageState((prevState) => ({
-          ...prevState,
-          toasts: prevState.toasts.filter((toast) => toast.id !== id)
-        }));
-      }, 10000);
     }
   };
 
@@ -141,60 +105,30 @@ const Hazards = () => {
         resetHazard();
 
         if (hazardState.isEditing) {
-          setAlertMessageState((prevState) => ({
-            ...prevState,
-            toasts: [
-              ...prevState.toasts,
-              {
-                id: id,
-                heading: `Hazard Updated`,
-                show: true,
-                message: `Success! ${hazardState.title} has been updated`,
-                background: 'success',
-                color: 'white'
-              }
-            ]
-          }));
+          addToast(
+            `Hazard Updated`,
+            `Success! ${hazardState.title} has been updated`,
+            'success',
+            'white'
+          );
         } else {
-          setAlertMessageState((prevState) => ({
-            ...prevState,
-            toasts: [
-              ...prevState.toasts,
-              {
-                id: id,
-                heading: 'Hazard Added',
-                show: true,
-                message: `Success! ${hazardState.title} has beeen added`,
-                background: 'success',
-                color: 'white'
-              }
-            ]
-          }));
+          addToast(
+            'Hazard Added',
+            `Success! ${hazardState.title} has beeen added`,
+            'success',
+            'white'
+          );
         }
       }
     } catch (error) {
-      setAlertMessageState((prevState) => ({
-        ...prevState,
-        toasts: [
-          ...prevState.toasts,
-          {
-            id: id,
-            heading: 'Add Hazard',
-            show: true,
-            message: `Error! An Error has occurred adding editing or adding ${hazardState.title} hazard`,
-            background: 'danger',
-            color: 'white'
-          }
-        ]
-      }));
+      addToast(
+        'Add Hazard',
+        `Error! An Error has occurred adding editing or adding ${hazardState.title} hazard`,
+        'danger',
+        'white'
+      );
     } finally {
-      setTimeout(() => {
-        setShowSpinner(false);
-        setAlertMessageState((prevState) => ({
-          ...prevState,
-          toasts: prevState.toasts.filter((toast) => toast.id !== id)
-        }));
-      }, 10000);
+      setShowSpinner(false);
     }
   };
 
@@ -217,8 +151,11 @@ const Hazards = () => {
     if (selectedHazardIds.length === 0) {
       return;
     }
-    const hazardNames = hazards.filter((hazard) => selectedHazardIds.includes(hazard._id)).map(hazard => hazard.id).join(',');
-console.log("delelele", hazardNames)
+    const hazardNames = hazards
+      .filter((hazard) => selectedHazardIds.includes(hazard._id))
+      .map((hazard) => hazard.id)
+      .join(',');
+    console.log('delelele', hazardNames);
     setConfirmationModalState((prevState) => ({
       ...prevState,
       show: true,
@@ -242,20 +179,7 @@ console.log("delelele", hazardNames)
             if (response.status === 200) {
               resetHazard();
               setHazards(response.data.hazards);
-              setAlertMessageState((prevState) => ({
-                ...prevState,
-                toasts: [
-                  ...prevState.toasts,
-                  {
-                    id: id,
-                    heading: 'Hazard Removed',
-                    show: true,
-                    message: `Success! Removed Hazard`,
-                    background: 'success',
-                    color: 'white'
-                  }
-                ]
-              }));
+              addToast('Hazard Removed', `Success! Removed Hazard`, 'success', 'white');
               setConfirmationModalState((prevState) => ({
                 ...prevState,
                 confirmed: false
@@ -265,29 +189,12 @@ console.log("delelele", hazardNames)
             }
           })
           .catch((error) => {
-            setAlertMessageState((prevState) => ({
-              ...prevState,
-              toasts: [
-                ...prevState.toasts,
-                {
-                  id: id,
-                  heading: 'Remove Hazard',
-                  show: true,
-                  message: `Error! An error has occured while removing hazard`,
-                  background: 'danger',
-                  color: 'white'
-                }
-              ]
-            }));
+            addToast(
+              'Remove Hazard',
+              `Error! An error has occured while removing hazard`,
+              'danger'
+            );
             console.error(error);
-          })
-          .finally(() => {
-            setTimeout(() => {
-              setAlertMessageState((prevState) => ({
-                ...prevState,
-                toasts: prevState.toasts.filter((toast) => toast.id !== id)
-              }));
-            }, 10000);
           });
       }
     };
@@ -331,11 +238,6 @@ console.log("delelele", hazardNames)
       isCreateHazardModalVisible: true,
       isEditing: false
     }));
-  };
-
-  //HazardReviewModal
-  const handleOpenReviewModal = () => {
-    setShowReviewModal(true);
   };
 
   const handleCloseReviewModal = () => {
@@ -407,24 +309,21 @@ console.log("delelele", hazardNames)
                   variant="outline-secondary"
                   className="selective"
                   style={{ marginRight: '8px' }}
-                  onClick={deleteSelected}
-                >
+                  onClick={deleteSelected}>
                   <i className="fa fa-trash" aria-hidden="true"></i>&nbsp;Delete
                 </Button>
                 <Button
                   variant="outline-secondary"
                   className="selective"
                   style={{ marginRight: '8px' }}
-                  onClick={updateSelected}
-                >
+                  onClick={updateSelected}>
                   <i className="fa fa-magic" aria-hidden="true"></i>&nbsp;Update Review
                 </Button>
                 <Button
                   variant="outline-secondary"
                   className="selective"
                   style={{ marginRight: '8px' }}
-                  onClick={editHazard}
-                >
+                  onClick={editHazard}>
                   <i className="fa fa-pencil" aria-hidden="true"></i>&nbsp;Edit Hazard
                 </Button>
               </>

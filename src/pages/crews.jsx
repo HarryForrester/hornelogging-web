@@ -70,6 +70,7 @@ const Crews = () => {
         </div>
 
         {people?.peopleByCrew?.map((crew) => {
+          console.log(crew);
           return (
           <CrewCard key={crew.name} crew={crew} />)
 })}
