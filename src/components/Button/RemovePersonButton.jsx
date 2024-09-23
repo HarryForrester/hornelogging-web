@@ -17,6 +17,7 @@ const RemovePersonButton = ({ person, _account }) => {
   const { addToast } = useAlertMessage();
   const { crews } = useCrews();
   const navigate = useNavigate();
+  console.log('perosn', person)
 
   const deletePerson = () => {
     setConfirmationModalState((prevState) => ({
@@ -26,7 +27,7 @@ const RemovePersonButton = ({ person, _account }) => {
       label: 'Remove Person',
       message: (
         <>
-          Are you sure you want to remove crew member: <strong>{person.name}</strong>
+          Are you sure you want to remove crew member: <strong>{person.firstName} {person.lastName}</strong>
         </>
       )
     }));
@@ -47,10 +48,10 @@ const RemovePersonButton = ({ person, _account }) => {
           if (response.status === 200) {
               await deletePresignedUrl([`${person._id}/`]);
               navigate('/');
-              addToast('Person Removed!', `${person.name} has been removed from ${crewName} successfully`, 'success', 'white' );
+              addToast('Person Removed!', `${person.firstName} ${person.lastName} has been removed from ${crewName} successfully`, 'success', 'white' );
           }
         } catch (error) {
-          addToast('Error!', `An error occurred removing ${person.name} from ${crewName}`, 'danger', 'white');
+          addToast('Error!', `An error occurred removing ${person.firstName} ${person.lastName} from ${crewName}`, 'danger', 'white');
           console.error('An error has occured while removing crew member');
         } finally {
           setConfirmationModalState((prevState) => ({
