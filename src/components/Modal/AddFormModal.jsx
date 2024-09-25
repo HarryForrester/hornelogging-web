@@ -5,8 +5,25 @@ import Button from 'react-bootstrap/Button';
 import { Form } from 'react-bootstrap';
 import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
-import * as formik from 'formik';
 import * as yup from 'yup';
+import {
+  DndContext,
+  closestCenter,
+  useSensor,
+  useSensors,
+  MouseSensor,
+  TouchSensor,
+  KeyboardSensor,
+  DragOverlay,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  arrayMove,
+  useSortable,
+  sortableKeyboardCoordinates,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 import SectionElement from '../FormElements/SectionElement';
 import { useAlertMessage } from '../AlertMessage';
@@ -15,9 +32,7 @@ const AddFormModal = ({ crews, isVisible, onClose, selectedForm, setForms, setCr
   const [formSections, setFormSections] = useState([]);
   const [formTitle, setFormTitle] = useState('');
   const [validated, setValidated] = useState(false);
-  const [showSpinner, setShowSpinner] = useState(false);
-  const { alertMessageState, setAlertMessageState } = useAlertMessage();
-  const { Formik } = formik;
+  const { setAlertMessageState } = useAlertMessage();
 
   const schema = yup.object().shape({
     formTitle: yup.string().required()
@@ -32,15 +47,8 @@ const AddFormModal = ({ crews, isVisible, onClose, selectedForm, setForms, setCr
 
   useEffect(() => {
     if (selectedForm) {
-      // Update the form title
       setFormTitle(selectedForm.title);
-
-      console.log('selectedForm.sectionsSerialized: ', selectedForm);
-
-      // Parse and update the form sections
       const parsedSections = JSON.parse(selectedForm.sectionsSerialized);
-      console.log('parsed sections: ', parsedSections);
-
       if (parsedSections && Array.isArray(parsedSections)) {
         const newSections = parsedSections.map((sectionData) => {
           const newSection = {
@@ -53,25 +61,17 @@ const AddFormModal = ({ crews, isVisible, onClose, selectedForm, setForms, setCr
                 label: item.label,
                 value: item.value
               };
-
               if (item.type === 'selectlist') {
                 formElement.items = item.items || [];
               }
-
               if (item.type === 'check') {
                 formElement.checked = item.checked || false;
               }
-
               return formElement;
             })
           };
-
           return newSection;
         });
-
-        console.log('new Sections:', newSections);
-
-        // Update the form sections
         setFormSections(newSections);
       }
     }
@@ -79,14 +79,22 @@ const AddFormModal = ({ crews, isVisible, onClose, selectedForm, setForms, setCr
 
   const handleAddElement = () => {
     const key = `section_${Date.now()}`;
-
     setFormSections((prevSections) => [
       ...prevSections,
       {
         sectionKey: key,
-        items: []
+        items: [],
+        order: prevSections.length + 1
       }
     ]);
+  };
+
+  const handleReorderSections = (sourceIndex, destinationIndex) => {
+    if (destinationIndex < 0 || destinationIndex >= formSections.length) {
+      return;
+    }
+    const updatedSections = arrayMove(formSections, sourceIndex, destinationIndex);
+    setFormSections(updatedSections);
   };
 
   const handleRemoveElement = (sectionKeyToRemove) => {
@@ -100,12 +108,9 @@ const AddFormModal = ({ crews, isVisible, onClose, selectedForm, setForms, setCr
   };
 
   const handleAddElementsToSection = (key, newSection) => {
-    console.log('key:', key);
     setFormSections((prevSections) => {
-      // Check if any section has the specified key
       const updatedSections = prevSections.map((section) => {
         if (section.sectionKey === key) {
-          // If the section matches the key, update its formElements array
           return {
             ...section,
             items: [...section.items, newSection]
@@ -113,30 +118,21 @@ const AddFormModal = ({ crews, isVisible, onClose, selectedForm, setForms, setCr
         }
         return section;
       });
-
-      // If no section matched the key, add a new section with the specified key
       if (!updatedSections.some((section) => section.sectionKey === key)) {
         updatedSections.push({
           sectionKey: key,
           items: [newSection]
         });
       }
-
       return updatedSections;
     });
   };
 
   const handleSubmit = async (event) => {
-    setShowSpinner(true);
     const id = new Date().getTime();
-    console.log('formy:', formSections);
     event.preventDefault();
-
     const form = event.currentTarget;
-
-    console.log('the form :', form);
     if (form.checkValidity() === false) {
-      console.log('not vatiated');
       event.stopPropagation();
       setValidated(false);
     } else {
@@ -146,52 +142,28 @@ const AddFormModal = ({ crews, isVisible, onClose, selectedForm, setForms, setCr
         title: formTitle,
         sections: formSections
       };
-
-      console.log('hahahahaha', data);
-      console.log('meow meow meow');
-
       try {
         const response = await axios.post('http://localhost:3001/submit-form', data, {
           withCredentials: true
         });
-
         if (response.status === 200) {
-          console.log('Success!!@', response.data);
           setCrews(response.data.crew);
           setForms(response.data.forms);
           handleClose();
-
-          if (data.id === '') {
-            setAlertMessageState((prevState) => ({
-              ...prevState,
-              toasts: [
-                ...prevState.toasts,
-                {
-                  id: id,
-                  heading: 'Form Added',
-                  show: true,
-                  message: `Success! Form has been added`,
-                  background: 'success',
-                  color: 'white'
-                }
-              ]
-            }));
-          } else {
-            setAlertMessageState((prevState) => ({
-              ...prevState,
-              toasts: [
-                ...prevState.toasts,
-                {
-                  id: id,
-                  heading: 'Form Updated',
-                  show: true,
-                  message: `Success! Form has been updated`,
-                  background: 'success',
-                  color: 'white'
-                }
-              ]
-            }));
-          }
+          setAlertMessageState((prevState) => ({
+            ...prevState,
+            toasts: [
+              ...prevState.toasts,
+              {
+                id: id,
+                heading: data.id === '' ? 'Form Added' : 'Form Updated',
+                show: true,
+                message: `Success! Form has been ${data.id === '' ? 'added' : 'updated'}`,
+                background: 'success',
+                color: 'white'
+              }
+            ]
+          }));
         }
       } catch (error) {
         setAlertMessageState((prevState) => ({
@@ -209,18 +181,17 @@ const AddFormModal = ({ crews, isVisible, onClose, selectedForm, setForms, setCr
           ]
         }));
         console.error('An error has occured submitting form', error);
-      } finally {
-        setShowSpinner(false);
-
-        setTimeout(() => {
-          setAlertMessageState((prevState) => ({
-            ...prevState,
-            toasts: prevState.toasts.filter((toast) => toast.id !== id)
-          }));
-        }, 10000);
       }
     }
   };
+
+  const sensors = useSensors(
+    useSensor(MouseSensor),
+    useSensor(TouchSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   return (
     <Modal show={isVisible} onHide={handleClose} backdrop="static" size="lg">
@@ -236,25 +207,44 @@ const AddFormModal = ({ crews, isVisible, onClose, selectedForm, setForms, setCr
               value={formTitle}
               style={{ marginBottom: '15px' }}
               onChange={(e) => handleFormTitleChange(e)}
-              isInvalid={!formTitle.trim()} // Check if formTitle is empty or contains only whitespace
+              isInvalid={!formTitle.trim()}
               required
             />
             <Form.Control.Feedback type="invalid">Form Title is required</Form.Control.Feedback>
           </Form.Group>
 
-          {formSections.map((section) => (
-            <SectionElement
-              key={section.sectionKey}
-              sectionKey={section.sectionKey}
-              crews={crews}
-              onAddSection={handleAddElementsToSection}
-              onRemoveSection={handleRemoveElement}
-              sectionTitle={section.title}
-              items={section.items}
-              setFormSections={setFormSections}
-              formSections={formSections}
-            />
-          ))}
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={(event) => {
+              const { active, over } = event;
+              if (over && active.id !== over.id) {
+                const oldIndex = formSections.findIndex((section) => section.sectionKey === active.id);
+                const newIndex = formSections.findIndex((section) => section.sectionKey === over.id);
+                handleReorderSections(oldIndex, newIndex);
+              }
+            }}
+          >
+            <SortableContext items={formSections.map((section) => section.sectionKey)} strategy={verticalListSortingStrategy}>
+              {formSections.map((section, index) => (
+                <SortableSection
+                  key={section.sectionKey}
+                  id={section.sectionKey}
+                  index={index}
+                  section={section}
+                  crews={crews}
+                  onAddSection={handleAddElementsToSection}
+                  onRemoveSection={handleRemoveElement}
+                  setFormSections={setFormSections}
+                  formSections={formSections}
+                  sensors={sensors}
+                />
+              ))}
+            </SortableContext>
+            <DragOverlay>
+              {/* Render a drag overlay if needed */}
+            </DragOverlay>
+          </DndContext>
 
           <Form.Group>
             <Button onClick={handleAddElement}>Add new section</Button>
@@ -271,6 +261,72 @@ const AddFormModal = ({ crews, isVisible, onClose, selectedForm, setForms, setCr
       </Modal.Footer>
     </Modal>
   );
+};
+
+const SortableSection = ({ id, section, crews, onAddSection, onRemoveSection, setFormSections, formSections }) => {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    padding: '10px',
+    margin: '10px 0',
+    backgroundColor: 'white',
+    border: '1px solid #ccc',
+    borderRadius: '4px'
+  };
+
+  const handleStyle = {
+    cursor: 'move',
+    padding: '5px',
+    backgroundColor: '#007bff',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    marginBottom: '10px'
+  };
+
+  return (
+    <div ref={setNodeRef} style={style}>
+      <button style={handleStyle} {...attributes} {...listeners}>
+        Move Section
+      </button>
+      <SectionElement
+        sectionKey={section.sectionKey}
+        crews={crews}
+        onAddSection={onAddSection}
+        onRemoveSection={onRemoveSection}
+        sectionTitle={section.title}
+        items={section.items}
+        setFormSections={setFormSections}
+        formSections={formSections}
+      />
+    </div>
+  );
+};
+
+SortableSection.propTypes = {
+  id: PropTypes.string.isRequired,
+  index: PropTypes.number.isRequired,
+  section: PropTypes.shape({
+    sectionKey: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    items: PropTypes.arrayOf(
+      PropTypes.shape({
+        key: PropTypes.string.isRequired,
+        type: PropTypes.string.isRequired,
+        label: PropTypes.string.isRequired,
+        value: PropTypes.string,
+        items: PropTypes.array,
+        checked: PropTypes.bool
+      })
+    ).isRequired
+  }).isRequired,
+  crews: PropTypes.array.isRequired,
+  onAddSection: PropTypes.func.isRequired,
+  onRemoveSection: PropTypes.func.isRequired,
+  setFormSections: PropTypes.func.isRequired,
+  formSections: PropTypes.array.isRequired
 };
 
 AddFormModal.propTypes = {

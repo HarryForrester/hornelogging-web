@@ -22,11 +22,6 @@ const SectionElement = ({
   formSections,
   sectionTitle
 }) => {
-  //const [formElements, setFormElements] = useState([]);
-
-  const handleSectionLabelChange = () => {
-    console.log('handleSectionLabelChange');
-  };
 
   /**
    * Adds a Check, Text, Number, Date, Time, Image, Singature, SelectList, and Crew List Element to given section
@@ -34,8 +29,7 @@ const SectionElement = ({
   const handleAddElement = (elementType) => {
     const key = `${elementType}_${Date.now()}`;
 
-    const newSection = { key, type: elementType, label: '', value: '' };
-
+    const newSection = { key, type: elementType, label: '', value: '', order: items.length + 1 };
     onAddSection(sectionKey, newSection);
 
     // Create a unique key for the new element
@@ -173,22 +167,6 @@ const SectionElement = ({
       return updatedSections;
     });
 
-    /* setFormElements((prevElements) => {
-      const updatedElements = prevElements.map((element) => {
-        if (element.key === key) {
-          const updatedItemLabels = [...element.itemLabels];
-          updatedItemLabels[index] = value;
-          return { ...element, itemLabels: updatedItemLabels };
-        } else {
-          return element;
-        }
-      });
-      console.log("Updated elements:", updatedElements);
-  
-      // Now use the updatedElements array for any immediate logic
-      return updatedElements;
-    });
- */
   };
 
   const handleRemoveElement = (key) => {
@@ -314,6 +292,7 @@ const SectionElement = ({
   return (
     <div className="section-container">
       <div className="flex-grow-1" style={{ height: '25px', marginBottom: '25px' }}>
+        
         <Form.Control
           type="text"
           className="section-title form-control"
