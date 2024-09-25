@@ -7,6 +7,7 @@ import axios from 'axios';
 import { useAlertMessage } from '../AlertMessage';
 
 const HazardReviewModal = ({ show, onHide, selectedHazardsId, hazards, setHazards }) => {
+  console.log('hazard', hazards);
   const { addToast } = useAlertMessage();
 
   const initialValues = {
@@ -23,6 +24,7 @@ const HazardReviewModal = ({ show, onHide, selectedHazardsId, hazards, setHazard
    **/
 
   const handleFormSubmit = async (values, { setSubmitting }) => {
+    console.log('vaues', selectedHazardsId);
     const hazardObj = {
       _ids: selectedHazardsId,
       comment: values.comment
