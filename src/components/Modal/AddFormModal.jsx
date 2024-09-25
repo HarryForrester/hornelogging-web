@@ -264,14 +264,14 @@ const AddFormModal = ({ crews, isVisible, onClose, selectedForm, setForms, setCr
 };
 
 const SortableSection = ({ id, section, crews, onAddSection, onRemoveSection, setFormSections, formSections }) => {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     padding: '10px',
     margin: '10px 0',
-    backgroundColor: 'white',
+    backgroundColor: isDragging ? '#f0f8ff' : 'white', // Highlight when dragging
     border: '1px solid #ccc',
     borderRadius: '4px'
   };
