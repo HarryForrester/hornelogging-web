@@ -399,8 +399,21 @@ const SortableFormElement = ({ id, element, handleElementChange, handleRemoveEle
     }
   };
 
+  const handleStyle = {
+    cursor: 'move',
+    padding: '5px',
+    backgroundColor: '#007bff',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    marginBottom: '10px'
+  };
+
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+    <div ref={setNodeRef} style={style} >
+      <button style={handleStyle} {...attributes} {...listeners}>
+        Move Item
+      </button>
       {renderElement()}
     </div>
   );
