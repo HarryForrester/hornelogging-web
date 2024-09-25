@@ -10,6 +10,9 @@ import AddImage from '../AddFormElements/AddImage';
 import AddSignature from '../AddFormElements/AddSignature';
 import AddSelectlist from '../AddFormElements/AddSelectList';
 import AddCrewList from '../AddFormElements/AddCrewList';
+import { DndContext, closestCenter, useSensor, useSensors, MouseSensor, TouchSensor, KeyboardSensor, DragOverlay } from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy, arrayMove, useSortable, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 const SectionElement = ({
   sectionKey,
@@ -23,31 +26,45 @@ const SectionElement = ({
   sectionTitle
 }) => {
 
-  /**
-   * Adds a Check, Text, Number, Date, Time, Image, Singature, SelectList, and Crew List Element to given section
-   */
+  const sensors = useSensors(
+    useSensor(MouseSensor),
+    useSensor(TouchSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = items.findIndex((item) => item.key === active.id);
+      const newIndex = items.findIndex((item) => item.key === over.id);
+      const updatedItems = arrayMove(items, oldIndex, newIndex);
+      setFormSections((prevSections) => {
+        return prevSections.map((section) =>
+          section.sectionKey === sectionKey
+            ? { ...section, items: updatedItems }
+            : section
+        );
+      });
+    }
+  };
+
   const handleAddElement = (elementType) => {
     const key = `${elementType}_${Date.now()}`;
-
     const newSection = { key, type: elementType, label: '', value: '', order: items.length + 1 };
     onAddSection(sectionKey, newSection);
-
-    // Create a unique key for the new element
   };
 
   const handleAddItem = (key) => {
-    console.log('Before Update:', formSections);
-
     setFormSections((prevSections) => {
       const updatedSections = prevSections.map((section) => {
-        console.log('sectionKey: ', section.sectionKey);
-        console.log('key: ', key);
         if (section.sectionKey === sectionKey) {
           return {
             ...section,
             items: section.items.map((element) => {
               if (element.key === key) {
-                const updatedItemLabels = [...element.items, '']; // Add an empty string as a new item
+                const updatedItemLabels = [...element.items, ''];
                 return { ...element, items: updatedItemLabels };
               } else {
                 return element;
@@ -57,27 +74,20 @@ const SectionElement = ({
         }
         return section;
       });
-
       return updatedSections;
     });
-
-    console.log('After Update:', formSections);
   };
 
   const handleRemoveItem = (key) => {
-    console.log('Before Update:', formSections);
-
     setFormSections((prevSections) => {
       const updatedSections = prevSections.map((section) => {
-        console.log('sectionKey: ', section.sectionKey);
-        console.log('key: ', key);
         if (section.sectionKey === sectionKey) {
           return {
             ...section,
             items: section.items.map((element) => {
               if (element.key === key) {
                 const updatedItemLabels = [...element.items];
-                updatedItemLabels.pop(); // Remove the last item
+                updatedItemLabels.pop();
                 return { ...element, items: updatedItemLabels };
               } else {
                 return element;
@@ -87,28 +97,18 @@ const SectionElement = ({
         }
         return section;
       });
-
       return updatedSections;
     });
-
-    console.log('After Update:', formSections);
   };
 
   const handleAddCrewListElement = (elementType, crew) => {
     const key = `${elementType}_${Date.now()}`;
-
     const newSection = { key, type: elementType, label: '', value: crew };
     onAddSection(sectionKey, newSection);
-
-    // Create a unique key for the new element
-
-    // Add the new element to the state
-    //setFormElements((prevElements) => [...prevElements, {  }]);
   };
 
   const handleAddSelectlistElement = (elementType) => {
     const key = `${elementType}_${Date.now()}`;
-
     const newSection = { type: elementType, key, label: '', items: [''], value: '' };
     onAddSection(sectionKey, newSection);
   };
@@ -163,10 +163,8 @@ const SectionElement = ({
             }
           : section
       );
-      console.log('Updated sections:', updatedSections);
       return updatedSections;
     });
-
   };
 
   const handleRemoveElement = (key) => {
@@ -179,120 +177,24 @@ const SectionElement = ({
   };
 
   const renderFormElements = () => {
-    return items.map((element) => {
-      console.log('test: ', element);
-
-      switch (element.type) {
-        case 'check':
-          return (
-            <AddCheckbox
-              key={element.key}
-              labelValue={element.label}
-              onChange={(event) => handleElementChange(element.key, event)}
-              onRemove={() => handleRemoveElement(element.key)}
-            />
-          );
-        case 'freeform':
-          return (
-            <AddFreeform
-              key={element.key}
-              labelValue={element.label}
-              value={element.value}
-              onChange={(event) => handleElementChange(element.key, event)}
-              onRemove={() => handleRemoveElement(element.key)}
-            />
-          );
-        case 'number':
-          return (
-            <AddNumber
-              key={element.key}
-              labelValue={element.label}
-              value={element.value}
-              onChange={(event) => handleElementChange(element.key, event)}
-              onRemove={() => handleRemoveElement(element.key)}
-            />
-          );
-        case 'date':
-          return (
-            <AddDate
-              key={element.key}
-              labelValue={element.label}
-              date={element.value}
-              onChange={(event) => handleElementChange(element.key, event)}
-              onRemove={() => handleRemoveElement(element.key)}
-            />
-          );
-
-        case 'time':
-          return (
-            <AddTime
-              key={element.key}
-              labelValue={element.label}
-              date={element.value}
-              onChange={(event) => handleElementChange(element.key, event)}
-              onRemove={() => handleRemoveElement(element.key)}
-            />
-          );
-
-        case 'image':
-          return (
-            <AddImage
-              key={element.key}
-              labelValue={element.label}
-              date={element.value}
-              onChange={(event) => handleElementChange(element.key, event)}
-              onRemove={() => handleRemoveElement(element.key)}
-            />
-          );
-
-        case 'signature':
-          return (
-            <AddSignature
-              key={element.key}
-              labelValue={element.label}
-              date={element.value}
-              onChange={(event) => handleElementChange(element.key, event)}
-              onRemove={() => handleRemoveElement(element.key)}
-            />
-          );
-
-        case 'selectlist':
-          return (
-            <AddSelectlist
-              itemKey={element.key}
-              label={element.label}
-              items={element.items}
-              onChange={(event) => handleElementChange(element.key, event)}
-              onItemLabelChange={handleItemLabelChange}
-              addItem={() => handleAddItem(element.key)}
-              onRemove={() => handleRemoveElement(element.key)}
-              onRemoveItem={handleRemoveItem}
-              setFormElements={setFormElements}
-            />
-          );
-
-        case 'list':
-          return (
-            <AddCrewList
-              key={element.key}
-              label={element.label}
-              value={element.value}
-              crew={element.crew}
-              onChange={(event) => handleElementChange(element.key, event)}
-              onRemove={() => handleRemoveElement(element.key)}
-            />
-          );
-        // Add other cases as needed...
-        default:
-          return null;
-      }
-    });
+    return items.map((element) => (
+      <SortableFormElement
+        key={element.key}
+        id={element.key}
+        element={element}
+        handleElementChange={handleElementChange}
+        handleRemoveElement={handleRemoveElement}
+        handleItemLabelChange={handleItemLabelChange}
+        handleAddItem={handleAddItem}
+        handleRemoveItem={handleRemoveItem}
+        setFormElements={setFormElements}
+      />
+    ));
   };
 
   return (
     <div className="section-container">
       <div className="flex-grow-1" style={{ height: '25px', marginBottom: '25px' }}>
-        
         <Form.Control
           type="text"
           className="section-title form-control"
@@ -307,24 +209,15 @@ const SectionElement = ({
       <br />
 
       <div className="button-container">
-        <Button
-          className="add-check-btn btn btn-secondary"
-          onClick={() => handleAddElement('check')}
-        >
+        <Button className="add-check-btn btn btn-secondary" onClick={() => handleAddElement('check')}>
           <i className="fa-solid fa-circle-check"></i>
           <span className="span-text"> Check</span>
         </Button>
-        <Button
-          className="add-freeform-btn btn btn-secondary"
-          onClick={() => handleAddElement('freeform')}
-        >
+        <Button className="add-freeform-btn btn btn-secondary" onClick={() => handleAddElement('freeform')}>
           <i className="fa-solid fa-font"></i>
           <span className="span-text"> Text</span>
         </Button>
-        <Button
-          className="add-number-btn btn btn-secondary"
-          onClick={() => handleAddElement('number')}
-        >
+        <Button className="add-number-btn btn btn-secondary" onClick={() => handleAddElement('number')}>
           <i className="fa-solid fa-hashtag"></i>
           <span className="span-text"> Number</span>
         </Button>
@@ -336,29 +229,19 @@ const SectionElement = ({
           <i className="fa-solid fa-clock"></i>
           <span className="span-text"> Time</span>
         </Button>
-        <Button
-          className="add-image-btn btn btn-secondary"
-          onClick={() => handleAddElement('image')}
-        >
+        <Button className="add-image-btn btn btn-secondary" onClick={() => handleAddElement('image')}>
           <i className="fa-solid fa-image"></i>
           <span className="span-text"> Image</span>
         </Button>
-        <Button
-          className="add-signature-btn btn btn-secondary"
-          onClick={() => handleAddElement('signature')}
-        >
+        <Button className="add-signature-btn btn btn-secondary" onClick={() => handleAddElement('signature')}>
           <i className="fa-solid fa-signature"></i>
           <span className="span-text"> Signature</span>
         </Button>
-        <Button
-          className="add-selectlist-btn btn btn-secondary"
-          onClick={() => handleAddSelectlistElement('selectlist')}
-        >
+        <Button className="add-selectlist-btn btn btn-secondary" onClick={() => handleAddSelectlistElement('selectlist')}>
           <i className="fa-solid fa-rectangle-list"></i>
           <span className="span-text"> Select List</span>
         </Button>
 
-        {/* Dropdown for Crew List */}
         <Dropdown>
           <Dropdown.Toggle variant="secondary" id="dropdown-crew-list">
             <i className="fa-solid fa-rectangle-list"></i>
@@ -366,41 +249,159 @@ const SectionElement = ({
           </Dropdown.Toggle>
           <Dropdown.Menu>
             {crews.map((crewMember, index) => (
-              <Dropdown.Item
-                key={index}
-                className="crew-item"
-                onClick={() => handleAddCrewListElement('list', crewMember.name)}
-              >
+              <Dropdown.Item key={index} className="crew-item" onClick={() => handleAddCrewListElement('list', crewMember.name)}>
                 {crewMember.name}
               </Dropdown.Item>
             ))}
-            <Dropdown.Item
-              className="crew-item"
-              onClick={() => handleAddCrewListElement('list', 'All')}
-            >
+            <Dropdown.Item className="crew-item" onClick={() => handleAddCrewListElement('list', 'All')}>
               All
             </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
       </div>
 
-      <div className="form-container">
-        {/* Free-form text elements will be dynamically added here */}
-        {renderFormElements()}
-      </div>
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={items.map((item) => item.key)} strategy={verticalListSortingStrategy}>
+          <div className="form-container">
+            {renderFormElements()}
+          </div>
+        </SortableContext>
+        <DragOverlay>
+          {/* Render a drag overlay if needed */}
+        </DragOverlay>
+      </DndContext>
 
       <div className="dropdown-form-designer-crew">{/* Dropdown Form Designer Crew content */}</div>
 
       <br />
       <div className="mt-3 remove-section-btn">
-        <Button
-          className="remove-section-btn btn btn-danger"
-          onClick={() => onRemoveSection(sectionKey)}
-        >
+        <Button className="remove-section-btn btn btn-danger" onClick={() => onRemoveSection(sectionKey)}>
           Remove Section
         </Button>
       </div>
       <br />
+    </div>
+  );
+};
+
+const SortableFormElement = ({ id, element, handleElementChange, handleRemoveElement, handleItemLabelChange, handleAddItem, handleRemoveItem, setFormElements }) => {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    marginBottom: '10px',
+    padding: '10px',
+    backgroundColor: 'white',
+    border: '1px solid #ccc',
+    borderRadius: '4px',
+    cursor: 'move'
+  };
+
+  const renderElement = () => {
+    switch (element.type) {
+      case 'check':
+        return (
+          <AddCheckbox
+            key={element.key}
+            labelValue={element.label}
+            onChange={(event) => handleElementChange(element.key, event)}
+            onRemove={() => handleRemoveElement(element.key)}
+          />
+        );
+      case 'freeform':
+        return (
+          <AddFreeform
+            key={element.key}
+            labelValue={element.label}
+            value={element.value}
+            onChange={(event) => handleElementChange(element.key, event)}
+            onRemove={() => handleRemoveElement(element.key)}
+          />
+        );
+      case 'number':
+        return (
+          <AddNumber
+            key={element.key}
+            labelValue={element.label}
+            value={element.value}
+            onChange={(event) => handleElementChange(element.key, event)}
+            onRemove={() => handleRemoveElement(element.key)}
+          />
+        );
+      case 'date':
+        return (
+          <AddDate
+            key={element.key}
+            labelValue={element.label}
+            date={element.value}
+            onChange={(event) => handleElementChange(element.key, event)}
+            onRemove={() => handleRemoveElement(element.key)}
+          />
+        );
+      case 'time':
+        return (
+          <AddTime
+            key={element.key}
+            labelValue={element.label}
+            date={element.value}
+            onChange={(event) => handleElementChange(element.key, event)}
+            onRemove={() => handleRemoveElement(element.key)}
+          />
+        );
+      case 'image':
+        return (
+          <AddImage
+            key={element.key}
+            labelValue={element.label}
+            date={element.value}
+            onChange={(event) => handleElementChange(element.key, event)}
+            onRemove={() => handleRemoveElement(element.key)}
+          />
+        );
+      case 'signature':
+        return (
+          <AddSignature
+            key={element.key}
+            labelValue={element.label}
+            date={element.value}
+            onChange={(event) => handleElementChange(element.key, event)}
+            onRemove={() => handleRemoveElement(element.key)}
+          />
+        );
+      case 'selectlist':
+        return (
+          <AddSelectlist
+            itemKey={element.key}
+            label={element.label}
+            items={element.items}
+            onChange={(event) => handleElementChange(element.key, event)}
+            onItemLabelChange={handleItemLabelChange}
+            addItem={() => handleAddItem(element.key)}
+            onRemove={() => handleRemoveElement(element.key)}
+            onRemoveItem={handleRemoveItem}
+            setFormElements={setFormElements}
+          />
+        );
+      case 'list':
+        return (
+          <AddCrewList
+            key={element.key}
+            label={element.label}
+            value={element.value}
+            crew={element.crew}
+            onChange={(event) => handleElementChange(element.key, event)}
+            onRemove={() => handleRemoveElement(element.key)}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      {renderElement()}
     </div>
   );
 };
@@ -415,6 +416,25 @@ SectionElement.propTypes = {
   formSections: PropTypes.array.isRequired,
   setFormSections: PropTypes.func.isRequired,
   sectionTitle: PropTypes.string.isRequired
+};
+
+SortableFormElement.propTypes = {
+  id: PropTypes.string.isRequired,
+  element: PropTypes.shape({
+    key: PropTypes.string.isRequired,
+    type: PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired,
+    value: PropTypes.string,
+    items: PropTypes.array,
+    checked: PropTypes.bool,
+    crew: PropTypes.string
+  }).isRequired,
+  handleElementChange: PropTypes.func.isRequired,
+  handleRemoveElement: PropTypes.func.isRequired,
+  handleItemLabelChange: PropTypes.func.isRequired,
+  handleAddItem: PropTypes.func.isRequired,
+  handleRemoveItem: PropTypes.func.isRequired,
+  setFormElements: PropTypes.func.isRequired
 };
 
 export default SectionElement;
