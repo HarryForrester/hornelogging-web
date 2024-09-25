@@ -18,6 +18,7 @@ const HazardCard = ({ hazard, selectAll, handleHazardChange }) => {
             id={_id}
             type="checkbox"
             className="hazard-check"
+            data-testid={`hazard-check-${_id}`}
             onChange={() => handleHazardChange(_id)}
             checked={selectAll}
           />

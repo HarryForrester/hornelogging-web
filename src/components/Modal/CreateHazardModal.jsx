@@ -16,6 +16,7 @@ const CreateHazardModal = ({ show, handleClose, initialValues, isEditing, update
    * @param {*} e
    */
   const submit = async (values, resetForm) => {
+    console.log('values of submitted', values);
    
     try {
       setShowSpinner(true);
@@ -105,12 +106,13 @@ const CreateHazardModal = ({ show, handleClose, initialValues, isEditing, update
             </Modal.Header>
             <Modal.Body>
               <Form.Group as={Col} controlId="newHazardTitle">
-                <Form.Label>Hazard Title</Form.Label>
+                <Form.Label>Hazard Name</Form.Label>
                 <Field
                   type="text"
                   name="title"
                   placeholder="E.g. Early over-exertion"
                   className="form-control"
+                  data-testid="input-title"
                 />
                 <ErrorMessage name="title" component="div" className="error" />
               </Form.Group>
@@ -118,7 +120,7 @@ const CreateHazardModal = ({ show, handleClose, initialValues, isEditing, update
                 <Col>
                   <Form.Group as={Col} controlId="newHazardSev">
                     <Form.Label>Severity</Form.Label>
-                    <Field as="select" name="sev" className="form-select">
+                    <Field as="select" name="sev" className="form-select" data-testid="select-sev">
                       <option value="LOW">LOW</option>
                       <option value="MEDIUM">MEDIUM</option>
                       <option value="HIGH">HIGH</option>
@@ -129,7 +131,7 @@ const CreateHazardModal = ({ show, handleClose, initialValues, isEditing, update
                 <Col>
                   <Form.Group controlId="newHazardCat" className="mb-3">
                     <Form.Label>Category</Form.Label>
-                    <Field as="select" name="category" className="form-select">
+                    <Field as="select" name="category" className="form-select" data-testid="select-category">
                       <option value="Health">Health</option>
                       <option value="Generic">Generic</option>
                       <option value="Environmental">Environmental</option>
@@ -156,7 +158,7 @@ const CreateHazardModal = ({ show, handleClose, initialValues, isEditing, update
               </Row>
               <Form.Group controlId="newHazardReviewDate" className="mb-3">
                 <Form.Label>Review Date</Form.Label>
-                <Field type="date" name="reviewDate" className="form-control" />
+                <Field type="date" name="reviewDate" className="form-control" data-testid="input-reviewDate" />
                 <ErrorMessage name="reviewDate" component="div" className="error" />
               </Form.Group>
               <Form.Group controlId="newHazardReviewReason" className="mb-3">
@@ -166,6 +168,7 @@ const CreateHazardModal = ({ show, handleClose, initialValues, isEditing, update
                   name="reviewReason"
                   placeholder="E.g. General Review"
                   className="form-control"
+                  data-testid="input-reviewReason"
                 />
                 <ErrorMessage name="reviewReason" component="div" className="error" />
               </Form.Group>
@@ -202,6 +205,7 @@ const CreateHazardModal = ({ show, handleClose, initialValues, isEditing, update
                               name={`harmFields.${harmIndex}.category`}
                               placeholder="Category (E.g. Fire)"
                               className="form-control mb-2"
+                              data-testid={`input-harmFields.${harmIndex}.category`}
                             />
                             <ErrorMessage
                               name={`harmFields.${harmIndex}.category`}
@@ -230,6 +234,7 @@ const CreateHazardModal = ({ show, handleClose, initialValues, isEditing, update
                                         className="form-control mb-2"
                                         placeholder="Description (E.g. Do not light fires)"
                                         style={{ flex: '1', borderRadius: '5px' }}
+                                        data-testid={`input-harmFields.${harmIndex}.description.${descIndex}`}
                                       />
                                       <ErrorMessage
                                         name={`harmFields.${harmIndex}.description.${descIndex}`}
@@ -281,9 +286,6 @@ const CreateHazardModal = ({ show, handleClose, initialValues, isEditing, update
               </FieldArray>
             </Modal.Body>
             <Modal.Footer>
-              <Button variant="secondary" onClick={handleClose}>
-                Close
-              </Button>
               <Button type="submit" variant="secondary" onClick={handleSubmit}>
               {showSpinner ? (
                 <>

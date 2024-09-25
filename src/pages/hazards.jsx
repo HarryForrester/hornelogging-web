@@ -70,38 +70,28 @@ const Hazards = () => {
   };
 
   useEffect(() => {
-    const submit = async () => {
-      if (confirmationModalState.confirmed) {
-        const id = new Date().getTime();
+    if (!confirmationModalState.confirmed) return;
 
-        axios
-          .delete(process.env.REACT_APP_URL + '/deleteHazard', {
-            withCredentials: true,
-            data: { hazardIds: selectedHazardIds }
-          })
-          .then((response) => {
-            if (response.status === 200) {
-              resetHazard();
-              setHazards(response.data.hazards);
-              addToast('Hazard Removed', `Success! Removed Hazard`, 'success', 'white');
-              setConfirmationModalState((prevState) => ({
-                ...prevState,
-                confirmed: false
-              }));
-            } else {
-              console.error('Error deleting hazards');
-            }
-          })
-          .catch((error) => {
-            addToast(
-              'Remove Hazard',
-              `Error! An error has occured while removing hazard`,
-              'danger'
-            );
-            console.error(error);
-          });
+    const submit = async () => {
+      try {
+        const response = await axios.delete(`${process.env.REACT_APP_URL}/deleteHazard`, {
+          withCredentials: true,
+          data: { hazardIds: selectedHazardIds }
+        });
+
+        if (response.status === 200) {
+          resetHazard();
+          setHazards(response.data.hazards);
+          addToast('Hazard Removed', 'Success! Removed Hazard', 'success', 'white');
+        } else {
+          console.error('Error deleting hazards');
+        }
+      } catch (error) {
+        addToast('Remove Hazard', 'Error! An error has occurred while removing hazard', 'danger');
+        console.error(error);
       }
     };
+
     submit();
   }, [confirmationModalState.confirmed]);
 
@@ -213,12 +203,13 @@ const Hazards = () => {
                   variant="outline-secondary"
                   className="selective"
                   style={{ marginRight: '8px' }}
+                  data-testid="edit-hazard"
                   onClick={editHazard}>
                   <i className="fa fa-pencil" aria-hidden="true"></i>&nbsp;Edit Hazard
                 </Button>
               </>
             )}
-            <Button variant="outline-secondary" onClick={addHazard}>
+            <Button variant="outline-secondary" onClick={addHazard} data-testid="add-hazard">
               <i className="fa fa-plus-square-o" aria-hidden="true"></i>&nbsp;Add Hazard
             </Button>
           </Col>
