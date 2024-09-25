@@ -6,28 +6,26 @@ import { Container, Row, Col, Form, Button } from 'react-bootstrap';
 import HazardCard from '../components/Card/HazardCard';
 import CreateHazardModal from '../components/Modal/CreateHazardModal';
 import HazardReviewModal from '../components/Modal/HazardReviewModal';
-import { useHazardState } from '../components/HazardContext';
-import UpdateReviewHazardModal from '../components/Modal/UpdateReviewHazardModal';
 import { useAlertMessage } from '../components/AlertMessage';
 import { useConfirmationModal } from '../components/ConfirmationModalContext';
 
 const Hazards = () => {
-  const { hazardState, setHazardState } = useHazardState();
   const [hazards, setHazards] = useState([]);
   const navigate = useNavigate();
   const [selectAll, setSelectAll] = useState(false);
   const [selectedHazardIds, setSelectedHazardIds] = useState([]);
   const { addToast } = useAlertMessage();
-  const [showSpinner, setShowSpinner] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const { confirmationModalState, setConfirmationModalState } = useConfirmationModal();
   const [searchTerm, setSearchTerm] = useState('');
 
+  const [edit, setEdit] = useState(false); // used to determine if the user is editing a hazard
+  const [showAddHazardModal, setShowAddHazardModal] = useState(false); // used to determine if the add hazard modal is visible
+  const [selectedHazard, setSelectedHazard] = useState(null); // used to store the selected hazard
+
   const resetHazard = () => {
-    setHazardState({
-      isCreateHazardModalVisible: false,
-      isUpdateReviewModalVisible: false,
-      title: null,
+    setSelectedHazard({
+      title: '',
       sev: 'LOW',
       reviewDate: null,
       reviewReason: null,
@@ -36,100 +34,6 @@ const Hazards = () => {
     });
     setSelectAll(false);
     setSelectedHazardIds([]);
-  };
-
-  /**
-   * Handles the submission of hazard review updates
-   * @param {string} comment - The review comment given by user
-   */
-  const handleUpateReviewSubmit = async (comment) => {
-    const id = new Date().getTime();
-    const hazardObj = {
-      _ids: selectedHazardIds,
-      comment: comment
-    };
-
-    try {
-      const response = await axios.post(process.env.REACT_APP_URL + '/hazardreview', hazardObj, {
-        withCredentials: true
-      });
-      var message;
-
-      if (response.status === 200) {
-        if (selectedHazardIds.length === 1) {
-          const hazardObj = hazards.find((hazard) => hazard._id == selectedHazardIds[0]);
-          message = `Success! ${hazardObj.title} review comment has been updated`;
-        } else {
-          message = `Success! multiple hazard review comments has been updated`;
-        }
-        addToast('Hazard Review Updated', message, 'success', 'white');
-        setHazards(response.data.hazards);
-        resetHazard();
-      }
-    } catch (error) {
-      addToast(
-        'Add Person',
-        `Error! An error has occured while updating hazard review`,
-        'danger',
-        'white'
-      );
-      console.error('Error updating review:', error);
-    } finally {
-      setShowSpinner(false);
-    }
-  };
-
-  /**
-   * Handles the submission of adding/editing a hazard
-   * @param {*} e
-   */
-  const handleSubmit = async (e) => {
-    const id = new Date().getTime();
-    setShowSpinner(true);
-    e.preventDefault();
-
-    try {
-      var response;
-      if (hazardState.isEditing) {
-        response = await axios.post(process.env.REACT_APP_URL + '/hazardedit', hazardState, {
-          withCredentials: true
-        });
-      } else {
-        response = await axios.post(process.env.REACT_APP_URL + '/hazardcreate', hazardState, {
-          withCredentials: true
-        });
-      }
-
-      if (response.status === 200) {
-        setHazards(response.data.hazards);
-        resetHazard();
-
-        if (hazardState.isEditing) {
-          addToast(
-            `Hazard Updated`,
-            `Success! ${hazardState.title} has been updated`,
-            'success',
-            'white'
-          );
-        } else {
-          addToast(
-            'Hazard Added',
-            `Success! ${hazardState.title} has beeen added`,
-            'success',
-            'white'
-          );
-        }
-      }
-    } catch (error) {
-      addToast(
-        'Add Hazard',
-        `Error! An Error has occurred adding editing or adding ${hazardState.title} hazard`,
-        'danger',
-        'white'
-      );
-    } finally {
-      setShowSpinner(false);
-    }
   };
 
   const toggleSelectAll = () => {
@@ -202,10 +106,7 @@ const Hazards = () => {
   }, [confirmationModalState.confirmed]);
 
   const updateSelected = () => {
-    setHazardState((prevState) => ({
-      ...prevState,
-      isUpdateReviewModalVisible: true
-    }));
+    setShowReviewModal(true);
   };
 
   const editHazard = () => {
@@ -217,11 +118,10 @@ const Hazards = () => {
         description: descriptions
       };
     });
-
-    setHazardState((prevState) => ({
-      ...prevState,
-      isCreateHazardModalVisible: true,
-      isEditing: true,
+    console.log('selectedHazardObj', selectedHazardObj);
+    setEdit(true); // set the edit state to true
+    setShowAddHazardModal(true);
+    setSelectedHazard({
       _id: selectedHazardObj._id,
       title: selectedHazardObj.title,
       sev: selectedHazardObj.sev,
@@ -229,27 +129,17 @@ const Hazards = () => {
       reviewReason: selectedHazardObj.reviewReason,
       category: selectedHazardObj.cat,
       harmFields: harmFields
-    }));
+    })
   };
 
   const addHazard = () => {
-    setHazardState((prevState) => ({
-      ...prevState,
-      isCreateHazardModalVisible: true,
-      isEditing: false
-    }));
+    setShowAddHazardModal(true);
   };
 
   const handleCloseReviewModal = () => {
     setShowReviewModal(false);
   };
 
-  const handleReviewSubmit = (comment) => {
-    // Process the comment as needed
-    console.log('Submitted comment:', comment);
-    // Close the modal
-    handleCloseReviewModal();
-  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -350,11 +240,12 @@ const Hazards = () => {
       <HazardReviewModal
         show={showReviewModal}
         onHide={handleCloseReviewModal}
-        onSubmit={handleReviewSubmit}
+        selectedHazardsId={selectedHazardIds}
+        hazards={hazards}
+        setHazards={setHazards}
       />
 
-      <CreateHazardModal handleSubmit={handleSubmit} />
-      <UpdateReviewHazardModal submit={handleUpateReviewSubmit} />
+      <CreateHazardModal show={showAddHazardModal} handleClose={() => setShowAddHazardModal(false)} initialValues={selectedHazard} isEditing={edit} updateHazards={setHazards} />
     </>
   );
 };

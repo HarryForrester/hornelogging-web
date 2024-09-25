@@ -1,77 +1,108 @@
-import React, { useState } from 'react';
-import { Modal, Form, Button, Col, Row } from 'react-bootstrap';
-import { useHazardState } from '../HazardContext';
+/**
+ * NOT IN USE!!
+ */
+
+/* import React from 'react';
+import { Modal, Form, Button } from 'react-bootstrap';
+import { Formik, Field, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
 import axios from 'axios';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faRemove } from '@fortawesome/free-solid-svg-icons';
-import Feedback from 'react-bootstrap/esm/Feedback';
 import PropTypes from 'prop-types';
+import { useAlertMessage } from '../AlertMessage';
 
-const UpdateReviewHazardModal = ({ submit }) => {
-  const { hazardState, setHazardState } = useHazardState();
+const UpdateReviewHazardModal = ({ show, onHide, selectedHazardIds, hazards, setHazards }) => {
+  const { addToast } = useAlertMessage();
 
-  const [comment, setComment] = useState(null);
-  const [commentIsValid, setCommentIsValid] = useState(null);
-
-  const resetForm = () => {
-    setComment(null);
-    setCommentIsValid(null);
+  const initialValues = {
+    comment: ''
   };
 
-  const handleSubmit = () => {
-    if (!comment) {
-      setCommentIsValid(false);
+  const validationSchema = Yup.object({
+    comment: Yup.string().required('Please provide a valid comment')
+  });
+
+  const handleUpateReviewSubmit = async (values, { setSubmitting }) => {
+    const hazardObj = {
+      _ids: selectedHazardIds,
+      comment: values.comment
+    };
+
+    try {
+      // eslint-disable-next-line no-undef
+      const response = await axios.post(process.env.REACT_APP_URL + '/hazardreview', hazardObj, {
+        withCredentials: true
+      });
+      let message;
+
+      if (response.status === 200) {
+        if (selectedHazardIds.length === 1) {
+          const hazardObj = hazards.find((hazard) => hazard._id === selectedHazardIds[0]);
+          message = `Success! ${hazardObj.title} review comment has been updated`;
+        } else {
+          message = `Success! multiple hazard review comments have been updated`;
+        }
+        addToast('Hazard Review Updated', message, 'success', 'white');
+        setHazards(response.data.hazards);
+        onHide();
+      }
+    } catch (error) {
+      addToast(
+        'Add Person',
+        `Error! An error has occurred while updating hazard review`,
+        'danger',
+        'white'
+      );
+      console.error('Error updating review:', error);
+    } finally {
+      setSubmitting(false);
     }
-    //console.log("submit: ", comment);
-    //resetForm();
-    submit(comment);
-  };
-
-  const handleClose = () => {
-    setHazardState((prevState) => ({
-      ...prevState,
-      isUpdateReviewModalVisible: false,
-      reviewDate: null,
-      reviewReason: null
-    }));
-  };
-
-  const handleCommentChange = (e) => {
-    setComment(e.target.value);
-    setCommentIsValid(e ? true : null);
   };
 
   return (
-    <Modal show={hazardState.isUpdateReviewModalVisible} onHide={handleClose} centered>
+    <Modal show={show} onHide={onHide} centered>
       <Modal.Header closeButton>
         <Modal.Title id="updateReviewHazardLabel">Update Review</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <Form id="updateReviewHazardForm" onSubmit={handleSubmit}>
-          <Form.Label>Review comment</Form.Label>
-          <Form.Control
-            type="text"
-            id="comment"
-            name="comment"
-            onChange={(e) => handleCommentChange(e)}
-            isValid={commentIsValid === true}
-            isInvalid={commentIsValid === false}
-            required
-          />
-          {commentIsValid === false && (
-            <Feedback type="invalid">Please provide a valid comment</Feedback>
+        <Formik
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+          onSubmit={handleUpateReviewSubmit}
+        >
+          {({ handleSubmit, isSubmitting }) => (
+            <Form id="updateReviewHazardForm" onSubmit={handleSubmit}>
+              <Form.Group controlId="comment">
+                <Form.Label>Review comment</Form.Label>
+                <Field
+                  type="text"
+                  name="comment"
+                  className="form-control"
+                  placeholder="Enter your comment"
+                />
+                <ErrorMessage name="comment" component="div" className="invalid-feedback" />
+              </Form.Group>
+              <Modal.Footer>
+                <Button variant="secondary" onClick={onHide}>
+                  Close
+                </Button>
+                <Button variant="primary" type="submit" disabled={isSubmitting}>
+                  Update Review
+                </Button>
+              </Modal.Footer>
+            </Form>
           )}
-        </Form>
+        </Formik>
       </Modal.Body>
-      <Modal.Footer>
-        <Button onClick={handleSubmit}>Update Reivew</Button>
-      </Modal.Footer>
     </Modal>
   );
 };
 
 UpdateReviewHazardModal.propTypes = {
-  submit: PropTypes.func.isRequired
+  show: PropTypes.bool.isRequired,
+  onHide: PropTypes.func.isRequired,
+  selectedHazardIds: PropTypes.array.isRequired,
+  hazards: PropTypes.array.isRequired,
+  setHazards: PropTypes.func.isRequired
 };
 
-export default UpdateReviewHazardModal;
+export default UpdateReviewHazardModal; */

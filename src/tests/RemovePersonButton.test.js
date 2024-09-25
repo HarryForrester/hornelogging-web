@@ -20,7 +20,7 @@ describe('RemovePersonButton', () => {
   const mockSetConfirmationModalState = jest.fn();
   const mockAddToast = jest.fn();
   const mockNavigate = jest.fn();
-  const mockPerson = { _id: '1', name: 'John Doe', crew: 'crew1' };
+  const mockPerson = { _id: '1', firstName: 'John', lastName: 'Doe', crew: 'crew_id_1' };
   const mockAccount = 1;
 
   beforeEach(() => {
@@ -29,7 +29,7 @@ describe('RemovePersonButton', () => {
       setConfirmationModalState: mockSetConfirmationModalState,
     });
     useAlertMessage.mockReturnValue({ addToast: mockAddToast });
-    useCrews.mockReturnValue({ crews: [{ _id: 'crew1', name: 'Alpha Team' }] });
+    useCrews.mockReturnValue({ crews: [{ _id: 'crew_id_1', name: 'Alpha Team' }] });
     useNavigate.mockReturnValue(mockNavigate);
     deletePresignedUrl.mockResolvedValue();
     axios.delete.mockResolvedValue({ status: 200 });
@@ -60,7 +60,7 @@ describe('RemovePersonButton', () => {
         // Verify the message contains the correct dynamic content
         const expectedMessage = (
             <>
-            Are you sure you want to remove crew member: <strong>{mockPerson.name}</strong>
+            Are you sure you want to remove crew member: <strong>{mockPerson.firstName} {mockPerson.lastName}</strong>
             </>
         );
 

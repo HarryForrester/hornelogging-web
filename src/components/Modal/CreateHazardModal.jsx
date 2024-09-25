@@ -1,300 +1,319 @@
-import React, { useState } from 'react';
-import { Modal, Form, Button, Col, Row } from 'react-bootstrap';
-import { useHazardState } from '../HazardContext';
-import axios from 'axios';
+import React from 'react';
+import { Modal, Button, Col, Row, Form, Spinner } from 'react-bootstrap';
+import { Formik, ErrorMessage, FieldArray, Field } from 'formik';
+
+import * as Yup from 'yup';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleMinus } from '@fortawesome/free-solid-svg-icons';
-import { faCirclePlus } from '@fortawesome/free-solid-svg-icons';
+import { faCircleMinus, faCirclePlus } from '@fortawesome/free-solid-svg-icons';
 import PropTypes from 'prop-types';
+import axios from 'axios';
+import { useAlertMessage } from '../AlertMessage';
+const CreateHazardModal = ({ show, handleClose, initialValues, isEditing, updateHazards }) => {
+  const [showSpinner, setShowSpinner] = React.useState(false);
+  const { addToast } = useAlertMessage();
+  /**
+   * Handles the submission of adding/editing a hazard
+   * @param {*} e
+   */
+  const submit = async (values, resetForm) => {
+   
+    try {
+      setShowSpinner(true);
+      console.log('handleSubmit', values)
+       var response;
+      if (isEditing) {
+        // eslint-disable-next-line no-undef
+        response = await axios.post(process.env.REACT_APP_URL + '/hazardedit', values, {
+          withCredentials: true
+        });
+      } else {
+        // eslint-disable-next-line no-undef
+        response = await axios.post(process.env.REACT_APP_URL + '/hazardcreate', values, {
+          withCredentials: true
+        });
+      }
 
-const CreateHazardModal = ({ handleSubmit }) => {
-  const { hazardState, setHazardState } = useHazardState();
+      if (response.status === 200) {
+        updateHazards(response.data.hazards);
+        resetForm();
+        handleClose();
 
-  const handleClose = () => {
-    setHazardState((prevState) => ({
-      ...prevState,
-      isCreateHazardModalVisible: false,
-      title: null,
-      sev: 'LOW',
-      reviewDate: null,
-      reviewReason: null,
-      category: 'Health',
-      harmFields: [{ category: '', description: [''] }]
-    }));
+        if (isEditing) {
+          addToast(
+            `Hazard Updated`,
+            `Success! ${values.title} has been updated`,
+            'success',
+            'white'
+          );
+        } else {
+          addToast(
+            'Hazard Added',
+            `Success! ${values.title} has beeen added`,
+            'success',
+            'white'
+          );
+        }
+      } 
+    } catch (error) {
+      addToast(
+        'Add Hazard',
+        `Error! An Error has occurred adding editing or adding ${values.title} hazard`,
+        'danger',
+        'white'
+      );
+    } finally {
+      setShowSpinner(false);
+    } 
+  };
+  const defaultInitialValues = {
+    title: '',
+    sev: 'LOW',
+    reviewDate: '',
+    reviewReason: '',
+    category: 'Health',
+    harmFields: [{ category: '', description: [''] }]
   };
 
-  const addHarmRow = () => {
-    let obj = {
-      category: '',
-      description: ['']
-    };
-    setHazardState((prevState) => ({
-      ...prevState,
-      harmFields: [...hazardState.harmFields, obj]
-    }));
-  };
-
-  const addDescription = (harmIndex) => {
-    setHazardState((prevState) => ({
-      ...prevState,
-      harmFields: prevState.harmFields.map((harmField, index) => ({
-        ...harmField,
-        description: index === harmIndex ? [...harmField.description, ''] : harmField.description
-      }))
-    }));
-  };
-
-  const handleRemoveHarm = (index) => {
-    let data = [...hazardState.harmFields];
-    data.splice(index, 1);
-    setHazardState((prevState) => ({
-      ...prevState,
-      harmFields: data
-    }));
-  };
-
-  const handleRemoveDesc = (harmIndex, descriptionIndex) => {
-    const updatedHarmFields = [...hazardState.harmFields];
-    updatedHarmFields[harmIndex].description.splice(descriptionIndex, 1);
-    setHazardState({ ...hazardState, harmFields: updatedHarmFields });
-  };
-
-  const handleHarmChange = (event, index) => {
-    let data = [...hazardState.harmFields];
-    data[index][event.target.name] = event.target.value;
-    setHazardState((prevState) => ({
-      ...prevState,
-      harmFields: data
-    }));
-  };
-
-  const handleDescriptionChange = (event, harmIndex, descriptionIndex) => {
-    const newValue = event.target.value;
-    const updatedHarmFields = [...hazardState.harmFields];
-    updatedHarmFields[harmIndex].description[descriptionIndex] = newValue;
-    setHazardState({ ...hazardState, harmFields: updatedHarmFields });
-  };
+  const validationSchema = Yup.object({
+    title: Yup.string().required('Title is required'),
+    sev: Yup.string().required('Severity is required'),
+    reviewDate: Yup.date().required('Review Date is required'),
+    reviewReason: Yup.string().required('Review Reason is required'),
+    category: Yup.string().required('Category is required'),
+    harmFields: Yup.array().of(
+      Yup.object({
+        category: Yup.string().required('Category is required'),
+        description: Yup.array().of(Yup.string().required('Description is required'))
+      })
+    )
+  });
 
   return (
-    <Modal show={hazardState.isCreateHazardModalVisible} onHide={handleClose} centered>
-      <Modal.Header closeButton>
-        <Modal.Title id="createModalLabel">
-          {hazardState.isEditing ? 'Edit' : 'Add'} Hazard
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Form id="createHazardForm" onSubmit={handleSubmit}>
-          <Form.Group as={Col} controlId="newHazardTitle">
-            <Form.Label>Hazard Title</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="E.g. Early over-exertion"
-              value={hazardState.title}
-              onChange={(e) =>
-                setHazardState((prevState) => ({
-                  ...prevState,
-                  title: e.target.value
-                }))
-              }
-            />
-          </Form.Group>
-          <Row>
-            <Col>
-              <Form.Group as={Col} controlId="newHazardSev">
-                <Form.Label>Severity</Form.Label>
-                <Form.Select
-                  value={hazardState.sev}
-                  onChange={(e) =>
-                    setHazardState((prevState) => ({
-                      ...prevState,
-                      sev: e.target.value
-                    }))
-                  }
-                >
-                  <option value="LOW">LOW</option>
-                  <option value="MEDIUM">MEDIUM</option>
-                  <option value="HIGH">HIGH</option>
-                </Form.Select>
+    <Formik
+      enableReinitialize
+      initialValues={isEditing ? initialValues : defaultInitialValues}
+      //validationSchema={validationSchema}
+      onSubmit={(values, { resetForm }) => {
+        submit(values, resetForm);
+      }}
+    >
+      {({ values, setFieldValue, handleSubmit }) => (
+        <Form>
+          <Modal show={show} onHide={handleClose} centered>
+            <Modal.Header closeButton>
+              <Modal.Title id="createModalLabel">{isEditing ? 'Edit' : 'Add'} Hazard</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <Form.Group as={Col} controlId="newHazardTitle">
+                <Form.Label>Hazard Title</Form.Label>
+                <Field
+                  type="text"
+                  name="title"
+                  placeholder="E.g. Early over-exertion"
+                  className="form-control"
+                />
+                <ErrorMessage name="title" component="div" className="error" />
               </Form.Group>
-            </Col>
-
-            <Col>
-              <Form.Group controlId="newHazardCat" className="mb-3">
-                <Form.Label>Category</Form.Label>
-                <Form.Select
-                  value={hazardState.category}
-                  onChange={(e) =>
-                    setHazardState((prevState) => ({
-                      ...prevState,
-                      category: e.target.value
-                    }))
-                  }
-                >
-                  <option value="Health">Health</option>
-                  <option value="Generic">Generic</option>
-                  <option value="Environmental">Environmental</option>
-                  <option value="HazardousSubstances">Hazardous Substances</option>
-                  <option value="Fire">Fire</option>
-                  <option value="ChainsawUse">Chainsaw Use</option>
-                  <option value="TreeFelling(Manual)">Tree Felling (Manual)</option>
-                  <option value="TreeFelling(Mechanical)">Tree Felling (Mechanical)</option>
-                  <option value="BreakingOut">Breaking Out</option>
-                  <option value="Machine Ops">Machine Ops</option>
-                  <option value="MachinesinCutover">Machines in Cutover</option>
-                  <option value="RiggingSupport">Rigging Support</option>
-                  <option value="Poleman">Poleman</option>
-                  <option value="Skidwork">Skid work</option>
-                  <option value="MechanicalProcessingonSkid">Mechanical Processing on Skid</option>
-                  <option value="Loading">Loading</option>
-                  <option value="Office">Office</option>
-                  <option value="Workshop">Workshop</option>
-                  <option value="TetherSteepSlopeHarvesting">Tether Steep Slope Harvesting</option>
-                </Form.Select>
+              <Row>
+                <Col>
+                  <Form.Group as={Col} controlId="newHazardSev">
+                    <Form.Label>Severity</Form.Label>
+                    <Field as="select" name="sev" className="form-select">
+                      <option value="LOW">LOW</option>
+                      <option value="MEDIUM">MEDIUM</option>
+                      <option value="HIGH">HIGH</option>
+                    </Field>
+                    <ErrorMessage name="sev" component="div" className="error" />
+                  </Form.Group>
+                </Col>
+                <Col>
+                  <Form.Group controlId="newHazardCat" className="mb-3">
+                    <Form.Label>Category</Form.Label>
+                    <Field as="select" name="category" className="form-select">
+                      <option value="Health">Health</option>
+                      <option value="Generic">Generic</option>
+                      <option value="Environmental">Environmental</option>
+                      <option value="HazardousSubstances">Hazardous Substances</option>
+                      <option value="Fire">Fire</option>
+                      <option value="ChainsawUse">Chainsaw Use</option>
+                      <option value="TreeFelling(Manual)">Tree Felling (Manual)</option>
+                      <option value="TreeFelling(Mechanical)">Tree Felling (Mechanical)</option>
+                      <option value="BreakingOut">Breaking Out</option>
+                      <option value="Machine Ops">Machine Ops</option>
+                      <option value="MachinesinCutover">Machines in Cutover</option>
+                      <option value="RiggingSupport">Rigging Support</option>
+                      <option value="Poleman">Poleman</option>
+                      <option value="Skidwork">Skid work</option>
+                      <option value="MechanicalProcessingonSkid">Mechanical Processing on Skid</option>
+                      <option value="Loading">Loading</option>
+                      <option value="Office">Office</option>
+                      <option value="Workshop">Workshop</option>
+                      <option value="TetherSteepSlopeHarvesting">Tether Steep Slope Harvesting</option>
+                    </Field>
+                    <ErrorMessage name="category" component="div" className="error" />
+                  </Form.Group>
+                </Col>
+              </Row>
+              <Form.Group controlId="newHazardReviewDate" className="mb-3">
+                <Form.Label>Review Date</Form.Label>
+                <Field type="date" name="reviewDate" className="form-control" />
+                <ErrorMessage name="reviewDate" component="div" className="error" />
               </Form.Group>
-            </Col>
-          </Row>
-
-          <Form.Group controlId="newHazardReviewDate" className="mb-3">
-            <Form.Label>Review Date</Form.Label>
-            <Form.Control
-              type="date"
-              placeholder="E.g. 3/5/2024"
-              value={hazardState.reviewDate}
-              onChange={(e) =>
-                setHazardState((prevState) => ({
-                  ...prevState,
-                  reviewDate: e.target.value
-                }))
-              }
-            />
-          </Form.Group>
-
-          <Form.Group controlId="newHazardReviewReason" className="mb-3">
-            <Form.Label>Review Reason</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="E.g. General Review"
-              value={hazardState.reviewReason}
-              onChange={(e) =>
-                setHazardState((prevState) => ({
-                  ...prevState,
-                  reviewReason: e.target.value
-                }))
-              }
-            />
-          </Form.Group>
-
-          {hazardState.harmFields.map((harm, harmIndex) => {
-            return (
-              <div
-                key={harmIndex}
-                style={{
-                  border: '1px solid #000',
-                  borderRadius: '5px 5px 5px 5px',
-                  padding: '15px',
-                  marginBottom: '10px',
-                  position: 'relative'
-                }}
-              >
-                <Button
-                  variant="danger"
-                  onClick={() => handleRemoveHarm(harmIndex)}
-                  style={{
-                    position: 'absolute',
-                    top: '0',
-                    right: '0',
-                    background: 'none',
-                    border: 'none'
-                  }}
-                >
-                  <FontAwesomeIcon color="red" size="lg" icon={faCircleMinus} />
-                </Button>
-                <Row className="harm-row">
-                  <Col md={5}>
-                    <Form.Control
-                      id={harmIndex}
-                      name="category"
-                      className="form-control mb-2"
-                      placeholder="Category (E.g. Fire)"
-                      value={harm.category}
-                      onChange={(event) => handleHarmChange(event, harmIndex)}
-                    />
-                  </Col>
-
-                  <Col md={12}>
-                    {harm.description.map((description, descriptionIndex) => {
-                      return (
-                        <div
-                          key={descriptionIndex}
+              <Form.Group controlId="newHazardReviewReason" className="mb-3">
+                <Form.Label>Review Reason</Form.Label>
+                <Field
+                  type="text"
+                  name="reviewReason"
+                  placeholder="E.g. General Review"
+                  className="form-control"
+                />
+                <ErrorMessage name="reviewReason" component="div" className="error" />
+              </Form.Group>
+              <FieldArray name="harmFields">
+                {({ push, remove }) => (
+                  <>
+                    {values.harmFields.map((harm, harmIndex) => (
+                      <div
+                        key={harmIndex}
+                        style={{
+                          border: '1px solid #000',
+                          borderRadius: '5px',
+                          padding: '15px',
+                          marginBottom: '10px',
+                          position: 'relative'
+                        }}
+                      >
+                        <Button
+                          variant="danger"
+                          onClick={() => remove(harmIndex)}
                           style={{
-                            display: 'flex',
-                            alignItems: 'stretch',
-                            gap: '10px',
-                            marginBottom: '10px'
+                            position: 'absolute',
+                            top: '0',
+                            right: '0',
+                            background: 'none',
+                            border: 'none'
                           }}
                         >
-                          <Form.Control
-                            key={descriptionIndex}
-                            id={descriptionIndex}
-                            name="description"
-                            as="textarea"
-                            rows={1}
-                            className="form-control mb-2"
-                            placeholder="Description (E.g. Do not light fires)"
-                            value={description}
-                            onChange={(event) =>
-                              handleDescriptionChange(event, harmIndex, descriptionIndex)
-                            }
-                            style={{ flex: '1', borderRadius: '5px 5px 5px 5px' }}
-                          />
-
-                          {descriptionIndex !== 0 && (
-                            <Button
-                              onClick={() => handleRemoveDesc(harmIndex, descriptionIndex)}
-                              style={{
-                                flex: 'none',
-                                alignSelf: 'stretch',
-                                borderRadius: '5px 5px 5px 5px',
-                                backgroundColor: '#dc3545',
-                                color: '#fff',
-                                border: 'none',
-                                height: '100%',
-                                background: 'none'
-                              }}
-                            >
-                              <FontAwesomeIcon color="red" size="lg" icon={faCircleMinus} />
-                            </Button>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </Col>
-                </Row>
-                <Button
-                  onClick={() => addDescription(harmIndex)}
-                  style={{ background: 'none', border: 'none' }}
-                >
-                  <FontAwesomeIcon color="blue" size="lg" icon={faCirclePlus} />
-                </Button>
-              </div>
-            );
-          })}
-
-          <Form.Group controlId="hazardHarms" className="mb-3">
-            <Button type="button" variant="primary" className="mt-2" onClick={addHarmRow}>
-              Add Harm
+                          <FontAwesomeIcon color="red" size="lg" icon={faCircleMinus} />
+                        </Button>
+                        <Row className="harm-row">
+                          <Col md={5}>
+                            <Field
+                              name={`harmFields.${harmIndex}.category`}
+                              placeholder="Category (E.g. Fire)"
+                              className="form-control mb-2"
+                            />
+                            <ErrorMessage
+                              name={`harmFields.${harmIndex}.category`}
+                              component="div"
+                              className="error"
+                            />
+                          </Col>
+                          <Col md={12}>
+                            <FieldArray name={`harmFields.${harmIndex}.description`}>
+                              {({ push: pushDesc, remove: removeDesc }) => (
+                                <>
+                                  {harm.description.map((desc, descIndex) => (
+                                    <div
+                                      key={descIndex}
+                                      style={{
+                                        display: 'flex',
+                                        alignItems: 'stretch',
+                                        gap: '10px',
+                                        marginBottom: '10px'
+                                      }}
+                                    >
+                                      <Field
+                                        name={`harmFields.${harmIndex}.description.${descIndex}`}
+                                        as="textarea"
+                                        rows={1}
+                                        className="form-control mb-2"
+                                        placeholder="Description (E.g. Do not light fires)"
+                                        style={{ flex: '1', borderRadius: '5px' }}
+                                      />
+                                      <ErrorMessage
+                                        name={`harmFields.${harmIndex}.description.${descIndex}`}
+                                        component="div"
+                                        className="error"
+                                      />
+                                      {descIndex !== 0 && (
+                                        <Button
+                                          onClick={() => removeDesc(descIndex)}
+                                          style={{
+                                            flex: 'none',
+                                            alignSelf: 'stretch',
+                                            borderRadius: '5px',
+                                            backgroundColor: '#dc3545',
+                                            color: '#fff',
+                                            border: 'none',
+                                            height: '100%',
+                                            background: 'none'
+                                          }}
+                                        >
+                                          <FontAwesomeIcon color="red" size="lg" icon={faCircleMinus} />
+                                        </Button>
+                                      )}
+                                    </div>
+                                  ))}
+                                  <Button
+                                    onClick={() => pushDesc('')}
+                                    style={{ background: 'none', border: 'none' }}
+                                  >
+                                    <FontAwesomeIcon color="blue" size="lg" icon={faCirclePlus} />
+                                  </Button>
+                                </>
+                              )}
+                            </FieldArray>
+                          </Col>
+                        </Row>
+                      </div>
+                    ))}
+                    <Button
+                      type="button"
+                      variant="primary"
+                      className="mt-2"
+                      onClick={() => push({ category: '', description: [''] })}
+                    >
+                      Add Harm
+                    </Button>
+                  </>
+                )}
+              </FieldArray>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleClose}>
+                Close
+              </Button>
+              <Button type="submit" variant="secondary" onClick={handleSubmit}>
+              {showSpinner ? (
+                <>
+                  <Spinner
+                    as="span"
+                    animation="border"
+                    size="sm"
+                    role="status"
+                    aria-hidden="true"
+                  />
+                  <span className="visually-hidden">Loading...</span>
+                </>
+              ) : (
+                'Save changes'
+              )}
             </Button>
-          </Form.Group>
+            </Modal.Footer>
+          </Modal>
         </Form>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button onClick={handleSubmit}>Submit</Button>
-      </Modal.Footer>
-    </Modal>
+      )}
+    </Formik>
   );
 };
 
 CreateHazardModal.propTypes = {
-  handleSubmit: PropTypes.func.isRequired
+  show: PropTypes.bool.isRequired,
+  handleClose: PropTypes.func.isRequired,
+  initialValues: PropTypes.object,
+  isEditing: PropTypes.bool,
+  updateHazards: PropTypes.func.isRequired
 };
+
 export default CreateHazardModal;
