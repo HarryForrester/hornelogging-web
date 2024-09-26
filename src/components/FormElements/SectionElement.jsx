@@ -246,6 +246,16 @@ const SectionElement = ({
       </div>
       <br />
 
+
+
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext
+          items={items.map((item) => item.key)}
+          strategy={verticalListSortingStrategy}>
+          <div className="form-container">{renderFormElements()}</div>
+        </SortableContext>
+        <DragOverlay>{/* Render a drag overlay if needed */}</DragOverlay>
+      </DndContext>
       <div className="button-container">
         <OverlayTrigger
           placement="top"
@@ -363,16 +373,6 @@ const SectionElement = ({
           </Dropdown>
         </OverlayTrigger>
       </div>
-
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <SortableContext
-          items={items.map((item) => item.key)}
-          strategy={verticalListSortingStrategy}>
-          <div className="form-container">{renderFormElements()}</div>
-        </SortableContext>
-        <DragOverlay>{/* Render a drag overlay if needed */}</DragOverlay>
-      </DndContext>
-
       <div className="dropdown-form-designer-crew">{/* Dropdown Form Designer Crew content */}</div>
 
       <br />
@@ -513,6 +513,8 @@ const SortableFormElement = ({
             crew={element.crew}
             onChange={(event) => handleElementChange(element.key, event)}
             onRemove={() => handleRemoveElement(element.key)}
+            attributes={attributes}
+            listeners={listeners}
           />
         );
       default:
