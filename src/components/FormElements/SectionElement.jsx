@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Form, Button, Dropdown } from 'react-bootstrap';
+import { Form, Button, Dropdown, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import AddCheckbox from '../AddFormElements/AddCheckbox';
 import AddFreeform from '../AddFormElements/AddFreeform';
 import AddNumber from '../AddFormElements/AddNumber';
@@ -13,7 +13,8 @@ import AddCrewList from '../AddFormElements/AddCrewList';
 import { DndContext, closestCenter, useSensor, useSensors, MouseSensor, TouchSensor, KeyboardSensor, DragOverlay } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, arrayMove, useSortable, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSquareCheck, faFont, fa9, faHashtag, faCalendarDays, faClock, faImage, faSignature, faRectangleList, faPeopleGroup } from '@fortawesome/free-solid-svg-icons';
 const SectionElement = ({
   sectionKey,
   crews,
@@ -209,73 +210,139 @@ const SectionElement = ({
       <br />
 
       <div className="button-container">
-        <Button className="add-check-btn btn btn-secondary" onClick={() => handleAddElement('check')}>
-          <i className="fa-solid fa-circle-check"></i>
-          <span className="span-text"> Check</span>
-        </Button>
-        <Button className="add-freeform-btn btn btn-secondary" onClick={() => handleAddElement('freeform')}>
-          <i className="fa-solid fa-font"></i>
-          <span className="span-text"> Text</span>
-        </Button>
-        <Button className="add-number-btn btn btn-secondary" onClick={() => handleAddElement('number')}>
-          <i className="fa-solid fa-hashtag"></i>
-          <span className="span-text"> Number</span>
-        </Button>
-        <Button className="add-date-btn btn btn-secondary" onClick={() => handleAddElement('date')}>
-          <i className="fa-solid fa-calendar-days"></i>
-          <span className="span-text"> Date</span>
-        </Button>
-        <Button className="add-time-btn btn btn-secondary" onClick={() => handleAddElement('time')}>
-          <i className="fa-solid fa-clock"></i>
-          <span className="span-text"> Time</span>
-        </Button>
-        <Button className="add-image-btn btn btn-secondary" onClick={() => handleAddElement('image')}>
-          <i className="fa-solid fa-image"></i>
-          <span className="span-text"> Image</span>
-        </Button>
-        <Button className="add-signature-btn btn btn-secondary" onClick={() => handleAddElement('signature')}>
-          <i className="fa-solid fa-signature"></i>
-          <span className="span-text"> Signature</span>
-        </Button>
-        <Button className="add-selectlist-btn btn btn-secondary" onClick={() => handleAddSelectlistElement('selectlist')}>
-          <i className="fa-solid fa-rectangle-list"></i>
-          <span className="span-text"> Select List</span>
-        </Button>
+        <OverlayTrigger
+          placement="top"
+          overlay={<Tooltip id="tooltip-add-checkbox">Add Checkbox</Tooltip>}>
+          <Button
+            className="add-check-btn btn btn-outline-secondary"
+            onClick={() => handleAddElement('check')}
+            style={{ backgroundColor: 'transparent' }}>
+            <FontAwesomeIcon icon={faSquareCheck} style={{ color: '#242424' }} />
+          </Button>
+        </OverlayTrigger>
 
-        <Dropdown>
-          <Dropdown.Toggle variant="secondary" id="dropdown-crew-list">
-            <i className="fa-solid fa-rectangle-list"></i>
-            <span className="span-text"> Crew List</span>
+        <OverlayTrigger
+          placement="top"
+          overlay={<Tooltip id="tooltip-add-checkbox">Add Text</Tooltip>}>
+          <Button
+            className="add-freeform-btn btn btn-secondary"
+            onClick={() => handleAddElement('freeform')}
+            style={{ backgroundColor: 'transparent' }}>
+            <FontAwesomeIcon icon={faFont} style={{ color: '#242424' }} />
+          </Button>
+        </OverlayTrigger>
+
+        <OverlayTrigger
+          placement="top"
+          overlay={<Tooltip id="tooltip-add-checkbox">Add Number</Tooltip>}>
+          <Button
+            className="add-number-btn btn btn-secondary"
+            onClick={() => handleAddElement('number')}
+            style={{ backgroundColor: 'transparent' }}>
+            <FontAwesomeIcon icon={faHashtag} style={{ color: '#242424' }} />
+          </Button>
+        </OverlayTrigger>
+
+        <OverlayTrigger
+          placement="top"
+          overlay={<Tooltip id="tooltip-add-checkbox">Add Date</Tooltip>}>
+          <Button
+            className="add-date-btn btn btn-secondary"
+            onClick={() => handleAddElement('date')}
+            style={{ backgroundColor: 'transparent' }}>
+            <FontAwesomeIcon icon={faCalendarDays} style={{ color: '#242424' }} />
+          </Button>
+        </OverlayTrigger>
+
+        <OverlayTrigger
+          placement="top"
+          overlay={<Tooltip id="tooltip-add-checkbox">Add Clock</Tooltip>}>
+          <Button
+            className="add-time-btn btn btn-secondary"
+            onClick={() => handleAddElement('time')}
+            style={{ backgroundColor: 'transparent' }}>
+            <FontAwesomeIcon icon={faClock} style={{ color: '#242424' }} />
+          </Button>
+        </OverlayTrigger>
+
+        <OverlayTrigger
+          placement="top"
+          overlay={<Tooltip id="tooltip-add-checkbox">Add Image</Tooltip>}>
+          <Button
+            className="add-image-btn btn btn-secondary"
+            onClick={() => handleAddElement('image')}
+            style={{ backgroundColor: 'transparent' }}>
+            <FontAwesomeIcon icon={faImage} style={{ color: '#242424' }} />
+          </Button>
+        </OverlayTrigger>
+
+        <OverlayTrigger
+          placement="top"
+          overlay={<Tooltip id="tooltip-add-checkbox">Add Signature</Tooltip>}>
+          <Button
+            className="add-signature-btn btn btn-secondary"
+            onClick={() => handleAddElement('signature')}
+            style={{ backgroundColor: 'transparent' }}>
+            <FontAwesomeIcon icon={faSignature} style={{ color: '#242424' }} />
+          </Button>
+        </OverlayTrigger>
+
+        <OverlayTrigger
+          placement="top"
+          overlay={<Tooltip id="tooltip-add-checkbox">Add Select List</Tooltip>}>
+          <Button
+            className="add-selectlist-btn btn btn-secondary"
+            onClick={() => handleAddSelectlistElement('selectlist')}
+            style={{ backgroundColor: 'transparent' }}>
+            <FontAwesomeIcon icon={faRectangleList} style={{ color: '#242424' }} />
+          </Button>
+        </OverlayTrigger>
+
+        <OverlayTrigger
+          placement="top"
+          overlay={<Tooltip id="tooltip-add-checkbox">Add Crew List</Tooltip>}>
+          <Dropdown>
+          <Dropdown.Toggle variant="secondary" id="dropdown-crew-list" style={{ backgroundColor: 'transparent', color: 'black' }} >
+          <FontAwesomeIcon icon={faPeopleGroup} style={{ color: '#242424' }} />
+
           </Dropdown.Toggle>
           <Dropdown.Menu>
             {crews.map((crewMember, index) => (
-              <Dropdown.Item key={index} className="crew-item" onClick={() => handleAddCrewListElement('list', crewMember.name)}>
+              <Dropdown.Item
+                key={index}
+                className="crew-item"
+                onClick={() => handleAddCrewListElement('list', crewMember.name)}>
                 {crewMember.name}
               </Dropdown.Item>
             ))}
-            <Dropdown.Item className="crew-item" onClick={() => handleAddCrewListElement('list', 'All')}>
+            <Dropdown.Item
+              className="crew-item"
+              onClick={() => handleAddCrewListElement('list', 'All')}>
               All
             </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
+        </OverlayTrigger>
+
+        
       </div>
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <SortableContext items={items.map((item) => item.key)} strategy={verticalListSortingStrategy}>
-          <div className="form-container">
-            {renderFormElements()}
-          </div>
+        <SortableContext
+          items={items.map((item) => item.key)}
+          strategy={verticalListSortingStrategy}>
+          <div className="form-container">{renderFormElements()}</div>
         </SortableContext>
-        <DragOverlay>
-          {/* Render a drag overlay if needed */}
-        </DragOverlay>
+        <DragOverlay>{/* Render a drag overlay if needed */}</DragOverlay>
       </DndContext>
 
       <div className="dropdown-form-designer-crew">{/* Dropdown Form Designer Crew content */}</div>
 
       <br />
       <div className="mt-3 remove-section-btn">
-        <Button className="remove-section-btn btn btn-danger" onClick={() => onRemoveSection(sectionKey)}>
+        <Button
+          className="remove-section-btn btn btn-danger"
+          onClick={() => onRemoveSection(sectionKey)}>
           Remove Section
         </Button>
       </div>
