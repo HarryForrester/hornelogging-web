@@ -10,11 +10,38 @@ import AddImage from '../AddFormElements/AddImage';
 import AddSignature from '../AddFormElements/AddSignature';
 import AddSelectlist from '../AddFormElements/AddSelectList';
 import AddCrewList from '../AddFormElements/AddCrewList';
-import { DndContext, closestCenter, useSensor, useSensors, MouseSensor, TouchSensor, KeyboardSensor, DragOverlay } from '@dnd-kit/core';
-import { SortableContext, verticalListSortingStrategy, arrayMove, useSortable, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
+import {
+  DndContext,
+  closestCenter,
+  useSensor,
+  useSensors,
+  MouseSensor,
+  TouchSensor,
+  KeyboardSensor,
+  DragOverlay
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  arrayMove,
+  useSortable,
+  sortableKeyboardCoordinates
+} from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSquareCheck, faFont, fa9, faHashtag, faCalendarDays, faClock, faImage, faSignature, faRectangleList, faPeopleGroup } from '@fortawesome/free-solid-svg-icons';
+import {
+  faSquareCheck,
+  faFont,
+  fa9,
+  faHashtag,
+  faCalendarDays,
+  faClock,
+  faImage,
+  faSignature,
+  faRectangleList,
+  faPeopleGroup,
+  faArrowsUpDown
+} from '@fortawesome/free-solid-svg-icons';
 const SectionElement = ({
   sectionKey,
   crews,
@@ -26,12 +53,11 @@ const SectionElement = ({
   formSections,
   sectionTitle
 }) => {
-
   const sensors = useSensors(
     useSensor(MouseSensor),
     useSensor(TouchSensor),
     useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
+      coordinateGetter: sortableKeyboardCoordinates
     })
   );
 
@@ -43,17 +69,21 @@ const SectionElement = ({
       const updatedItems = arrayMove(items, oldIndex, newIndex);
       setFormSections((prevSections) => {
         return prevSections.map((section) =>
-          section.sectionKey === sectionKey
-            ? { ...section, items: updatedItems }
-            : section
+          section.sectionKey === sectionKey ? { ...section, items: updatedItems } : section
         );
       });
     }
   };
 
+  const handleAddCheckbox = (elementType) => {
+    const key = `${elementType}_${Date.now()}`;
+    const newSection = { key, type: elementType, label: '', checked: false, order: items.length + 1 };
+    onAddSection(sectionKey, newSection);
+  };
+
   const handleAddElement = (elementType) => {
     const key = `${elementType}_${Date.now()}`;
-    const newSection = { key, type: elementType, label: '', value: '', order: items.length + 1 };
+    const newSection = { key, type: elementType, label: '', value: '', order: items.length + 1, isRequired: false };
     onAddSection(sectionKey, newSection);
   };
 
@@ -115,14 +145,21 @@ const SectionElement = ({
   };
 
   const handleElementChange = (elementKey, event) => {
-    const { value } = event.target;
+    console.log('event.target', event.target);
+    const { value, checked, type } = event.target;
     setFormSections((prevSections) => {
       const updatedSections = prevSections.map((section) =>
         section.sectionKey === sectionKey
           ? {
               ...section,
               items: section.items.map((element) =>
-                element.key === elementKey ? { ...element, label: value } : element
+                element.key === elementKey
+                  ? {
+                      ...element,
+                      label: type === 'checkbox' ? element.label : value,
+                      isRequired: type === 'checkbox' ? checked : element.isRequired
+                    }
+                  : element
               )
             }
           : section
@@ -215,7 +252,7 @@ const SectionElement = ({
           overlay={<Tooltip id="tooltip-add-checkbox">Add Checkbox</Tooltip>}>
           <Button
             className="add-check-btn btn btn-outline-secondary"
-            onClick={() => handleAddElement('check')}
+            onClick={() => handleAddCheckbox('check')}
             style={{ backgroundColor: 'transparent' }}>
             <FontAwesomeIcon icon={faSquareCheck} style={{ color: '#242424' }} />
           </Button>
@@ -302,29 +339,29 @@ const SectionElement = ({
           placement="top"
           overlay={<Tooltip id="tooltip-add-checkbox">Add Crew List</Tooltip>}>
           <Dropdown>
-          <Dropdown.Toggle variant="secondary" id="dropdown-crew-list" style={{ backgroundColor: 'transparent', color: 'black' }} >
-          <FontAwesomeIcon icon={faPeopleGroup} style={{ color: '#242424' }} />
-
-          </Dropdown.Toggle>
-          <Dropdown.Menu>
-            {crews.map((crewMember, index) => (
+            <Dropdown.Toggle
+              variant="secondary"
+              id="dropdown-crew-list"
+              style={{ backgroundColor: 'transparent', color: 'black' }}>
+              <FontAwesomeIcon icon={faPeopleGroup} style={{ color: '#242424' }} />
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              {crews.map((crewMember, index) => (
+                <Dropdown.Item
+                  key={index}
+                  className="crew-item"
+                  onClick={() => handleAddCrewListElement('list', crewMember.name)}>
+                  {crewMember.name}
+                </Dropdown.Item>
+              ))}
               <Dropdown.Item
-                key={index}
                 className="crew-item"
-                onClick={() => handleAddCrewListElement('list', crewMember.name)}>
-                {crewMember.name}
+                onClick={() => handleAddCrewListElement('list', 'All')}>
+                All
               </Dropdown.Item>
-            ))}
-            <Dropdown.Item
-              className="crew-item"
-              onClick={() => handleAddCrewListElement('list', 'All')}>
-              All
-            </Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown>
+            </Dropdown.Menu>
+          </Dropdown>
         </OverlayTrigger>
-
-        
       </div>
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -351,21 +388,22 @@ const SectionElement = ({
   );
 };
 
-const SortableFormElement = ({ id, element, handleElementChange, handleRemoveElement, handleItemLabelChange, handleAddItem, handleRemoveItem, setFormElements }) => {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    marginBottom: '10px',
-    padding: '10px',
-    backgroundColor: 'white',
-    border: '1px solid #ccc',
-    borderRadius: '4px',
-    cursor: 'move'
-  };
+const SortableFormElement = ({
+  id,
+  element,
+  handleElementChange,
+  handleRemoveElement,
+  handleItemLabelChange,
+  handleAddItem,
+  handleRemoveItem,
+  setFormElements
+}) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id
+  });
 
   const renderElement = () => {
+    console.log('element', element);    
     switch (element.type) {
       case 'check':
         return (
@@ -381,9 +419,11 @@ const SortableFormElement = ({ id, element, handleElementChange, handleRemoveEle
           <AddFreeform
             key={element.key}
             labelValue={element.label}
-            value={element.value}
+            isRequired={element.isRequired}
             onChange={(event) => handleElementChange(element.key, event)}
             onRemove={() => handleRemoveElement(element.key)}
+            attributes={attributes}
+            listeners={listeners}
           />
         );
       case 'number':
@@ -466,22 +506,21 @@ const SortableFormElement = ({ id, element, handleElementChange, handleRemoveEle
     }
   };
 
-  const handleStyle = {
-    cursor: 'move',
-    padding: '5px',
-    backgroundColor: '#007bff',
-    color: 'white',
-    border: 'none',
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition: transition ? `${transition}, opacity 0.2s ease-in-out` : 'opacity 0.2s ease-in-out',
+    margin: isDragging ? '10px' : '20px',
+    paddingTop: '10px',
+    paddingLeft: '10px',
+    backgroundColor: isDragging ? '#e6f7ff' : '#ffffff', // Highlight when dragging
+    border: '1px solid #cccccc',
     borderRadius: '4px',
-    marginBottom: '10px'
+    opacity: isDragging ? 0.5 : 1 // Smooth transition for opacity
   };
 
   return (
-    <div ref={setNodeRef} style={style} >
-      <button style={handleStyle} {...attributes} {...listeners}>
-        Move Item
-      </button>
-      {renderElement()}
+    <div ref={setNodeRef} style={style}>
+        {renderElement(attributes, listeners)}
     </div>
   );
 };
@@ -507,7 +546,8 @@ SortableFormElement.propTypes = {
     value: PropTypes.string,
     items: PropTypes.array,
     checked: PropTypes.bool,
-    crew: PropTypes.string
+    crew: PropTypes.string,
+    isRequired: PropTypes.bool
   }).isRequired,
   handleElementChange: PropTypes.func.isRequired,
   handleRemoveElement: PropTypes.func.isRequired,
