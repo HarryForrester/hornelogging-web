@@ -75,7 +75,7 @@ function AddCheckbox({ labelValue, onChange, onRemove, attributes, listeners }) 
         }}
         {...attributes}
         {...listeners}>
-        <FontAwesomeIcon icon={faArrowsUpDown} size="xl" style={{ color: '#242424' }} />
+        <FontAwesomeIcon icon={faArrowsUpDown} style={{ color: '#242424' }} />
       </button>
     </div>
   );
