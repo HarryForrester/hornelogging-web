@@ -4,6 +4,19 @@ import { Form, InputGroup, Button, Row, Col, OverlayTrigger, Tooltip } from 'rea
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { fa8, faMinusSquare, faArrowsUpDown } from '@fortawesome/free-solid-svg-icons';
 
+/**
+ * AddNumber component renders a form element for adding a number input field.
+ *
+ * @param {Object} props - The properties object.
+ * @param {string} props.labelValue - The value of the label input field.
+ * @param {function} props.onChange - The function to call when the input value changes.
+ * @param {function} props.onRemove - The function to call when the remove button is clicked.
+ * @param {boolean} props.isRequired - Indicates if the input field is required.
+ * @param {Object} props.attributes - Attributes for the draggable button.
+ * @param {Object} props.listeners - Event listeners for the draggable button.
+ *
+ * @returns {JSX.Element} The rendered AddNumber component.
+ */
 function AddNumber({ labelValue, onChange, onRemove, isRequired, attributes, listeners }) {
   return (
     <div className="d-flex justify-content-center align-items-center position-relative">
@@ -20,15 +33,15 @@ function AddNumber({ labelValue, onChange, onRemove, isRequired, attributes, lis
             <Form.Group className="flex-grow-1">
               <Form.Label htmlFor="freeform-label">Enter Number Label</Form.Label>
               <Form.Control
-          type="text"
-          className="check-item form-control element-name"
-          placeholder="Number Element"
-          value={labelValue}
-          onChange={onChange}
-          isInvalid={!labelValue.trim()}
-          required
-        />
-        <Form.Control.Feedback type="invalid">Number title is required</Form.Control.Feedback>
+                type="text"
+                className="check-item form-control element-name"
+                placeholder="Number Element"
+                value={labelValue}
+                onChange={onChange}
+                isInvalid={!labelValue.trim()}
+                required
+              />
+              <Form.Control.Feedback type="invalid">Number title is required</Form.Control.Feedback>
             </Form.Group>
             <OverlayTrigger
               placement="right"
@@ -41,6 +54,7 @@ function AddNumber({ labelValue, onChange, onRemove, isRequired, attributes, lis
                 checked={isRequired}
                 onChange={onChange}
                 className="mt-2"
+                aria-labelledby='required-checkbox'
               />
             </OverlayTrigger>
           </Col>
