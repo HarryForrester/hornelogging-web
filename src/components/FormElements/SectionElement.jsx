@@ -460,6 +460,8 @@ const SortableFormElement = ({
             date={element.value}
             onChange={(event) => handleElementChange(element.key, event)}
             onRemove={() => handleRemoveElement(element.key)}
+            attributes={attributes}
+            listeners={listeners}
           />
         );
       case 'image':
