@@ -4,6 +4,19 @@ import { Form, Button, Row, Col, OverlayTrigger, Tooltip } from 'react-bootstrap
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendar, faMinusSquare, faArrowsUpDown } from '@fortawesome/free-solid-svg-icons';
 
+/**
+ * AddDate component renders a form element for adding a date input with customizable label and required checkbox.
+ *
+ * @component
+ * @param {Object} props - The properties object.
+ * @param {string} props.labelValue - The value of the date label input.
+ * @param {function} props.onChange - The function to call when the input value changes.
+ * @param {function} props.onRemove - The function to call when the remove button is clicked.
+ * @param {boolean} props.isRequired - Indicates whether the date input is required.
+ * @param {Object} props.attributes - Additional attributes for the draggable button.
+ * @param {Object} props.listeners - Event listeners for the draggable button.
+ * @returns {JSX.Element} The rendered AddDate component.
+ */
 function AddDate({ labelValue, onChange, onRemove, isRequired, attributes, listeners }) {
   return (
     <div className="d-flex justify-content-center align-items-center position-relative">

@@ -293,7 +293,7 @@ const SectionElement = ({
 
         <OverlayTrigger
           placement="top"
-          overlay={<Tooltip id="tooltip-add-checkbox">Add Clock</Tooltip>}>
+          overlay={<Tooltip id="tooltip-add-checkbox">Add Date</Tooltip>}>
           <Button
             className="add-time-btn btn btn-secondary"
             onClick={() => handleAddElement('time')}
@@ -472,6 +472,8 @@ const SortableFormElement = ({
             date={element.value}
             onChange={(event) => handleElementChange(element.key, event)}
             onRemove={() => handleRemoveElement(element.key)}
+            attributes={attributes}
+            listeners={listeners}
           />
         );
       case 'signature':
@@ -482,6 +484,8 @@ const SortableFormElement = ({
             date={element.value}
             onChange={(event) => handleElementChange(element.key, event)}
             onRemove={() => handleRemoveElement(element.key)}
+            attributes={attributes}
+            listeners={listeners}
           />
         );
       case 'selectlist':
