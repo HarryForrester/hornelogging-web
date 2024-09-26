@@ -4,6 +4,17 @@ import { Form, Button, Row, Col } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSquareCheck, faMinusSquare, faArrowsUpDown } from '@fortawesome/free-solid-svg-icons';
 
+/**
+ * AddCheckbox component renders a form element for adding a checkbox with a label.
+ *
+ * @param {Object} props - The properties object.
+ * @param {string} props.labelValue - The value of the checkbox label.
+ * @param {function} props.onChange - The function to call when the label value changes.
+ * @param {function} props.onRemove - The function to call when the remove button is clicked.
+ * @param {Object} props.attributes - The attributes to be spread onto the move button.
+ * @param {Object} props.listeners - The event listeners to be spread onto the move button.
+ * @returns {JSX.Element} The rendered AddCheckbox component.
+ */
 function AddCheckbox({ labelValue, onChange, onRemove, attributes, listeners }) {
   return (
     <div className="d-flex justify-content-center align-items-center position-relative">
