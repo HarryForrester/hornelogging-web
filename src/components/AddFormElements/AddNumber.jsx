@@ -1,21 +1,25 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Form, InputGroup, Button } from 'react-bootstrap';
+import { Form, InputGroup, Button, Row, Col, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { fa8, faMinusCircle } from '@fortawesome/free-solid-svg-icons';
+import { fa8, faMinusSquare, faArrowsUpDown } from '@fortawesome/free-solid-svg-icons';
 
-function AddNumber({ labelValue, itemValue, onChange, onRemove }) {
+function AddNumber({ labelValue, onChange, onRemove, isRequired, attributes, listeners }) {
   return (
-    <div
-      className="d-flex align-items-center mb-2 px-3 element-container"
-      style={{ marginTop: '10px' }}
-    >
-      <label className="elementLabel">
-        <FontAwesomeIcon icon={fa8} />
-        <span className="span-text-element"> Number</span>
-      </label>
-      <div className="flex-grow-1" style={{ height: '25px', marginBottom: '25px' }}>
-        <Form.Control
+    <div className="d-flex justify-content-center align-items-center position-relative">
+      <div className="px-5 mt-2 mb-2 element-container" style={{ flexGrow: 1 }}>
+        <Row className="align-items-center">
+          <Col
+            xs="auto"
+            className="d-flex justify-content-center align-items-center"
+            style={{ minWidth: '120px' }}>
+            <FontAwesomeIcon icon={fa8} />
+            <span className="ms-2">Number</span>
+          </Col>
+          <Col className="d-flex flex-column">
+            <Form.Group className="flex-grow-1">
+              <Form.Label htmlFor="freeform-label">Enter Number Label</Form.Label>
+              <Form.Control
           type="text"
           className="check-item form-control element-name"
           placeholder="Number Element"
@@ -25,23 +29,68 @@ function AddNumber({ labelValue, itemValue, onChange, onRemove }) {
           required
         />
         <Form.Control.Feedback type="invalid">Number title is required</Form.Control.Feedback>
+            </Form.Group>
+            <OverlayTrigger
+              placement="right"
+              overlay={
+                <Tooltip id="checkbox-tooltip">Check this box to make the input required</Tooltip>
+              }>
+              <Form.Check
+                type="checkbox"
+                label="Required"
+                checked={isRequired}
+                onChange={onChange}
+                className="mt-2"
+              />
+            </OverlayTrigger>
+          </Col>
+        </Row>
       </div>
+
       <Button
-        className="remove-check-btn btn btn-danger ms-2"
+        className="remove-check-btn btn btn-danger"
         onClick={onRemove}
-        style={{ background: 'none', color: 'red', border: 'none' }}
-      >
-        <FontAwesomeIcon size="lg" icon={faMinusCircle} />
+        data-testid="remove-freeform"
+        style={{
+          padding: '10px',
+          color: 'white',
+          border: 'none',
+          borderRadius: '0px 3px 3px 0px',
+          position: 'absolute',
+          top: '0',
+          right: '0',
+          height: '100%'
+        }}>
+        <FontAwesomeIcon size="xl" icon={faMinusSquare} />
       </Button>
+
+      <button
+        style={{
+          cursor: 'move',
+          padding: '5px',
+          color: 'white',
+          border: 'none',
+          borderRadius: '3px 0px 0px 3px',
+          position: 'absolute',
+          top: '0',
+          left: '0',
+          height: '100%'
+        }}
+        {...attributes}
+        {...listeners}>
+        <FontAwesomeIcon icon={faArrowsUpDown} style={{ color: '#242424' }} />
+      </button>
     </div>
   );
 }
 
 AddNumber.propTypes = {
   labelValue: PropTypes.string.isRequired,
-  itemValue: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
-  onRemove: PropTypes.func.isRequired
+  onRemove: PropTypes.func.isRequired,
+  isRequired: PropTypes.bool.isRequired,
+  attributes: PropTypes.object.isRequired,
+  listeners: PropTypes.object.isRequired,
 };
 
 export default AddNumber;
