@@ -35,7 +35,7 @@ function AddNumber({ labelValue, onChange, onRemove, isRequired, attributes, lis
               <Form.Control
                 type="text"
                 className="check-item form-control element-name"
-                placeholder="Number Element"
+                placeholder="E.g. Enter your age"
                 value={labelValue}
                 onChange={onChange}
                 isInvalid={!labelValue.trim()}

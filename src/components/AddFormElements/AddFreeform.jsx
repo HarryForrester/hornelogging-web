@@ -23,7 +23,7 @@ function AddFreeform({ labelValue, isRequired, onChange, onRemove, attributes, l
                 id="freeform-label"
                 type="text"
                 className="check-item form-control element-name"
-                placeholder="Freeform Element"
+                placeholder="E.g. Enter your name"
                 value={labelValue}
                 onChange={onChange}
                 isInvalid={!labelValue.trim()}
