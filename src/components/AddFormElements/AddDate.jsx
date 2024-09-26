@@ -1,12 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Form, InputGroup, Button, Row, Col, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Form, Button, Row, Col, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faCalendar,
-  faMinusSquare,
-  faArrowsUpDown
-} from '@fortawesome/free-solid-svg-icons';
+import { faCalendar, faMinusSquare, faArrowsUpDown } from '@fortawesome/free-solid-svg-icons';
 
 function AddDate({ labelValue, onChange, onRemove, isRequired, attributes, listeners }) {
   return (
@@ -45,6 +41,8 @@ function AddDate({ labelValue, onChange, onRemove, isRequired, attributes, liste
                 checked={isRequired}
                 onChange={onChange}
                 className="mt-2"
+                aria-labelledby='required-checkbox'
+
               />
             </OverlayTrigger>
           </Col>
@@ -90,7 +88,6 @@ function AddDate({ labelValue, onChange, onRemove, isRequired, attributes, liste
 
 AddDate.propTypes = {
   labelValue: PropTypes.string.isRequired,
-  itemValue: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   onRemove: PropTypes.func.isRequired,
   isRequired: PropTypes.bool.isRequired,
