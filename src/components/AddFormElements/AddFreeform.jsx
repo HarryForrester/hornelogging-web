@@ -6,12 +6,13 @@ import { faFont, faMinusSquare, faArrowsUpDown } from '@fortawesome/free-solid-s
 
 function AddFreeform({ labelValue, isRequired, onChange, onRemove, attributes, listeners }) {
   return (
-    <div className="d-flex justify-content-between align-items-start position-relative">
-      <div
-        className="mb-3 px-3 element-container"
-        style={{ flexGrow: 1 }}>
+    <div className="d-flex justify-content-center align-items-center position-relative">
+      <div className="px-5 mt-2 mb-2 element-container" style={{ flexGrow: 1 }}>
         <Row className="align-items-center">
-          <Col xs="auto" className="d-flex align-items-center" style={{ minWidth: '120px' }}>
+          <Col
+            xs="auto"
+            className="d-flex justify-content-center align-items-center"
+            style={{ minWidth: '120px' }}>
             <FontAwesomeIcon icon={faFont} />
             <span className="ms-2">Text</span>
           </Col>
@@ -54,9 +55,14 @@ function AddFreeform({ labelValue, isRequired, onChange, onRemove, attributes, l
         onClick={onRemove}
         data-testid="remove-freeform"
         style={{
-          background: 'none',
-          color: 'red',
+          padding: '10px',
+          color: 'white',
           border: 'none',
+          borderRadius: '0px 3px 3px 0px',
+          position: 'absolute',
+          top: '0',
+          right: '0',
+          height: '100%'
         }}>
         <FontAwesomeIcon size="xl" icon={faMinusSquare} />
       </Button>
@@ -64,14 +70,14 @@ function AddFreeform({ labelValue, isRequired, onChange, onRemove, attributes, l
       <button
         style={{
           cursor: 'move',
-          padding: '10px',
+          padding: '5px',
           color: 'white',
           border: 'none',
-          borderRadius: '5px',
-          display: 'flex',
+          borderRadius: '3px 0px 0px 3px',
           position: 'absolute',
           top: '0',
           left: '0',
+          height: '100%'
         }}
         {...attributes}
         {...listeners}>

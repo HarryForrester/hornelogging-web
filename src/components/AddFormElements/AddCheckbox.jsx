@@ -61,9 +61,10 @@ function AddCheckbox({ labelValue, onChange, onRemove, attributes, listeners }) 
       </Button>
 
       <button
+      data-testid="move-button"
         style={{
           cursor: 'move',
-          padding: '10px',
+          padding: '5px',
           color: 'white',
           border: 'none',
           borderRadius: '3px 0px 0px 3px',
