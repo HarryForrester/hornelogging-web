@@ -500,6 +500,8 @@ const SortableFormElement = ({
             onRemove={() => handleRemoveElement(element.key)}
             onRemoveItem={handleRemoveItem}
             setFormElements={setFormElements}
+            attributes={attributes}
+            listeners={listeners}
           />
         );
       case 'list':
