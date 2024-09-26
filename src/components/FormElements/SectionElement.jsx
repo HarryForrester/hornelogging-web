@@ -412,6 +412,8 @@ const SortableFormElement = ({
             labelValue={element.label}
             onChange={(event) => handleElementChange(element.key, event)}
             onRemove={() => handleRemoveElement(element.key)}
+            attributes={attributes}
+            listeners={listeners}
           />
         );
       case 'freeform':
@@ -510,8 +512,6 @@ const SortableFormElement = ({
     transform: CSS.Transform.toString(transform),
     transition: transition ? `${transition}, opacity 0.2s ease-in-out` : 'opacity 0.2s ease-in-out',
     margin: isDragging ? '10px' : '20px',
-    paddingTop: '10px',
-    paddingLeft: '10px',
     backgroundColor: isDragging ? '#e6f7ff' : '#ffffff', // Highlight when dragging
     border: '1px solid #cccccc',
     borderRadius: '4px',

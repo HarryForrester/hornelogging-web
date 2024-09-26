@@ -2,41 +2,69 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Form, Button, Row, Col } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSquareCheck, faMinusSquare } from '@fortawesome/free-solid-svg-icons';
+import { faSquareCheck, faMinusSquare, faArrowsUpDown } from '@fortawesome/free-solid-svg-icons';
 
-function AddCheckbox({ labelValue, onChange, onRemove }) {
+function AddCheckbox({ labelValue, onChange, onRemove, attributes, listeners }) {
   return (
-    <div className="mb-3 px-3 element-container position-relative" style={{ paddingTop: '1.5rem' }}>
+    <div className="d-flex justify-content-center align-items-center position-relative">
+      <div className="px-5 mt-2 mb-2 element-container" style={{ flexGrow: 1 }}>
+        <Row className="align-items-center">
+          <Col xs="auto" className="d-flex justify-content-center align-items-center" style={{ minWidth: '120px' }}>
+            <FontAwesomeIcon icon={faSquareCheck} />
+            <span className="ms-2">Checkbox</span>
+          </Col>
+          <Col className="d-flex flex-column">
+            <Form.Group className="flex-grow-1">
+              <Form.Label>Enter Check Label</Form.Label>
+              <Form.Control
+                type="text"
+                className="check-item form-control element-name"
+                placeholder="E.g. I have read and understood the above"
+                value={labelValue}
+                onChange={onChange}
+                isInvalid={!labelValue}
+                required
+              />
+              <Form.Control.Feedback type="invalid">
+                Checkbox title is required
+              </Form.Control.Feedback>
+            </Form.Group>
+          </Col>
+        </Row>
+      </div>
       <Button
-        className="remove-check-btn btn btn-danger position-absolute"
+        className="remove-check-btn btn btn-danger"
         onClick={onRemove}
-        style={{ top: '0.5rem', right: '0.5rem', background: 'none', color: 'red', border: 'none' }}
-      >
-        <FontAwesomeIcon size="lg" icon={faMinusSquare} />
+        data-testid="remove-freeform"
+        style={{
+          padding: '10px',
+          color: 'white',
+          border: 'none',
+          borderRadius: '0px 3px 3px 0px',
+          position: 'absolute',
+          top: '0',
+          right: '0',
+          height: '100%',
+        }}>
+        <FontAwesomeIcon size="xl" icon={faMinusSquare} />
       </Button>
-      <Row className="align-items-center">
-        <Col xs="auto" className="d-flex align-items-center" style={{minWidth: '120px'}}>
-          <FontAwesomeIcon icon={faSquareCheck} />
-          <span className="ms-2">Checkbox</span>
-        </Col>
-        <Col className="d-flex flex-column">
-          <Form.Group className="flex-grow-1">
-            <Form.Label>Enter Check Label</Form.Label>
-            <Form.Control
-              type="text"
-              className="check-item form-control element-name"
-              placeholder="E.g. I have read and understood the above"
-              value={labelValue}
-              onChange={onChange}
-              isInvalid={!labelValue}
-              required
-            />
-            <Form.Control.Feedback type="invalid">
-              Checkbox title is required
-            </Form.Control.Feedback>
-          </Form.Group>
-        </Col>
-      </Row>
+
+      <button
+        style={{
+          cursor: 'move',
+          padding: '10px',
+          color: 'white',
+          border: 'none',
+          borderRadius: '3px 0px 0px 3px',
+          position: 'absolute',
+          top: '0',
+          left: '0',
+          height: '100%',
+        }}
+        {...attributes}
+        {...listeners}>
+        <FontAwesomeIcon icon={faArrowsUpDown} size="xl" style={{ color: '#242424' }} />
+      </button>
     </div>
   );
 }
@@ -45,6 +73,8 @@ AddCheckbox.propTypes = {
   labelValue: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
   onRemove: PropTypes.func.isRequired,
+  attributes: PropTypes.object,
+  listeners: PropTypes.object
 };
 
 export default AddCheckbox;
