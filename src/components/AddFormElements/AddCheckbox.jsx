@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Form, Button, Row, Col } from 'react-bootstrap';
+import { Form, Button, Row, Col, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSquareCheck, faMinusSquare, faArrowsUpDown } from '@fortawesome/free-solid-svg-icons';
 
@@ -60,23 +60,26 @@ function AddCheckbox({ labelValue, onChange, onRemove, attributes, listeners }) 
         <FontAwesomeIcon size="xl" icon={faMinusSquare} />
       </Button>
 
-      <button
-      data-testid="move-button"
-        style={{
-          cursor: 'move',
-          padding: '5px',
-          color: 'white',
-          border: 'none',
-          borderRadius: '3px 0px 0px 3px',
-          position: 'absolute',
-          top: '0',
-          left: '0',
-          height: '100%',
-        }}
-        {...attributes}
-        {...listeners}>
-        <FontAwesomeIcon icon={faArrowsUpDown} style={{ color: '#242424' }} />
-      </button>
+      <OverlayTrigger
+        placement="top"
+        overlay={<Tooltip id="tooltip-add-checkbox">Move Checkbox</Tooltip>}>
+        <button
+          style={{
+            cursor: 'move',
+            padding: '5px',
+            color: 'white',
+            border: 'none',
+            borderRadius: '3px 0px 0px 3px',
+            position: 'absolute',
+            top: '0',
+            left: '0',
+            height: '100%'
+          }}
+          {...attributes}
+          {...listeners}>
+          <FontAwesomeIcon icon={faArrowsUpDown} style={{ color: '#242424' }} />
+        </button>
+      </OverlayTrigger>
     </div>
   );
 }

@@ -83,22 +83,26 @@ function AddCrewList({ label, value, onChange, onRemove, isRequired, attributes,
         <FontAwesomeIcon size="xl" icon={faMinusSquare} />
       </Button>
 
-      <button
-        style={{
-          cursor: 'move',
-          padding: '5px',
-          color: 'white',
-          border: 'none',
-          borderRadius: '3px 0px 0px 3px',
-          position: 'absolute',
-          top: '0',
-          left: '0',
-          height: '100%'
-        }}
-        {...attributes}
-        {...listeners}>
-        <FontAwesomeIcon icon={faArrowsUpDown} style={{ color: '#242424' }} />
-      </button>
+      <OverlayTrigger
+        placement="top"
+        overlay={<Tooltip id="tooltip-add-checkbox">Move Crew List</Tooltip>}>
+        <button
+          style={{
+            cursor: 'move',
+            padding: '5px',
+            color: 'white',
+            border: 'none',
+            borderRadius: '3px 0px 0px 3px',
+            position: 'absolute',
+            top: '0',
+            left: '0',
+            height: '100%'
+          }}
+          {...attributes}
+          {...listeners}>
+          <FontAwesomeIcon icon={faArrowsUpDown} style={{ color: '#242424' }} />
+        </button>
+      </OverlayTrigger>
     </div>
   );
 }

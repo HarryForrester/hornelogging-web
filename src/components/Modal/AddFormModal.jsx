@@ -14,25 +14,29 @@ import {
   MouseSensor,
   TouchSensor,
   KeyboardSensor,
-  DragOverlay,
+  DragOverlay
 } from '@dnd-kit/core';
 import {
   SortableContext,
   verticalListSortingStrategy,
   arrayMove,
   useSortable,
-  sortableKeyboardCoordinates,
+  sortableKeyboardCoordinates
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
 import SectionElement from '../FormElements/SectionElement';
 import { useAlertMessage } from '../AlertMessage';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowsUpDown } from '@fortawesome/free-solid-svg-icons';
 
 const AddFormModal = ({ crews, isVisible, onClose, selectedForm, setForms, setCrews }) => {
-  const [formSections, setFormSections] = useState([{
-    sectionKey: `section_${Date.now()}`,
-    items: [],
-  }]);
+  const [formSections, setFormSections] = useState([
+    {
+      sectionKey: `section_${Date.now()}`,
+      items: []
+    }
+  ]);
   const [formTitle, setFormTitle] = useState('');
   const [validated, setValidated] = useState(false);
   const { setAlertMessageState } = useAlertMessage();
@@ -86,7 +90,7 @@ const AddFormModal = ({ crews, isVisible, onClose, selectedForm, setForms, setCr
       ...prevSections,
       {
         sectionKey: key,
-        items: [],
+        items: []
       }
     ]);
   };
@@ -191,7 +195,7 @@ const AddFormModal = ({ crews, isVisible, onClose, selectedForm, setForms, setCr
     useSensor(MouseSensor),
     useSensor(TouchSensor),
     useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
+      coordinateGetter: sortableKeyboardCoordinates
     })
   );
 
@@ -203,7 +207,9 @@ const AddFormModal = ({ crews, isVisible, onClose, selectedForm, setForms, setCr
       <Modal.Body>
         <Form noValidate validated={validated} onSubmit={handleSubmit} id="modal-form">
           <Form.Group>
+            <Form.Label htmlFor="form-title">Enter Form Title</Form.Label>
             <Form.Control
+              id="form-title"
               type="text"
               placeholder="E.g. Daily Safety Inspection"
               value={formTitle}
@@ -221,13 +227,18 @@ const AddFormModal = ({ crews, isVisible, onClose, selectedForm, setForms, setCr
             onDragEnd={(event) => {
               const { active, over } = event;
               if (over && active.id !== over.id) {
-                const oldIndex = formSections.findIndex((section) => section.sectionKey === active.id);
-                const newIndex = formSections.findIndex((section) => section.sectionKey === over.id);
+                const oldIndex = formSections.findIndex(
+                  (section) => section.sectionKey === active.id
+                );
+                const newIndex = formSections.findIndex(
+                  (section) => section.sectionKey === over.id
+                );
                 handleReorderSections(oldIndex, newIndex);
               }
-            }}
-          >
-            <SortableContext items={formSections.map((section) => section.sectionKey)} strategy={verticalListSortingStrategy}>
+            }}>
+            <SortableContext
+              items={formSections.map((section) => section.sectionKey)}
+              strategy={verticalListSortingStrategy}>
               {formSections.map((section, index) => (
                 <SortableSection
                   key={section.sectionKey}
@@ -243,9 +254,7 @@ const AddFormModal = ({ crews, isVisible, onClose, selectedForm, setForms, setCr
                 />
               ))}
             </SortableContext>
-            <DragOverlay>
-              {/* Render a drag overlay if needed */}
-            </DragOverlay>
+            <DragOverlay>{/* Render a drag overlay if needed */}</DragOverlay>
           </DndContext>
 
           <Form.Group>
@@ -265,34 +274,43 @@ const AddFormModal = ({ crews, isVisible, onClose, selectedForm, setForms, setCr
   );
 };
 
-const SortableSection = ({ id, section, crews, onAddSection, onRemoveSection, setFormSections, formSections }) => {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+const SortableSection = ({
+  id,
+  section,
+  crews,
+  onAddSection,
+  onRemoveSection,
+  setFormSections,
+  formSections
+}) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    padding: '10px',
     margin: '10px 0',
     backgroundColor: isDragging ? '#f0f8ff' : 'white', // Highlight when dragging
+    //borderBottom: isDragging ? '1px solid #ccc' : null,
     border: '1px solid #ccc',
-    borderRadius: '4px'
+    borderRadius: '10px',
+    height: isDragging ? '150px' : 'auto',
+    overflow: 'hidden',
+    position: 'relative'
   };
 
-  const handleStyle = {
-    cursor: 'move',
-    padding: '5px',
-    backgroundColor: '#007bff',
-    color: 'white',
-    border: 'none',
-    borderRadius: '4px',
-    marginBottom: '10px'
+  const fadeOutStyle = {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: '100px',
+    background: 'linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,1))'
   };
 
   return (
     <div ref={setNodeRef} style={style}>
-      <button style={handleStyle} {...attributes} {...listeners}>
-        Move Section
-      </button>
       <SectionElement
         sectionKey={section.sectionKey}
         crews={crews}
@@ -302,7 +320,10 @@ const SortableSection = ({ id, section, crews, onAddSection, onRemoveSection, se
         items={section.items}
         setFormSections={setFormSections}
         formSections={formSections}
+        attributes={attributes}
+        listeners={listeners}
       />
+      <div style={isDragging ? fadeOutStyle : null}></div>
     </div>
   );
 };

@@ -40,7 +40,8 @@ import {
   faSignature,
   faRectangleList,
   faPeopleGroup,
-  faArrowsUpDown
+  faArrowsUpDown,
+  faMinusSquare
 } from '@fortawesome/free-solid-svg-icons';
 const SectionElement = ({
   sectionKey,
@@ -51,7 +52,9 @@ const SectionElement = ({
   setFormElements,
   setFormSections,
   formSections,
-  sectionTitle
+  sectionTitle,
+  attributes,
+  listeners
 }) => {
   const sensors = useSensors(
     useSensor(MouseSensor),
@@ -229,14 +232,44 @@ const SectionElement = ({
       />
     ));
   };
-
+  const handleStyle = {
+    cursor: 'move',
+    padding: '5px',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    marginBottom: '10px'
+  };
   return (
-    <div className="section-container">
-      <div className="flex-grow-1" style={{ height: '25px', marginBottom: '25px' }}>
+    <section>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <OverlayTrigger
+          placement="top"
+          overlay={<Tooltip id="tooltip-add-checkbox">Move Section</Tooltip>}>
+          <button
+            style={{ ...handleStyle, width: '38px', height: '38px' }}
+            {...attributes}
+            {...listeners}>
+            <FontAwesomeIcon icon={faArrowsUpDown} style={{ color: '#242424' }} />
+          </button>
+        </OverlayTrigger>
+
+        <OverlayTrigger
+          placement="top"
+          overlay={<Tooltip id="tooltip-add-checkbox">Remove Section</Tooltip>}>
+          <button
+            className="btn btn-danger"
+            style={{ width: '38px', height: '38px' }}
+            onClick={() => onRemoveSection(sectionKey)}>
+            <FontAwesomeIcon icon={faMinusSquare} />
+          </button>
+        </OverlayTrigger>
+      </div>
+      <div className="flex-grow-1 px-4" style={{ height: '25px', marginBottom: '25px' }}>
         <Form.Control
           type="text"
           className="section-title form-control"
-          placeholder="Enter Section Name"
+          placeholder="E.g. Personal Information"
           value={sectionTitle}
           onChange={handleSectionTitleChange}
           isInvalid={!sectionTitle}
@@ -246,8 +279,6 @@ const SectionElement = ({
       </div>
       <br />
 
-
-
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext
           items={items.map((item) => item.key)}
@@ -256,14 +287,14 @@ const SectionElement = ({
         </SortableContext>
         <DragOverlay>{/* Render a drag overlay if needed */}</DragOverlay>
       </DndContext>
-      <div className="button-container">
+      <div className="button-container" style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
         <OverlayTrigger
           placement="top"
           overlay={<Tooltip id="tooltip-add-checkbox">Add Checkbox</Tooltip>}>
           <Button
             className="add-check-btn btn btn-outline-secondary"
             onClick={() => handleAddCheckbox('check')}
-            style={{ backgroundColor: 'transparent' }}>
+            style={{ backgroundColor: 'transparent', width: '48px', height: '48px' }}>
             <FontAwesomeIcon icon={faSquareCheck} style={{ color: '#242424' }} />
           </Button>
         </OverlayTrigger>
@@ -274,7 +305,7 @@ const SectionElement = ({
           <Button
             className="add-freeform-btn btn btn-secondary"
             onClick={() => handleAddElement('freeform')}
-            style={{ backgroundColor: 'transparent' }}>
+            style={{ backgroundColor: 'transparent', width: '48px', height: '48px' }}>
             <FontAwesomeIcon icon={faFont} style={{ color: '#242424' }} />
           </Button>
         </OverlayTrigger>
@@ -285,7 +316,7 @@ const SectionElement = ({
           <Button
             className="add-number-btn btn btn-secondary"
             onClick={() => handleAddElement('number')}
-            style={{ backgroundColor: 'transparent' }}>
+            style={{ backgroundColor: 'transparent', width: '48px', height: '48px' }}>
             <FontAwesomeIcon icon={faHashtag} style={{ color: '#242424' }} />
           </Button>
         </OverlayTrigger>
@@ -296,18 +327,18 @@ const SectionElement = ({
           <Button
             className="add-date-btn btn btn-secondary"
             onClick={() => handleAddElement('date')}
-            style={{ backgroundColor: 'transparent' }}>
+            style={{ backgroundColor: 'transparent', width: '48px', height: '48px' }}>
             <FontAwesomeIcon icon={faCalendarDays} style={{ color: '#242424' }} />
           </Button>
         </OverlayTrigger>
 
         <OverlayTrigger
           placement="top"
-          overlay={<Tooltip id="tooltip-add-checkbox">Add Date</Tooltip>}>
+          overlay={<Tooltip id="tooltip-add-checkbox">Add Time</Tooltip>}>
           <Button
             className="add-time-btn btn btn-secondary"
             onClick={() => handleAddElement('time')}
-            style={{ backgroundColor: 'transparent' }}>
+            style={{ backgroundColor: 'transparent', width: '48px', height: '48px' }}>
             <FontAwesomeIcon icon={faClock} style={{ color: '#242424' }} />
           </Button>
         </OverlayTrigger>
@@ -318,7 +349,7 @@ const SectionElement = ({
           <Button
             className="add-image-btn btn btn-secondary"
             onClick={() => handleAddElement('image')}
-            style={{ backgroundColor: 'transparent' }}>
+            style={{ backgroundColor: 'transparent', width: '48px', height: '48px' }}>
             <FontAwesomeIcon icon={faImage} style={{ color: '#242424' }} />
           </Button>
         </OverlayTrigger>
@@ -329,7 +360,7 @@ const SectionElement = ({
           <Button
             className="add-signature-btn btn btn-secondary"
             onClick={() => handleAddElement('signature')}
-            style={{ backgroundColor: 'transparent' }}>
+            style={{ backgroundColor: 'transparent', width: '48px', height: '48px' }}>
             <FontAwesomeIcon icon={faSignature} style={{ color: '#242424' }} />
           </Button>
         </OverlayTrigger>
@@ -340,7 +371,7 @@ const SectionElement = ({
           <Button
             className="add-selectlist-btn btn btn-secondary"
             onClick={() => handleAddSelectlistElement('selectlist')}
-            style={{ backgroundColor: 'transparent' }}>
+            style={{ backgroundColor: 'transparent', width: '48px', height: '48px' }}>
             <FontAwesomeIcon icon={faRectangleList} style={{ color: '#242424' }} />
           </Button>
         </OverlayTrigger>
@@ -352,7 +383,12 @@ const SectionElement = ({
             <Dropdown.Toggle
               variant="secondary"
               id="dropdown-crew-list"
-              style={{ backgroundColor: 'transparent', color: 'black' }}>
+              style={{
+                backgroundColor: 'transparent',
+                color: 'black',
+                width: '48px',
+                height: '48px'
+              }}>
               <FontAwesomeIcon icon={faPeopleGroup} style={{ color: '#242424' }} />
             </Dropdown.Toggle>
             <Dropdown.Menu>
@@ -374,17 +410,7 @@ const SectionElement = ({
         </OverlayTrigger>
       </div>
       <div className="dropdown-form-designer-crew">{/* Dropdown Form Designer Crew content */}</div>
-
-      <br />
-      <div className="mt-3 remove-section-btn">
-        <Button
-          className="remove-section-btn btn btn-danger"
-          onClick={() => onRemoveSection(sectionKey)}>
-          Remove Section
-        </Button>
-      </div>
-      <br />
-    </div>
+    </section>
   );
 };
 
@@ -403,7 +429,7 @@ const SortableFormElement = ({
   });
 
   const renderElement = () => {
-    console.log('element', element);    
+    console.log('element', element);
     switch (element.type) {
       case 'check':
         return (
@@ -534,7 +560,7 @@ const SortableFormElement = ({
 
   return (
     <div ref={setNodeRef} style={style}>
-        {renderElement(attributes, listeners)}
+      {renderElement(attributes, listeners)}
     </div>
   );
 };
@@ -548,7 +574,9 @@ SectionElement.propTypes = {
   setFormElements: PropTypes.func.isRequired,
   formSections: PropTypes.array.isRequired,
   setFormSections: PropTypes.func.isRequired,
-  sectionTitle: PropTypes.string.isRequired
+  sectionTitle: PropTypes.string.isRequired,
+  attributes: PropTypes.object,
+  listeners: PropTypes.object
 };
 
 SortableFormElement.propTypes = {

@@ -54,7 +54,7 @@ function AddNumber({ labelValue, onChange, onRemove, isRequired, attributes, lis
                 checked={isRequired}
                 onChange={onChange}
                 className="mt-2"
-                aria-labelledby='required-checkbox'
+                aria-labelledby="required-checkbox"
               />
             </OverlayTrigger>
           </Col>
@@ -78,22 +78,26 @@ function AddNumber({ labelValue, onChange, onRemove, isRequired, attributes, lis
         <FontAwesomeIcon size="xl" icon={faMinusSquare} />
       </Button>
 
-      <button
-        style={{
-          cursor: 'move',
-          padding: '5px',
-          color: 'white',
-          border: 'none',
-          borderRadius: '3px 0px 0px 3px',
-          position: 'absolute',
-          top: '0',
-          left: '0',
-          height: '100%'
-        }}
-        {...attributes}
-        {...listeners}>
-        <FontAwesomeIcon icon={faArrowsUpDown} style={{ color: '#242424' }} />
-      </button>
+      <OverlayTrigger
+        placement="top"
+        overlay={<Tooltip id="tooltip-add-checkbox">Move Number</Tooltip>}>
+        <button
+          style={{
+            cursor: 'move',
+            padding: '5px',
+            color: 'white',
+            border: 'none',
+            borderRadius: '3px 0px 0px 3px',
+            position: 'absolute',
+            top: '0',
+            left: '0',
+            height: '100%'
+          }}
+          {...attributes}
+          {...listeners}>
+          <FontAwesomeIcon icon={faArrowsUpDown} style={{ color: '#242424' }} />
+        </button>
+      </OverlayTrigger>
     </div>
   );
 }
@@ -104,7 +108,7 @@ AddNumber.propTypes = {
   onRemove: PropTypes.func.isRequired,
   isRequired: PropTypes.bool.isRequired,
   attributes: PropTypes.object.isRequired,
-  listeners: PropTypes.object.isRequired,
+  listeners: PropTypes.object.isRequired
 };
 
 export default AddNumber;
