@@ -237,7 +237,7 @@ const SectionElement = ({
     padding: '5px',
     color: 'white',
     border: 'none',
-    borderRadius: '4px',
+    borderRadius: '4px 0px 4px 0px',
     marginBottom: '10px'
   };
   return (
@@ -259,13 +259,14 @@ const SectionElement = ({
           overlay={<Tooltip id="tooltip-add-checkbox">Remove Section</Tooltip>}>
           <button
             className="btn btn-danger"
-            style={{ width: '38px', height: '38px' }}
+            style={{ width: '38px', height: '38px', borderRadius: '0px 4px 0px 4px' }}
             onClick={() => onRemoveSection(sectionKey)}>
             <FontAwesomeIcon icon={faMinusSquare} />
           </button>
         </OverlayTrigger>
       </div>
-      <div className="flex-grow-1 px-4" style={{ height: '25px', marginBottom: '25px' }}>
+      <div className="flex-grow-1 px-4" style={{ height: '25px', marginBottom: '45px' }}>
+        <Form.Label htmlFor="section-title">Enter Section Title</Form.Label>
         <Form.Control
           type="text"
           className="section-title form-control"

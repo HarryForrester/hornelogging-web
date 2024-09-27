@@ -66,12 +66,15 @@ function AddCrewList({ label, value, onChange, onRemove, isRequired, attributes,
         </Row>
       </div>
 
-      <Button
+      <OverlayTrigger
+        placement="top"
+        overlay={<Tooltip id="tooltip-add-checkbox">Remove Crew List</Tooltip>}>
+        <Button
         className="remove-check-btn btn btn-danger"
         onClick={onRemove}
         data-testid="remove-freeform"
         style={{
-          padding: '10px',
+          padding: '5px',
           color: 'white',
           border: 'none',
           borderRadius: '0px 3px 3px 0px',
@@ -80,8 +83,9 @@ function AddCrewList({ label, value, onChange, onRemove, isRequired, attributes,
           right: '0',
           height: '100%'
         }}>
-        <FontAwesomeIcon size="xl" icon={faMinusSquare} />
+        <FontAwesomeIcon icon={faMinusSquare} />
       </Button>
+      </OverlayTrigger>
 
       <OverlayTrigger
         placement="top"

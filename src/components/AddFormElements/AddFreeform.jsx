@@ -50,22 +50,26 @@ function AddFreeform({ labelValue, isRequired, onChange, onRemove, attributes, l
         </Row>
       </div>
 
-      <Button
-        className="remove-check-btn btn btn-danger"
-        onClick={onRemove}
-        data-testid="remove-freeform"
-        style={{
-          padding: '10px',
-          color: 'white',
-          border: 'none',
-          borderRadius: '0px 3px 3px 0px',
-          position: 'absolute',
-          top: '0',
-          right: '0',
-          height: '100%'
-        }}>
-        <FontAwesomeIcon size="xl" icon={faMinusSquare} />
-      </Button>
+      <OverlayTrigger
+        placement="top"
+        overlay={<Tooltip id="tooltip-add-checkbox">Remove Text</Tooltip>}>
+        <Button
+          className="remove-check-btn btn btn-danger"
+          onClick={onRemove}
+          data-testid="remove-freeform"
+          style={{
+            padding: '5px',
+            color: 'white',
+            border: 'none',
+            borderRadius: '0px 3px 3px 0px',
+            position: 'absolute',
+            top: '0',
+            right: '0',
+            height: '100%'
+          }}>
+          <FontAwesomeIcon icon={faMinusSquare} />
+        </Button>
+      </OverlayTrigger>
 
       <OverlayTrigger
         placement="top"
