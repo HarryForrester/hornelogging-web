@@ -77,13 +77,13 @@ const SectionElement = ({
 
   const handleAddCheckbox = (elementType) => {
     const key = `${elementType}_${Date.now()}`;
-    const newSection = { key, type: elementType, label: '', checked: false, order: items.length + 1 };
+    const newSection = { key, type: elementType, label: '', checked: false };
     onAddSection(sectionKey, newSection);
   };
 
   const handleAddElement = (elementType) => {
     const key = `${elementType}_${Date.now()}`;
-    const newSection = { key, type: elementType, label: '', value: '', order: items.length + 1, isRequired: false };
+    const newSection = { key, type: elementType, label: '', value: '', isRequired: false };
     onAddSection(sectionKey, newSection);
   };
 

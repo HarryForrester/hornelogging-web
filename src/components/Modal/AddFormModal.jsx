@@ -29,7 +29,10 @@ import SectionElement from '../FormElements/SectionElement';
 import { useAlertMessage } from '../AlertMessage';
 
 const AddFormModal = ({ crews, isVisible, onClose, selectedForm, setForms, setCrews }) => {
-  const [formSections, setFormSections] = useState([]);
+  const [formSections, setFormSections] = useState([{
+    sectionKey: `section_${Date.now()}`,
+    items: [],
+  }]);
   const [formTitle, setFormTitle] = useState('');
   const [validated, setValidated] = useState(false);
   const { setAlertMessageState } = useAlertMessage();
@@ -84,7 +87,6 @@ const AddFormModal = ({ crews, isVisible, onClose, selectedForm, setForms, setCr
       {
         sectionKey: key,
         items: [],
-        order: prevSections.length + 1
       }
     ]);
   };
@@ -203,7 +205,7 @@ const AddFormModal = ({ crews, isVisible, onClose, selectedForm, setForms, setCr
           <Form.Group>
             <Form.Control
               type="text"
-              placeholder="Enter Form Name"
+              placeholder="E.g. Daily Safety Inspection"
               value={formTitle}
               style={{ marginBottom: '15px' }}
               onChange={(e) => handleFormTitleChange(e)}
