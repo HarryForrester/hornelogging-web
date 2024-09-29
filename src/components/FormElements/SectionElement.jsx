@@ -463,6 +463,7 @@ const SortableFormElement = ({
             value={element.value}
             onChange={(event) => handleElementChange(element.key, event)}
             onRemove={() => handleRemoveElement(element.key)}
+            isRequired={element.isRequired}
             attributes={attributes}
             listeners={listeners}
           />
@@ -475,6 +476,7 @@ const SortableFormElement = ({
             date={element.value}
             onChange={(event) => handleElementChange(element.key, event)}
             onRemove={() => handleRemoveElement(element.key)}
+            isRequired={element.isRequired}
             attributes={attributes}
             listeners={listeners}
           />
@@ -487,6 +489,7 @@ const SortableFormElement = ({
             date={element.value}
             onChange={(event) => handleElementChange(element.key, event)}
             onRemove={() => handleRemoveElement(element.key)}
+            isRequired={element.isRequired}
             attributes={attributes}
             listeners={listeners}
           />
@@ -499,6 +502,7 @@ const SortableFormElement = ({
             date={element.value}
             onChange={(event) => handleElementChange(element.key, event)}
             onRemove={() => handleRemoveElement(element.key)}
+            isRequired={element.isRequired}
             attributes={attributes}
             listeners={listeners}
           />
@@ -511,6 +515,7 @@ const SortableFormElement = ({
             date={element.value}
             onChange={(event) => handleElementChange(element.key, event)}
             onRemove={() => handleRemoveElement(element.key)}
+            isRequired={element.isRequired}
             attributes={attributes}
             listeners={listeners}
           />
@@ -527,6 +532,7 @@ const SortableFormElement = ({
             onRemove={() => handleRemoveElement(element.key)}
             onRemoveItem={handleRemoveItem}
             setFormElements={setFormElements}
+            isRequired={element.isRequired}
             attributes={attributes}
             listeners={listeners}
           />
@@ -540,6 +546,7 @@ const SortableFormElement = ({
             crew={element.crew}
             onChange={(event) => handleElementChange(element.key, event)}
             onRemove={() => handleRemoveElement(element.key)}
+            isRequired={element.isRequired}
             attributes={attributes}
             listeners={listeners}
           />

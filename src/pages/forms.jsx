@@ -24,7 +24,7 @@ const Forms = () => {
   const [isFilledFormsModalVisible, setFilledFormsModalVisible] = useState(false);
   const [isTimeSheetModalVisible, setTimeSheetModalVisible] = useState(false);
   const [selectedFormId, setSelectedFormId] = useState(null);
-  const { alertMessageState, setAlertMessageState } = useAlertMessage();
+  const { addToast } = useAlertMessage();
   const [showSpinner, setShowSpinner] = useState(false); // shows spinner while submitting to server
 
   const handleShowTimeSheetModal = () => setTimeSheetModalVisible(true);
@@ -69,38 +69,12 @@ const Forms = () => {
       .then((response) => {
         console.log(response.data.message);
         // If needed, handle successful response
-        setAlertMessageState((prevState) => ({
-          ...prevState,
-          toasts: [
-            ...prevState.toasts,
-            {
-              id: id,
-              heading: 'Form Position Updated',
-              show: true,
-              message: `Success! Form position has been updated`,
-              background: 'success',
-              color: 'white'
-            }
-          ]
-        }));
+        addToast('Form Position Updated', `Success! Form position has been updated`, 'success', 'white');
       })
       .catch((error) => {
         console.error('Failed to update document positions:', error);
         // If needed, handle error
-        setAlertMessageState((prevState) => ({
-          ...prevState,
-          toasts: [
-            ...prevState.toasts,
-            {
-              id: id,
-              heading: 'Error: Form Position Update',
-              show: true,
-              message: `Success! Form position could not be updated, Please try again`,
-              background: 'success',
-              color: 'white'
-            }
-          ]
-        }));
+        addToast('Error: Form Position Update', `Success! Form position could not be updated, Please try again`, 'success', 'white');
       });
   };
   const confirmDeleteFormTemplate = (id) => {
@@ -122,51 +96,19 @@ const Forms = () => {
         setCrews(response.data.crew);
         setForms(response.data.forms);
 
-        setAlertMessageState((prevState) => ({
-          ...prevState,
-          toasts: [
-            ...prevState.toasts,
-            {
-              id: id,
-              heading: 'Form Removed',
-              show: true,
-              message: `Success! Form has been deleted`,
-              background: 'success',
-              color: 'white'
-            }
-          ]
-        }));
+        addToast('Form Removed', `Success! Form has been deleted`, 'success', 'white');
       }
     } catch (error) {
-      setAlertMessageState((prevState) => ({
-        ...prevState,
-        toasts: [
-          ...prevState.toasts,
-          {
-            id: id,
-            heading: 'Remove Form',
-            show: true,
-            message: `Error! An error has occured while removing form. Please try again.`,
-            background: 'danger',
-            color: 'white'
-          }
-        ]
-      }));
+      addToast('Remove Form', `Error! An error has occured while removing form. Please try again.`, 'danger', 'white');
       console.error('An error occurred while deleting form');
     } finally {
       setShowSpinner(false);
 
-      setTimeout(() => {
-        setAlertMessageState((prevState) => ({
-          ...prevState,
-          toasts: prevState.toasts.filter((toast) => toast.id !== id)
-        }));
-      }, 10000);
+      
     }
   };
 
   const openEditFormModal = (form) => {
-    console.log('formy my cuntL :m', form);
     setCreateFormModalVisible(true);
     setSelectedForm(form);
   };

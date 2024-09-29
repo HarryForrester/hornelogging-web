@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFont, faMinusSquare, faArrowsUpDown } from '@fortawesome/free-solid-svg-icons';
 
 function AddFreeform({ labelValue, isRequired, onChange, onRemove, attributes, listeners }) {
+  console.log('AddFreeform', isRequired);
   return (
     <div className="d-flex justify-content-center align-items-center position-relative">
       <div className="px-5 mt-2 mb-2 element-container" style={{ flexGrow: 1 }}>

@@ -28,7 +28,7 @@ import { CSS } from '@dnd-kit/utilities';
 import SectionElement from '../FormElements/SectionElement';
 import { useAlertMessage } from '../AlertMessage';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowsUpDown } from '@fortawesome/free-solid-svg-icons';
+import { faArrowsUpDown, faPlusSquare } from '@fortawesome/free-solid-svg-icons';
 
 const AddFormModal = ({ crews, isVisible, onClose, selectedForm, setForms, setCrews }) => {
   const [formSections, setFormSections] = useState([
@@ -39,7 +39,7 @@ const AddFormModal = ({ crews, isVisible, onClose, selectedForm, setForms, setCr
   ]);
   const [formTitle, setFormTitle] = useState('');
   const [validated, setValidated] = useState(false);
-  const { setAlertMessageState } = useAlertMessage();
+  const { addToast } = useAlertMessage();
 
   const schema = yup.object().shape({
     formTitle: yup.string().required()
@@ -62,12 +62,13 @@ const AddFormModal = ({ crews, isVisible, onClose, selectedForm, setForms, setCr
             sectionKey: `section_${uuidv4()}`,
             title: sectionData.title,
             items: sectionData.items.map((item) => {
-              const formElement = {
+                const formElement = {
                 key: `item_${uuidv4()}`,
                 type: item.type,
                 label: item.label,
-                value: item.value
-              };
+                value: item.value,
+                isRequired: item.isRequired || false
+                };
               if (item.type === 'selectlist') {
                 formElement.items = item.items || [];
               }
@@ -149,6 +150,7 @@ const AddFormModal = ({ crews, isVisible, onClose, selectedForm, setForms, setCr
         sections: formSections
       };
       try {
+        console.log('data', data);
         const response = await axios.post('http://localhost:3001/submit-form', data, {
           withCredentials: true
         });
@@ -156,36 +158,15 @@ const AddFormModal = ({ crews, isVisible, onClose, selectedForm, setForms, setCr
           setCrews(response.data.crew);
           setForms(response.data.forms);
           handleClose();
-          setAlertMessageState((prevState) => ({
-            ...prevState,
-            toasts: [
-              ...prevState.toasts,
-              {
-                id: id,
-                heading: data.id === '' ? 'Form Added' : 'Form Updated',
-                show: true,
-                message: `Success! Form has been ${data.id === '' ? 'added' : 'updated'}`,
-                background: 'success',
-                color: 'white'
-              }
-            ]
-          }));
+          addToast(
+            data.id === '' ? 'Form Added' : 'Form Updated',
+            `Success! ${data.title} has been ${data.id === '' ? 'added' : 'updated'}`,
+            'success',
+            'white'
+          );
         }
       } catch (error) {
-        setAlertMessageState((prevState) => ({
-          ...prevState,
-          toasts: [
-            ...prevState.toasts,
-            {
-              id: id,
-              heading: 'Form Added/Updated',
-              show: true,
-              message: `Error! An error has occured while adding/updating form. Please try again.`,
-              background: 'danger',
-              color: 'white'
-            }
-          ]
-        }));
+        addToast('Form Added/Updated', `Error! An error has occured while adding/updating form. Please try again.`, 'danger', 'white');
         console.error('An error has occured submitting form', error);
       }
     }
@@ -258,7 +239,9 @@ const AddFormModal = ({ crews, isVisible, onClose, selectedForm, setForms, setCr
           </DndContext>
 
           <Form.Group>
-            <Button onClick={handleAddElement}>Add new section</Button>
+            <Button onClick={handleAddElement}>
+              <FontAwesomeIcon icon={faPlusSquare} /> Add Section
+            </Button>
           </Form.Group>
         </Form>
       </Modal.Body>
