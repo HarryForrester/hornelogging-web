@@ -137,13 +137,13 @@ const SectionElement = ({
 
   const handleAddCrewListElement = (elementType, crew) => {
     const key = `${elementType}_${Date.now()}`;
-    const newSection = { key, type: elementType, label: '', value: crew };
+    const newSection = { key, type: elementType, label: '', value: crew , isRequired: false };
     onAddSection(sectionKey, newSection);
   };
 
   const handleAddSelectlistElement = (elementType) => {
     const key = `${elementType}_${Date.now()}`;
-    const newSection = { type: elementType, key, label: '', items: [''], value: '' };
+    const newSection = { type: elementType, key, label: '', items: [''], value: '', isRequired: false };
     onAddSection(sectionKey, newSection);
   };
 
@@ -241,7 +241,7 @@ const SectionElement = ({
     marginBottom: '10px'
   };
   return (
-    <section>
+    <section key={sectionKey}>
       <div style={{ display: 'flex', justifyContent: 'space-between' }}>
         <OverlayTrigger
           placement="top"
@@ -259,6 +259,7 @@ const SectionElement = ({
           overlay={<Tooltip id="tooltip-add-checkbox">Remove Section</Tooltip>}>
           <button
             className="btn btn-danger"
+            data-testid="remove-section"
             style={{ width: '38px', height: '38px', borderRadius: '0px 4px 0px 4px' }}
             onClick={() => onRemoveSection(sectionKey)}>
             <FontAwesomeIcon icon={faMinusSquare} />
@@ -268,6 +269,7 @@ const SectionElement = ({
       <div className="flex-grow-1 px-4" style={{ height: '25px', marginBottom: '45px' }}>
         <Form.Label htmlFor="section-title">Enter Section Title</Form.Label>
         <Form.Control
+          id='section-title'
           type="text"
           className="section-title form-control"
           placeholder="E.g. Personal Information"
@@ -293,6 +295,7 @@ const SectionElement = ({
           placement="top"
           overlay={<Tooltip id="tooltip-add-checkbox">Add Checkbox</Tooltip>}>
           <Button
+            data-testid="add-checkbox"
             className="add-check-btn btn btn-outline-secondary"
             onClick={() => handleAddCheckbox('check')}
             style={{ backgroundColor: 'transparent', width: '48px', height: '48px' }}>
@@ -305,6 +308,7 @@ const SectionElement = ({
           overlay={<Tooltip id="tooltip-add-checkbox">Add Text</Tooltip>}>
           <Button
             className="add-freeform-btn btn btn-secondary"
+            data-testid="add-freeform"
             onClick={() => handleAddElement('freeform')}
             style={{ backgroundColor: 'transparent', width: '48px', height: '48px' }}>
             <FontAwesomeIcon icon={faFont} style={{ color: '#242424' }} />
@@ -316,6 +320,7 @@ const SectionElement = ({
           overlay={<Tooltip id="tooltip-add-checkbox">Add Number</Tooltip>}>
           <Button
             className="add-number-btn btn btn-secondary"
+            data-testid="add-number"
             onClick={() => handleAddElement('number')}
             style={{ backgroundColor: 'transparent', width: '48px', height: '48px' }}>
             <FontAwesomeIcon icon={faHashtag} style={{ color: '#242424' }} />
@@ -327,6 +332,7 @@ const SectionElement = ({
           overlay={<Tooltip id="tooltip-add-checkbox">Add Date</Tooltip>}>
           <Button
             className="add-date-btn btn btn-secondary"
+            data-testid="add-date"
             onClick={() => handleAddElement('date')}
             style={{ backgroundColor: 'transparent', width: '48px', height: '48px' }}>
             <FontAwesomeIcon icon={faCalendarDays} style={{ color: '#242424' }} />
@@ -338,6 +344,7 @@ const SectionElement = ({
           overlay={<Tooltip id="tooltip-add-checkbox">Add Time</Tooltip>}>
           <Button
             className="add-time-btn btn btn-secondary"
+            data-testid="add-time"
             onClick={() => handleAddElement('time')}
             style={{ backgroundColor: 'transparent', width: '48px', height: '48px' }}>
             <FontAwesomeIcon icon={faClock} style={{ color: '#242424' }} />
@@ -349,6 +356,7 @@ const SectionElement = ({
           overlay={<Tooltip id="tooltip-add-checkbox">Add Image</Tooltip>}>
           <Button
             className="add-image-btn btn btn-secondary"
+            data-testid="add-image"
             onClick={() => handleAddElement('image')}
             style={{ backgroundColor: 'transparent', width: '48px', height: '48px' }}>
             <FontAwesomeIcon icon={faImage} style={{ color: '#242424' }} />
@@ -360,6 +368,7 @@ const SectionElement = ({
           overlay={<Tooltip id="tooltip-add-checkbox">Add Signature</Tooltip>}>
           <Button
             className="add-signature-btn btn btn-secondary"
+            data-testid="add-signature"
             onClick={() => handleAddElement('signature')}
             style={{ backgroundColor: 'transparent', width: '48px', height: '48px' }}>
             <FontAwesomeIcon icon={faSignature} style={{ color: '#242424' }} />
@@ -371,6 +380,7 @@ const SectionElement = ({
           overlay={<Tooltip id="tooltip-add-checkbox">Add Select List</Tooltip>}>
           <Button
             className="add-selectlist-btn btn btn-secondary"
+            data-testid="add-selectlist"
             onClick={() => handleAddSelectlistElement('selectlist')}
             style={{ backgroundColor: 'transparent', width: '48px', height: '48px' }}>
             <FontAwesomeIcon icon={faRectangleList} style={{ color: '#242424' }} />
@@ -384,6 +394,7 @@ const SectionElement = ({
             <Dropdown.Toggle
               variant="secondary"
               id="dropdown-crew-list"
+              data-testid="add-crew-list"
               style={{
                 backgroundColor: 'transparent',
                 color: 'black',
@@ -397,6 +408,7 @@ const SectionElement = ({
                 <Dropdown.Item
                   key={index}
                   className="crew-item"
+                  data-testid={`crew-item-${crewMember.name}`}
                   onClick={() => handleAddCrewListElement('list', crewMember.name)}>
                   {crewMember.name}
                 </Dropdown.Item>

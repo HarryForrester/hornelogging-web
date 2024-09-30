@@ -87,6 +87,8 @@ const AddFormModal = ({ crews, isVisible, onClose, selectedForm, setForms, setCr
 
   const handleAddElement = () => {
     const key = `section_${Date.now()}`;
+    console.log('handleAddElement', key);
+
     setFormSections((prevSections) => [
       ...prevSections,
       {

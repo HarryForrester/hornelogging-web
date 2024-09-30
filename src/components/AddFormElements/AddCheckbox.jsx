@@ -26,8 +26,10 @@ function AddCheckbox({ labelValue, onChange, onRemove, attributes, listeners }) 
           </Col>
           <Col className="d-flex flex-column">
             <Form.Group className="flex-grow-1">
-              <Form.Label>Enter Check Label</Form.Label>
+              <Form.Label htmlFor='check-label'>Enter Check Label</Form.Label>
               <Form.Control
+                id="check-label"
+                data-testid="check-label"
                 type="text"
                 className="check-item form-control element-name"
                 placeholder="E.g. I have read and understood the above"
